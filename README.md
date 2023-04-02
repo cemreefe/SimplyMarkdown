@@ -1,6 +1,10 @@
 # SimplyMarkdown
 
-SimplyMarkdown is a simple markdown to html website renderer.
+Welcome to SimplyMarkdown, the simplest framework for creating websites from your Markdown files! With SimplyMarkdown, you can easily and quickly turn your directory of Markdown files into a stunning website without having to deal with any complicated configurations or bloated features.
+
+As a solo developer who enjoys creating fun and easy-to-use tools in my free time, I wanted to make something that was both lightweight and effective. And that's exactly what SimplyMarkdown is all about! It's a simple and straightforward framework that lets you focus on your content, not the technical details.
+
+So whether you're a blogger, writer, or just someone who wants to share their thoughts and ideas with the world, SimplyMarkdown has got you covered. With its intuitive interface and easy-to-use features, you'll be up and running in no time!
 
 # Setup
 
@@ -63,3 +67,11 @@ Templates are html files that you supply to set the style of your website's page
 ```
 
 Where the `{{ navbar }}` is going to be replaced by the rendered `navbar.md` and `{{ content }}` will be replaced by the rendered markdown files specific to pages.
+
+## Special Tags
+
+I have introduced the `%` tag for easier rendering in SimplyMarkdown. If you use 
+```
+% <directory>`
+```
+SimplyMarkdown will render a list of links to all files under that directory. You can see an example usage in the `blog.md` file in `example/input/blog`.
