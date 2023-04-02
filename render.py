@@ -1,6 +1,8 @@
 import sys
 import os
+import re
 import markdown
+import shutil
 from jinja2 import Environment, FileSystemLoader
 from markdown.extensions import Extension
 from markdown.inlinepatterns import Pattern
@@ -8,6 +10,7 @@ from markdown.util import etree
 
 # get directory path from command line argument
 directory = sys.argv[1]
+default_title = sys.argv[2] if len(sys.argv) > 2 else 'SimplyMarkdown'
 
 # set up Jinja2 environment to load templates
 env = Environment(loader=FileSystemLoader('templates'))
@@ -70,22 +73,34 @@ def render_folder(directory, output_dir):
         if filename == "navbar.md":
             pass
         # check if the file is a markdown file
-        if filename.endswith('.md'):
+        elif filename.endswith('.md'):
             # read in the markdown file contents
             with open(os.path.join(directory, filename), 'r') as f:
                 markdown_content = f.read()
+
+            title = re.search(r'#\s*(.*)', markdown_content)
+            title = title.groups(0)[0] if title else default_title
             
             # convert the markdown to HTML using the Python-Markdown library
             html_content = markdown.markdown(markdown_content, extensions=['markdown.extensions.extra', 'markdown.extensions.toc', SubdirLinkExtension(directory)])
             
             # use Jinja2 to render the HTML content using a template
             template = env.get_template('base.html')
-            rendered_html = template.render(content=html_content, navbar=navbar_html)
+            rendered_html = template.render(content=html_content, navbar=navbar_html, title=title)
             
             # write out the rendered HTML to a new file in the output directory
             with open(os.path.join(output_dir, os.path.splitext(filename)[0] + '.html'), 'w') as f:
                 f.write(rendered_html)
-        if os.path.isdir(os.path.join(directory, filename)):
+        # if another directory, recursively call render
+        elif os.path.isdir(os.path.join(directory, filename)):
             render_folder(os.path.join(directory, filename), os.path.join(output_dir, filename))
 
+def copy_static():
+    static_dir = os.path.join(directory, 'static')
+    output_static_dir = os.path.join(output_dir, 'static')
+    if not os.path.exists(output_static_dir):
+        os.makedirs(output_static_dir)
+    shutil.copytree(static_dir, output_static_dir, dirs_exist_ok = True)
+
 render_folder(directory, output_dir)
+copy_static()
