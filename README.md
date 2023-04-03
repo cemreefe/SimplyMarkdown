@@ -1,4 +1,4 @@
-# SimplyMarkdown
+# SimplyMarkdown - Convert your Markdown into a Website
 
 Welcome to SimplyMarkdown, the simplest framework for creating websites from your Markdown files! With SimplyMarkdown, you can easily and quickly turn your directory of Markdown files into a stunning website without having to deal with any complicated configurations or bloated features.
 
