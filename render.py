@@ -64,6 +64,11 @@ with open(os.path.join(directory, 'navbar.md'), 'r') as f:
     navbar_markdown = f.read()
 navbar_html = markdown.markdown(navbar_markdown, extensions=['markdown.extensions.extra', 'markdown.extensions.toc', SubdirLinkExtension(directory)])
 
+# read in the footer file and convert it to HTML
+with open(os.path.join(directory, 'footer.md'), 'r') as f:
+    footer_markdown = f.read()
+footer_html = markdown.markdown(footer_markdown, extensions=['markdown.extensions.extra', 'markdown.extensions.toc', SubdirLinkExtension(directory)])
+
 def render_folder(directory, output_dir):
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
@@ -71,6 +76,8 @@ def render_folder(directory, output_dir):
     for filename in os.listdir(directory):
         # don't render navbar in a separate html file
         if filename == "navbar.md":
+            pass
+        if filename == "footer.md":
             pass
         # check if the file is a markdown file
         elif filename.endswith('.md'):
@@ -86,7 +93,7 @@ def render_folder(directory, output_dir):
             
             # use Jinja2 to render the HTML content using a template
             template = env.get_template('base.html')
-            rendered_html = template.render(content=html_content, navbar=navbar_html, title=title)
+            rendered_html = template.render(content=html_content, navbar=navbar_html, footer=footer_html, title=title)
             
             # write out the rendered HTML to a new file in the output directory
             with open(os.path.join(output_dir, os.path.splitext(filename)[0] + '.html'), 'w') as f:

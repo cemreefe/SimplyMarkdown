@@ -5,9 +5,14 @@
   padding: 0;
 }
 
+html {
+  height: 100%;
+}
+
 /* Set body background color */
 body {
   background-color: #fff;
+  min-height: 100%;
 }
 
 /* Style the navigation */
@@ -137,6 +142,15 @@ li::before {
   margin-left: -1em;
   text-align: right;
   margin-right: 0.5em;
+}
+
+footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  padding: 0.5em;
+  text-align: center;
+  color:slategray
 }
 
 @media only screen and (max-width: 768px) {

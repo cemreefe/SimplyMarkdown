@@ -13,4 +13,4 @@ You're welcome!
 > Quote! 
 > -Person
 
-Go to [google](https://google.com/?q=google) to find out more.
+Go to [google](https://google.com/search?q=google) to find out more.
