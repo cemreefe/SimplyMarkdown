@@ -7,16 +7,23 @@ from jinja2 import Environment, FileSystemLoader
 from markdown.extensions import Extension
 from markdown.inlinepatterns import Pattern
 from markdown.util import etree
+import argparse
 
-# get directory path from command line argument
-directory = sys.argv[1]
-default_title = sys.argv[2] if len(sys.argv) > 2 else 'SimplyMarkdown'
+parser = argparse.ArgumentParser(description='Argument parser example')
+parser.add_argument('-i', '--input_dir', type=str, help='Input directory')
+parser.add_argument('-o', '--output_dir', type=str, help='Output directory')
+parser.add_argument('-t', '--title', type=str, help='Title')
+parser.add_argument('-th', '--theme', type=str, help='CSS Theme file location')
+
+args = parser.parse_args()
+
+directory = args.input_dir
+output_dir = args.output_dir if args.output_dir else os.path.join(directory, '../output')
+default_title = args.title if args.title else '<<Title>>'
+theme = args.theme
 
 # set up Jinja2 environment to load templates
 env = Environment(loader=FileSystemLoader('templates'))
-
-# create output directory if it doesn't exist
-output_dir = os.path.join(directory, '../output')
 
 # define a custom markdown extension that adds links to all files in subdirectories
 class SubdirLinkExtension(Extension):
@@ -86,7 +93,7 @@ def render_folder(directory, output_dir):
                 markdown_content = f.read()
 
             title = re.search(r'#\s*(.*)', markdown_content)
-            title = title.groups(0)[0] if title else default_title
+            title = default_title + " | " + title.groups(0)[0] if title else default_title
             
             # convert the markdown to HTML using the Python-Markdown library
             html_content = markdown.markdown(markdown_content, extensions=['markdown.extensions.extra', 'markdown.extensions.toc', SubdirLinkExtension(directory)])
@@ -105,11 +112,15 @@ def render_folder(directory, output_dir):
 def copy_static():
     static_dir = os.path.join(directory, 'static')
     output_static_dir = os.path.join(output_dir, 'static')
-    if not os.path.exists(static_dir):
-        return
     if not os.path.exists(output_static_dir):
         os.makedirs(output_static_dir)
-    shutil.copytree(static_dir, output_static_dir, dirs_exist_ok = True)
+    if os.path.exists(static_dir):
+        shutil.copytree(static_dir, output_static_dir, dirs_exist_ok = True)
+    if theme:
+        if not os.path.exists(output_static_dir + "/css"):
+            os.makedirs(output_static_dir + "/css")
+        shutil.copy(theme, output_static_dir + "/css")
+        os.rename(output_static_dir + "/css/" + os.path.basename(theme), output_static_dir + "/css/" + "theme.css")
 
 render_folder(directory, output_dir)
 copy_static()
