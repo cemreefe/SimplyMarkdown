@@ -98,6 +98,8 @@ def render_folder(directory, output_dir):
 def copy_static():
     static_dir = os.path.join(directory, 'static')
     output_static_dir = os.path.join(output_dir, 'static')
+    if not os.path.exists(static_dir):
+        return
     if not os.path.exists(output_static_dir):
         os.makedirs(output_static_dir)
     shutil.copytree(static_dir, output_static_dir, dirs_exist_ok = True)
