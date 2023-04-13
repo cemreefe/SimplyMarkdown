@@ -145,12 +145,16 @@
   }
   
   footer {
-    position: fixed;
     bottom: 0;
     width: 100%;
     padding: 0.5em;
     text-align: center;
-    color:slategray
+    color:slategray;
+    height:30px
+  }
+
+  .wrapper {
+    min-height: calc(100vh - 30px);
   }
   
   @media only screen and (max-width: 768px) {
@@ -185,3 +189,7 @@
     }
   }
   
+
+html, body {
+    height: 100%;
+}

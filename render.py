@@ -66,61 +66,52 @@ class SubdirLinkPattern(Pattern):
             return None
 
 
-# read in the navbar file and convert it to HTML
-with open(os.path.join(directory, 'navbar.md'), 'r') as f:
-    navbar_markdown = f.read()
-navbar_html = markdown.markdown(navbar_markdown, extensions=['markdown.extensions.extra', 'markdown.extensions.toc', SubdirLinkExtension(directory)])
+def markdown_to_html(filename):
+    with open(os.path.join(directory, filename), 'r') as f:
+        markdown_str = f.read()
+    return markdown.markdown(markdown_str, extensions=['markdown.extensions.extra', 'markdown.extensions.toc', SubdirLinkExtension(directory)])
 
-# read in the footer file and convert it to HTML
-with open(os.path.join(directory, 'footer.md'), 'r') as f:
-    footer_markdown = f.read()
-footer_html = markdown.markdown(footer_markdown, extensions=['markdown.extensions.extra', 'markdown.extensions.toc', SubdirLinkExtension(directory)])
+# Convert navbar.md to HTML
+navbar_html = markdown_to_html('navbar.md')
+
+# Convert footer.md to HTML
+footer_html = markdown_to_html('footer.md')
 
 def render_folder(directory, output_dir):
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-    # iterate through each file in the directory
+    os.makedirs(output_dir, exist_ok=True)
     for filename in os.listdir(directory):
-        # don't render navbar in a separate html file
-        if filename == "navbar.md":
-            pass
-        if filename == "footer.md":
-            pass
-        # check if the file is a markdown file
-        elif filename.endswith('.md'):
-            # read in the markdown file contents
-            with open(os.path.join(directory, filename), 'r') as f:
+        if filename in ("navbar.md", "footer.md"):
+            continue
+        filepath = os.path.join(directory, filename)
+        if os.path.isfile(filepath) and filepath.endswith('.md'):
+            with open(filepath, 'r') as f:
                 markdown_content = f.read()
-
-            title = re.search(r'#\s*(.*)', markdown_content)
-            title = default_title + " | " + title.groups(0)[0] if title else default_title
-            
-            # convert the markdown to HTML using the Python-Markdown library
-            html_content = markdown.markdown(markdown_content, extensions=['markdown.extensions.extra', 'markdown.extensions.toc', SubdirLinkExtension(directory)])
-            
-            # use Jinja2 to render the HTML content using a template
+            title = default_title
+            match = re.search(r'#\s*(.*)', markdown_content)
+            if match:
+                title += f" | {match.group(1)}"
+            html_content = markdown.markdown(
+                markdown_content,
+                extensions=['markdown.extensions.extra', 'markdown.extensions.toc', SubdirLinkExtension(directory)]
+            )
             template = env.get_template('base.html')
             rendered_html = template.render(content=html_content, navbar=navbar_html, footer=footer_html, title=title)
-            
-            # write out the rendered HTML to a new file in the output directory
             with open(os.path.join(output_dir, os.path.splitext(filename)[0] + '.html'), 'w') as f:
                 f.write(rendered_html)
-        # if another directory, recursively call render
-        elif os.path.isdir(os.path.join(directory, filename)):
-            render_folder(os.path.join(directory, filename), os.path.join(output_dir, filename))
+        elif os.path.isdir(filepath):
+            render_folder(filepath, os.path.join(output_dir, filename))
+
 
 def copy_static():
     static_dir = os.path.join(directory, 'static')
     output_static_dir = os.path.join(output_dir, 'static')
-    if not os.path.exists(output_static_dir):
-        os.makedirs(output_static_dir)
+    os.makedirs(output_static_dir, exist_ok=True)
     if os.path.exists(static_dir):
-        shutil.copytree(static_dir, output_static_dir, dirs_exist_ok = True)
+        shutil.copytree(static_dir, output_static_dir, dirs_exist_ok=True)
     if theme:
-        if not os.path.exists(output_static_dir + "/css"):
-            os.makedirs(output_static_dir + "/css")
-        shutil.copy(theme, output_static_dir + "/css")
-        os.rename(output_static_dir + "/css/" + os.path.basename(theme), output_static_dir + "/css/" + "theme.css")
+        theme_css = os.path.join(output_static_dir, 'css', 'theme.css')
+        shutil.copy(theme, theme_css)
+
 
 render_folder(directory, output_dir)
 copy_static()
