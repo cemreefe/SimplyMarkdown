@@ -39,10 +39,12 @@ Here, `navbar.md` and `static` are reserved names for specific purposes.
 To render your website, simply run 
 
 ```
-python3 render.py /path/to/directory
+python3 render.py -i /path/to/directory
 ```
 
 The output directory will be formed inside the parent folder of the input directory.
+
+Additionally you can use `-t` to set a website title, and -o to specify output location.
 
 ## Templates
 
