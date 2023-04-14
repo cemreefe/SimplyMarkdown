@@ -69,9 +69,12 @@ class SubdirLinkPattern(Pattern):
 
 
 def markdown_to_html(filename):
-    with open(os.path.join(directory, filename), 'r') as f:
-        markdown_str = f.read()
-    return markdown.markdown(markdown_str, extensions=['markdown.extensions.extra', 'markdown.extensions.toc', SubdirLinkExtension(directory)])
+    if os.path.exists(filename):
+        with open(os.path.join(directory, filename), 'r') as f:
+            markdown_str = f.read()
+        return markdown.markdown(markdown_str, extensions=['markdown.extensions.extra', 'markdown.extensions.toc', SubdirLinkExtension(directory)])
+    else: 
+        return ""
 
 # Convert navbar.md to HTML
 navbar_html = markdown_to_html('navbar.md')
