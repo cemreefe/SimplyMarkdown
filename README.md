@@ -32,8 +32,9 @@ example/input/
 This will form the basis of your website. In the output directory, the tree structure will be kept and all markdown files are going to be rendered into html files according to the template.
 
 
-Here, `navbar.md` and `static` are reserved names for specific purposes. 
+Here, `navbar.md`, `footer.md` and `static` are reserved names for specific purposes. 
 - `navbar.md` will be used to render the navigation bar for all html files. 
+- `footer.md` will be used to render the footer for all html files. 
 - `static` will be used for holding static files to be served, like media, css, js and downloadable content.
 
 To render your website, simply run 
