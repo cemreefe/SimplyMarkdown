@@ -14,6 +14,7 @@ parser.add_argument('-i', '--input_dir', type=str, help='Input directory')
 parser.add_argument('-o', '--output_dir', type=str, help='Output directory')
 parser.add_argument('-t', '--title', type=str, help='Title')
 parser.add_argument('-th', '--theme', type=str, help='CSS Theme file location')
+parser.add_argument('--root', type=str, help='Path to website root if different from url root')
 
 args = parser.parse_args()
 
@@ -21,6 +22,7 @@ directory = args.input_dir
 output_dir = args.output_dir if args.output_dir else os.path.join(directory, '../output')
 default_title = args.title if args.title else '<<Title>>'
 theme = args.theme
+root = args.root if args.root else ''
 
 # set up Jinja2 environment to load templates
 env = Environment(loader=FileSystemLoader('templates'))
@@ -95,7 +97,13 @@ def render_folder(directory, output_dir):
                 extensions=['markdown.extensions.extra', 'markdown.extensions.toc', SubdirLinkExtension(directory)]
             )
             template = env.get_template('base.html')
-            rendered_html = template.render(content=html_content, navbar=navbar_html, footer=footer_html, title=title)
+            rendered_html = template.render(
+                content=html_content, 
+                navbar=navbar_html, 
+                footer=footer_html, 
+                title=title, 
+                root=root
+            )
             with open(os.path.join(output_dir, os.path.splitext(filename)[0] + '.html'), 'w') as f:
                 f.write(rendered_html)
         elif os.path.isdir(filepath):
