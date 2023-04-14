@@ -109,6 +109,7 @@ def copy_static():
     if os.path.exists(static_dir):
         shutil.copytree(static_dir, output_static_dir, dirs_exist_ok=True)
     if theme:
+        os.makedirs(os.path.join(output_static_dir, 'css'), exist_ok=True)
         theme_css = os.path.join(output_static_dir, 'css', 'theme.css')
         shutil.copy(theme, theme_css)
 
