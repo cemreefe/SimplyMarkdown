@@ -110,6 +110,8 @@ def render_folder(directory, output_dir):
                 f.write(rendered_html)
         elif os.path.isdir(filepath):
             render_folder(filepath, os.path.join(output_dir, filename))
+        else:
+            shutil.copy(filepath, os.path.join(output_dir, filename))
 
 
 def copy_static():
