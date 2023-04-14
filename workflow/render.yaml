@@ -1,0 +1,50 @@
+name: Render with MarkdownBlogger
+
+on:
+  push:
+    branches: 
+    - source
+
+jobs:
+  run_script:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python3
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - name: Install dependencies
+      run: |
+        python3 -m pip install --upgrade pip
+        pip3 install markdown==3.3.4 jinja2
+    - name: Clone MarkdownBlogger
+      run: git clone https://github.com/cemreefe/MarkdownBlogger
+    - name: Run MarkdownBlogger
+      run: |
+        cd MarkdownBlogger
+        python3 render.py -i ../source -o ../output -t "Cemre's Blog" -th themes/custom.css
+    - name: Cleanup repo
+      run: |
+        rm -r MarkdownBlogger
+    - name: Clone github pages branch and clean its contents
+      run: |
+        cd ..
+        mkdir ghp
+        cd ghp
+        git clone -b master https://github.com/${{ github.actor }}/${{ github.event.repository.name }}
+        cd ${{ github.event.repository.name }}
+        git rm -r '*' 
+    - name: Move new output into github pages branch
+      run: |
+        mv output/* ../ghp/${{ github.event.repository.name }}/
+        
+    - name: Commit changes
+      run: |
+        cd ../ghp/${{ github.event.repository.name }}/
+        git config --global user.name '${{ github.actor }}'
+        git config --global user.email '${{ github.actor }}@users.noreply.github.com'
+        git remote set-url origin https://x-access-token:${{ secrets.AUTO_RENDER_PAT }}@github.com/$GITHUB_REPOSITORY
+        git add -A 
+        git commit -m "Automatically rendered by MarkdownBlogger on `date +'%Y-%m-%d %H:%M:%S'`"
+        git push

@@ -77,3 +77,15 @@ I have introduced the `%` tag for easier rendering in SimplyMarkdown. If you use
 % <directory>`
 ```
 SimplyMarkdown will render a list of links to all files under that directory. You can see an example usage in the `blog.md` file in `example/input/blog`.
+
+## Github Pages Integration
+
+Using MarkdownBlogger with github pages is very simple. 
+
+1. If you have a website on your github pages repository `<username>/<username>.github.io`, checkout into a new branch and push it there as a backup.
+1. Create a new branch on your github pages repository `<username>/<username>.github.io`, named `source`
+1. Delete everything in your branch `source`, add the [worklfow](/workflow/render.yaml) into a new directory `.github/workflows`
+1. Create a folder in your `source` branch, let's call it `./source`, this is going to act as the root of your markdown directory
+1. Populate your markdown directory as needed. **To see an example check out [my personal website](https://github.com/cemreefe/cemreefe.github.io)**.
+1. When you push to your source branch, the workflow will trigger, clear out your `main` branch, and populate it with the rendered MarkdownBlogger website based on your source files
+
