@@ -68,8 +68,8 @@ class SubdirLinkPattern(Pattern):
             return None
 
 
-def markdown_to_html(filename):
-    if os.path.exists(filename):
+def markdown_to_html(directory, filename):
+    if os.path.join(directory, filename):
         with open(os.path.join(directory, filename), 'r') as f:
             markdown_str = f.read()
         return markdown.markdown(markdown_str, extensions=['markdown.extensions.extra', 'markdown.extensions.toc', SubdirLinkExtension(directory)])
@@ -77,10 +77,10 @@ def markdown_to_html(filename):
         return ""
 
 # Convert navbar.md to HTML
-navbar_html = markdown_to_html('navbar.md')
+navbar_html = markdown_to_html(directory, 'navbar.md')
 
 # Convert footer.md to HTML
-footer_html = markdown_to_html('footer.md')
+footer_html = markdown_to_html(directory, 'footer.md')
 
 def render_folder(directory, output_dir):
     os.makedirs(output_dir, exist_ok=True)
