@@ -1,4 +1,4 @@
-name: Render with MarkdownBlogger
+name: Render with SimplyMarkdown
 
 on:
   push:
@@ -18,15 +18,15 @@ jobs:
       run: |
         python3 -m pip install --upgrade pip
         pip3 install markdown==3.3.4 jinja2
-    - name: Clone MarkdownBlogger
-      run: git clone https://github.com/cemreefe/MarkdownBlogger
-    - name: Run MarkdownBlogger
+    - name: Clone SimplyMarkdown
+      run: git clone https://github.com/cemreefe/SimplyMarkdown
+    - name: Run SimplyMarkdown
       run: |
-        cd MarkdownBlogger
-        python3 render.py -i ../source -o ../output -t "Cemre's Blog" -th themes/custom.css
+        cd SimplyMarkdown
+        python3 render.py -i ../source -o ../output -t "My Blog" -th themes/basic.css
     - name: Cleanup repo
       run: |
-        rm -r MarkdownBlogger
+        rm -r SimplyMarkdown
     - name: Clone github pages branch and clean its contents
       run: |
         cd ..
@@ -46,5 +46,4 @@ jobs:
         git config --global user.email '${{ github.actor }}@users.noreply.github.com'
         git remote set-url origin https://x-access-token:${{ secrets.AUTO_RENDER_PAT }}@github.com/$GITHUB_REPOSITORY
         git add -A 
-        git commit -m "Automatically rendered by MarkdownBlogger on `date +'%Y-%m-%d %H:%M:%S'`"
-        git push
+        git diff-index --quiet HEAD || git commit -m "Automatically rendered by SimplyMarkdown on `date +'%Y-%m-%d %H:%M:%S'`" && git push    
