@@ -134,16 +134,6 @@
     line-height: 1.6;
   }
   
-  li::before {
-    content: "•";
-    color: #777;
-    display: inline-block;
-    width: 1em;
-    margin-left: -1em;
-    text-align: right;
-    margin-right: 0.5em;
-  }
-  
   footer {
     bottom: 0;
     width: 100%;
