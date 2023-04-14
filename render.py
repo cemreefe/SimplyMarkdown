@@ -84,6 +84,8 @@ def render_folder(directory, output_dir):
     for filename in os.listdir(directory):
         if filename in ("navbar.md", "footer.md"):
             continue
+        if os.path.basename(filename)[0] == "_":
+            continue
         filepath = os.path.join(directory, filename)
         if os.path.isfile(filepath) and filepath.endswith('.md'):
             with open(filepath, 'r') as f:
