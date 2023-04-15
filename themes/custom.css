@@ -180,6 +180,10 @@
   }
   
 
-html, body {
+  html, body {
     height: 100%;
-}
+  }
+
+  code {
+    background-color: #e6e6e6
+  }
