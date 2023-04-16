@@ -192,4 +192,5 @@
     display: block;
     margin-bottom: 1.5em;
     word-wrap:break-word;
+    overflow: auto;
   }
