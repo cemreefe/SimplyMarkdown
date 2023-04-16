@@ -109,7 +109,7 @@ def render_folder(directory, output_dir):
                 title=title, 
                 root=root
             )
-            with open(os.path.join(output_dir, os.path.splitext(filename)[0].replace(' ', '-') + '.html'), 'w') as f:
+            with open(os.path.join(output_dir, os.path.splitext(filename)[0] + '.html'), 'w') as f:
                 f.write(rendered_html)
         elif os.path.isdir(filepath):
             render_folder(filepath, os.path.join(output_dir, filename))
