@@ -185,5 +185,11 @@
   }
 
   code {
-    background-color: #e6e6e6
+    background-color: #e6e6e6;
+  }
+
+  code:only-child {
+    display: block;
+    margin-bottom: 1.5em;
+    word-wrap:break-word;
   }
