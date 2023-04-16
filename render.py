@@ -21,7 +21,7 @@ args = parser.parse_args()
 directory = args.input_dir
 output_dir = args.output_dir if args.output_dir else os.path.join(directory, '../output')
 default_title = args.title if args.title else '<<Title>>'
-theme = args.theme
+theme = args.theme if args.theme else 'templates/basic.css'
 root = args.root if args.root else ''
 
 # set up Jinja2 environment to load templates
@@ -123,7 +123,7 @@ def copy_static():
     os.makedirs(output_static_dir, exist_ok=True)
     if os.path.exists(static_dir):
         shutil.copytree(static_dir, output_static_dir, dirs_exist_ok=True)
-    if theme:
+    if theme != 'none':
         os.makedirs(os.path.join(output_static_dir, 'css'), exist_ok=True)
         theme_css = os.path.join(output_static_dir, 'css', 'theme.css')
         shutil.copy(theme, theme_css)
