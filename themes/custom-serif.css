@@ -196,3 +196,7 @@
     word-wrap:break-word;
     overflow: auto;
   }
+
+  p:has(img) {
+    text-align: center;
+  }
