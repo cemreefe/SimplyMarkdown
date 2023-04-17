@@ -93,7 +93,7 @@
   }
   
   table {
-    width: 100%;
+    width: -webkit-fill-available;
     border-collapse: collapse;
     margin-bottom: 1em;
     table-layout: fixed;
