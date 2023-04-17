@@ -92,7 +92,7 @@
   }
   
   table {
-    width: 100%;
+    width: -webkit-fill-available;
     border-collapse: collapse;
     margin-bottom: 1em;
     table-layout: fixed;
@@ -131,6 +131,7 @@
   
   li {
     margin: 0;
+    margin-left: 1em;
     padding: 0;
     line-height: 1.6;
   }
