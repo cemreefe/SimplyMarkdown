@@ -96,7 +96,7 @@ def render_folder(directory, output_dir):
             title = default_title
             match = re.search(r'#\s*(.*)', markdown_content)
             if match:
-                title += f" | {match.group(1)}"
+                title = f"{match.group(1)} | {title}"
             html_content = markdown.markdown(
                 markdown_content,
                 extensions=['markdown.extensions.extra', 'markdown.extensions.toc', SubdirLinkExtension(directory)]
