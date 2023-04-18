@@ -193,7 +193,7 @@
     color: #404040;
   }
 
-  code:only-child {
+  pre code {
     display: block;
     margin-bottom: 1.5em;
     word-wrap:break-word;
