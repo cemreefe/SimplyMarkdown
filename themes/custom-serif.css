@@ -195,6 +195,7 @@
     margin-bottom: 1.5em;
     word-wrap:break-word;
     overflow: auto;
+    padding-left: 1em;
   }
 
   p:has(img) {
