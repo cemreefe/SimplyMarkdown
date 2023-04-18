@@ -126,7 +126,6 @@
   ul {
     margin: 0;
     padding: 0;
-    list-style: none;
   }
   
   li {
@@ -199,4 +198,8 @@
 
   p:has(img) {
     text-align: center;
+  }
+
+  .toc {
+    margin-bottom: 2em;
   }
