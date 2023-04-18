@@ -210,11 +210,12 @@
   }
 
   .categoryTag {
-    background-color: #ababab;
-    border-radius: 0.5em;
-    padding: 0.2em;
+    border-radius: 2em;
+    border: 1px solid gray;
+    padding-inline: 0.4em;
+    padding-block: 0.1em;
     display: inline-block;
-    color: white;
+    color: gray;
     font-family: monospace;
     margin-bottom: 1em;
   }
