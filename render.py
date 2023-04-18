@@ -76,12 +76,12 @@ class SubdirLinkPattern(Pattern):
                 li_elem = ET.Element('li')
                 li_elem.append(link)
                 ul_elem.append(li_elem)
-            return ET.tostring(ul_elem, encoding='unicode')
+            return ul_elem
         else:
             return None
 
 
-def markdown_to_html(markdown_str):
+def markdown_to_html(directory, markdown_str):
     return markdown.markdown(
         markdown_str, 
         extensions=[
@@ -97,7 +97,7 @@ def markdown_file_to_html(directory, filename):
     if os.path.join(directory, filename):
         with open(os.path.join(directory, filename), 'r') as f:
             markdown_str = f.read()
-        return markdown_to_html(markdown_str)
+        return markdown_to_html(directory, markdown_str)
     else: 
         return ""
 
@@ -122,7 +122,7 @@ def render_folder(directory, output_dir):
             match = re.search(r'#\s*(.*)', markdown_content)
             if match:
                 title = f"{match.group(1)} | {title}"
-            html_content = markdown_to_html(markdown_content)
+            html_content = markdown_to_html(directory, markdown_content)
             template = env.get_template('base.html')
             rendered_html = template.render(
                 content=html_content, 
