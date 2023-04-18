@@ -1,13 +1,14 @@
+import argparse
+import markdown
+import re
+import shutil
 import sys
 import os
-import re
-import markdown
-import shutil
+
 from jinja2 import Environment, FileSystemLoader
 from markdown.extensions import Extension
 from markdown.inlinepatterns import Pattern
 from markdown.util import etree
-import argparse
 
 parser = argparse.ArgumentParser(description='Argument parser example')
 parser.add_argument('-i', '--input_dir', type=str, help='Input directory')
@@ -72,7 +73,15 @@ def markdown_to_html(directory, filename):
     if os.path.join(directory, filename):
         with open(os.path.join(directory, filename), 'r') as f:
             markdown_str = f.read()
-        return markdown.markdown(markdown_str, extensions=['markdown.extensions.extra', 'markdown.extensions.toc', SubdirLinkExtension(directory)])
+        return markdown.markdown(
+            markdown_str, 
+            extensions=[
+                'markdown.extensions.extra', 
+                'markdown.extensions.fenced_code',
+                'markdown.extensions.toc', 
+                SubdirLinkExtension(directory)
+            ]
+        )
     else: 
         return ""
 
