@@ -90,7 +90,7 @@ def markdown_to_html(directory, filename):
                 'markdown.extensions.fenced_code',
                 'markdown.extensions.toc', 
                 SubdirLinkExtension(directory),
-                codehilite
+                'codehilite'
             ]
         )
     else: 
