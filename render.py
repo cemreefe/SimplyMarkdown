@@ -29,14 +29,17 @@ root = args.root if args.root else ''
 # set up Jinja2 environment to load templates
 env = Environment(loader=FileSystemLoader('templates'))
 
+# Define the options for the CodeHiliteExtension
+options = {
+    'noclasses': True,
+    'pygments_options': {'style': 'colorful'},
+    'css_class': 'highlight',
+    'use_pygments': True,
+    'inline_css': True,
+}
 
-# initalise codehilite for code syntax highlighting
-codehilite = CodeHiliteExtension(css_class='highlight', 
-                                 style='friendly', 
-                                 use_pygments=True, 
-                                 guess_lang=False,
-                                 noclasses=True, 
-                                 pygments_options={'nowrap': True})
+# Create an instance of the CodeHiliteExtension with the modified options
+codehilite = CodeHiliteExtension(**options)
 
 # define a custom markdown extension that adds links to all files in subdirectories
 class SubdirLinkExtension(Extension):
@@ -78,28 +81,31 @@ class SubdirLinkPattern(Pattern):
             return None
 
 
-def markdown_to_html(directory, filename):
+def markdown_to_html(markdown_str):
+    return markdown.markdown(
+        markdown_str, 
+        extensions=[
+            'markdown.extensions.extra', 
+            'markdown.extensions.fenced_code',
+            'markdown.extensions.toc', 
+            SubdirLinkExtension(directory),
+            codehilite
+        ]
+    )
+
+def markdown_file_to_html(directory, filename):
     if os.path.join(directory, filename):
         with open(os.path.join(directory, filename), 'r') as f:
             markdown_str = f.read()
-        return markdown.markdown(
-            markdown_str, 
-            extensions=[
-                'markdown.extensions.extra', 
-                'markdown.extensions.fenced_code',
-                'markdown.extensions.toc', 
-                SubdirLinkExtension(directory),
-                'codehilite'
-            ]
-        )
+        return markdown_to_html(markdown_str)
     else: 
         return ""
 
 # Convert navbar.md to HTML
-navbar_html = markdown_to_html(directory, 'navbar.md')
+navbar_html = markdown_file_to_html(directory, 'navbar.md')
 
 # Convert footer.md to HTML
-footer_html = markdown_to_html(directory, 'footer.md')
+footer_html = markdown_file_to_html(directory, 'footer.md')
 
 def render_folder(directory, output_dir):
     os.makedirs(output_dir, exist_ok=True)
@@ -116,10 +122,7 @@ def render_folder(directory, output_dir):
             match = re.search(r'#\s*(.*)', markdown_content)
             if match:
                 title = f"{match.group(1)} | {title}"
-            html_content = markdown.markdown(
-                markdown_content,
-                extensions=['markdown.extensions.extra', 'markdown.extensions.toc', SubdirLinkExtension(directory)]
-            )
+            html_content = markdown_to_html(markdown_content)
             template = env.get_template('base.html')
             rendered_html = template.render(
                 content=html_content, 
