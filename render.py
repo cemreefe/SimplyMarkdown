@@ -65,7 +65,8 @@ class SubdirLinkPattern(Pattern):
                 for f in files:
                     path = os.path.join(root, f)
                     relpath = os.path.relpath(path, full_path)
-                    href = './' + dirpath + '/' + os.path.splitext(relpath)[0].replace(' ', '-') + '.html'
+                    # TODO: handle non-html files
+                    href = './' + dirpath + '/' + os.path.splitext(relpath)[0].replace(' ', '-')
                     link = ET.Element('a', href=href)
                     link.text = os.path.splitext(f)[0]
                     links.append(link)
