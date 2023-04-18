@@ -7,6 +7,7 @@ import os
 
 from jinja2 import Environment, FileSystemLoader
 from markdown.extensions import Extension
+from markdown.extensions.codehilite import CodeHiliteExtension
 from markdown.inlinepatterns import Pattern
 from markdown.util import etree
 
@@ -79,7 +80,8 @@ def markdown_to_html(directory, filename):
                 'markdown.extensions.extra', 
                 'markdown.extensions.fenced_code',
                 'markdown.extensions.toc', 
-                SubdirLinkExtension(directory)
+                SubdirLinkExtension(directory),
+                CodeHiliteExtension()
             ]
         )
     else: 
