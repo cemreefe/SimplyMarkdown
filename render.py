@@ -9,7 +9,7 @@ from jinja2 import Environment, FileSystemLoader
 from markdown.extensions import Extension
 from markdown.extensions.codehilite import CodeHiliteExtension
 from markdown.inlinepatterns import Pattern
-from markdown.util import etree
+import xml.etree.ElementTree as ET
 
 parser = argparse.ArgumentParser(description='Argument parser example')
 parser.add_argument('-i', '--input_dir', type=str, help='Input directory')
@@ -23,7 +23,7 @@ args = parser.parse_args()
 directory = args.input_dir
 output_dir = args.output_dir if args.output_dir else os.path.join(directory, '../output')
 default_title = args.title if args.title else '<<Title>>'
-theme = args.theme if args.theme else 'templates/basic.css'
+theme = args.theme if args.theme else 'themes/basic.css'
 root = args.root if args.root else ''
 
 # set up Jinja2 environment to load templates
@@ -63,18 +63,17 @@ class SubdirLinkPattern(Pattern):
                     path = os.path.join(root, f)
                     relpath = os.path.relpath(path, full_path)
                     href = './' + dirpath + '/' + os.path.splitext(relpath)[0].replace(' ', '-') + '.html'
-                    link = etree.Element('a')
-                    link.set('href', href)
+                    link = ET.Element('a', href=href)
                     link.text = os.path.splitext(f)[0]
                     links.append(link)
-                    # create a new ul element
-            ul = etree.Element('ul')
-            # append a new li element for each link
+
+            # create a new ul element
+            ul_elem = ET.Element('ul')
             for link in links:
-                li = etree.Element('li')
-                li.append(link)
-                ul.append(li)
-            return ul
+                li_elem = ET.Element('li')
+                li_elem.append(link)
+                ul_elem.append(li_elem)
+            return ET.tostring(ul_elem, encoding='unicode')
         else:
             return None
 
