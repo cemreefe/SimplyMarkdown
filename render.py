@@ -29,6 +29,15 @@ root = args.root if args.root else ''
 # set up Jinja2 environment to load templates
 env = Environment(loader=FileSystemLoader('templates'))
 
+
+# initalise codehilite for code syntax highlighting
+codehilite = CodeHiliteExtension(css_class='highlight', 
+                                 style='friendly', 
+                                 use_pygments=True, 
+                                 guess_lang=False,
+                                 noclasses=True, 
+                                 pygments_options={'nowrap': True})
+
 # define a custom markdown extension that adds links to all files in subdirectories
 class SubdirLinkExtension(Extension):
     def __init__(self, base_dir):
@@ -81,7 +90,7 @@ def markdown_to_html(directory, filename):
                 'markdown.extensions.fenced_code',
                 'markdown.extensions.toc', 
                 SubdirLinkExtension(directory),
-                CodeHiliteExtension()
+                codehilite
             ]
         )
     else: 
