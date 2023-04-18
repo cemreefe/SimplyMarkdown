@@ -202,3 +202,7 @@
   p:has(img) {
     text-align: center;
   }
+
+  .toc {
+    margin-bottom: 2em;
+  }
