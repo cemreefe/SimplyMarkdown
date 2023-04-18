@@ -47,7 +47,7 @@ class SubdirLinkExtension(Extension):
         super().__init__()
         self.base_dir = base_dir
     def extendMarkdown(self, md):
-        subdir_link_pattern = SubdirLinkPattern(r'%\s*([^\s]+)', md, self.base_dir)
+        subdir_link_pattern = SubdirLinkPattern(r'^%\s+([^\s]+)', md, self.base_dir)
         md.inlinePatterns.register(subdir_link_pattern, 'subdir_link', 175)
 
 class SubdirLinkPattern(Pattern):
@@ -81,6 +81,32 @@ class SubdirLinkPattern(Pattern):
         else:
             return None
 
+# define a custom markdown extension that adds tags
+class TagsExtension(Extension):
+    def __init__(self):
+        super().__init__()
+        
+    def extendMarkdown(self, md):
+        tags_pattern = TagsPattern(r'^@\s+(.+)', md)
+        md.inlinePatterns.register(tags_pattern, 'tags', 180)
+
+class TagsPattern(Pattern):
+    def __init__(self, pattern, md):
+        super(TagsPattern, self).__init__(pattern)
+        self.md = md
+
+    def handleMatch(self, m):
+        tags = m.group(2)
+        tags = [tag.strip() for tag in tags.split(',')]
+        tags_container = ET.Element('div')
+        for tag in tags:
+            tag_block = ET.Element('div', {'class': 'categoryTag'}) # Add class attribute
+            tag_block.text = tag # Set tag as text content of div element
+            tags_container.append(tag_block)
+        return tags_container
+
+
+
 
 def markdown_to_html(directory, markdown_str):
     return markdown.markdown(
@@ -90,6 +116,7 @@ def markdown_to_html(directory, markdown_str):
             'markdown.extensions.fenced_code',
             'markdown.extensions.toc', 
             SubdirLinkExtension(directory),
+            TagsExtension(),
             codehilite
         ]
     )

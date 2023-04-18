@@ -205,3 +205,13 @@
   .toc {
     margin-bottom: 2em;
   }
+
+  .categoryTag {
+    background-color: #ababab;
+    border-radius: 0.5em;
+    padding: 0.2em;
+    display: inline-block;
+    color: white;
+    font-family: monospace;
+    margin-bottom: 1em;
+  }
