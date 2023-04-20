@@ -122,7 +122,7 @@ def markdown_to_html(directory, markdown_str):
     )
 
 def markdown_file_to_html(directory, filename):
-    if os.path.join(directory, filename):
+    if os.path.exists(os.path.join(directory, filename)):
         with open(os.path.join(directory, filename), 'r') as f:
             markdown_str = f.read()
         return markdown_to_html(directory, markdown_str)
@@ -132,14 +132,19 @@ def markdown_file_to_html(directory, filename):
 # Convert navbar.md to HTML
 navbar_html = markdown_file_to_html(directory, 'navbar.md')
 
+# Convert socials.md to HTML
+socials_html = markdown_file_to_html(directory, 'socials_tag.md')
+
 # Convert footer.md to HTML
 footer_html = markdown_file_to_html(directory, 'footer.md')
 
 def render_folder(directory, output_dir):
     os.makedirs(output_dir, exist_ok=True)
     for filename in os.listdir(directory):
-        if filename in ("navbar.md", "footer.md"):
+        # pre-rendered special files
+        if filename in ("navbar.md", "footer.md", "socials_tag.md"):
             continue
+        # ignore files that start with _
         if os.path.basename(filename)[0] == "_":
             continue
         filepath = os.path.join(directory, filename)
@@ -147,17 +152,22 @@ def render_folder(directory, output_dir):
             with open(filepath, 'r') as f:
                 markdown_content = f.read()
             title = default_title
+            # set page title to include the first h1 if exists
             match = re.search(r'#\s*(.*)', markdown_content)
             if match:
                 title = f"{match.group(1)} | {title}"
-            html_content = markdown_to_html(directory, markdown_content)
+            # if [SOCIALS] tag, replace with rendered socials module
+            markdown_content = markdown_content.replace("[SOCIALS]", socials_html)
+            content_html = markdown_to_html(directory, markdown_content)
             template = env.get_template('base.html')
             rendered_html = template.render(
-                content=html_content, 
-                navbar=navbar_html, 
-                footer=footer_html, 
-                title=title, 
-                root=root
+                context={
+                    'content':  content_html,
+                    'navbar':   navbar_html,
+                    'footer':   footer_html,
+                    'title':    title,
+                    'root':     root
+                }
             )
             with open(os.path.join(output_dir, os.path.splitext(filename)[0].replace(' ', '-') + '.html'), 'w') as f:
                 f.write(rendered_html)
