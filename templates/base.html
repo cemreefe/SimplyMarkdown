@@ -3,25 +3,25 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="{{ root }}/static/css/theme.css">
-    <link rel="icon" type="image/png" href="{{ root }}/static/favicon/favicon.png">
-    <title>{{ title }}</title>
+    <link rel="stylesheet" href="{{ context.root }}/static/css/theme.css">
+    <link rel="icon" type="image/png" href="{{ context.root }}/static/favicon/favicon.png">
+    <title>{{ context.title }}</title>
   </head>
   <body>
     <div class="wrapper">
       <div class="content">
         <nav>
-          {{ navbar }}
+          {{ context.navbar }}
         </nav>
       </div>
       <div class="content">
         <main>
-          {{ content }}
+          {{ context.content }}
         </main>
       </div>
     </div>
     <footer>
-      {{ footer }}
+      {{ context.footer }}
     </footer>
   </body>
 </html>
