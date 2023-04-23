@@ -164,12 +164,12 @@ def render_folder(directory, output_dir):
             content_html = markdown_to_html(directory, markdown_content)
             template = env.get_template('base.html')
             rendered_html = template.render(
-                content=html_content, 
+                content=content_html, 
                 navbar=navbar_html, 
                 footer=footer_html, 
                 title=title, 
                 root=root,
-                head_extras=head_extras
+                head_extras=head_extras_html
             )
             with open(os.path.join(output_dir, os.path.splitext(filename)[0].replace(' ', '-') + '.html'), 'w') as f:
                 f.write(rendered_html)
