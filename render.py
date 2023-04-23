@@ -138,6 +138,9 @@ socials_html = markdown_file_to_html(directory, 'socials_tag.md')
 # Convert footer.md to HTML
 footer_html = markdown_file_to_html(directory, 'footer.md')
 
+# Convert head_extras.md to HTML
+head_extras_html = markdown_file_to_html(directory, 'head_extras.md')
+
 def render_folder(directory, output_dir):
     os.makedirs(output_dir, exist_ok=True)
     for filename in os.listdir(directory):
@@ -161,13 +164,12 @@ def render_folder(directory, output_dir):
             content_html = markdown_to_html(directory, markdown_content)
             template = env.get_template('base.html')
             rendered_html = template.render(
-                context={
-                    'content':  content_html,
-                    'navbar':   navbar_html,
-                    'footer':   footer_html,
-                    'title':    title,
-                    'root':     root
-                }
+                content=html_content, 
+                navbar=navbar_html, 
+                footer=footer_html, 
+                title=title, 
+                root=root,
+                head_extras=head_extras
             )
             with open(os.path.join(output_dir, os.path.splitext(filename)[0].replace(' ', '-') + '.html'), 'w') as f:
                 f.write(rendered_html)
