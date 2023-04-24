@@ -145,7 +145,7 @@ def render_folder(directory, output_dir):
     os.makedirs(output_dir, exist_ok=True)
     for filename in os.listdir(directory):
         # pre-rendered special files
-        if filename in ("navbar.md", "footer.md", "socials_tag.md"):
+        if filename in ("navbar.md", "footer.md", "socials_tag.md", "head_extras.md"):
             continue
         # ignore files that start with _
         if os.path.basename(filename)[0] == "_":
