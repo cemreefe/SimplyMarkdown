@@ -129,6 +129,17 @@ def markdown_file_to_html(directory, filename):
     else: 
         return ""
 
+
+def get_image_meta_tags_html(markdown_text):
+    pattern = r'!\[[^\]]*\]\((.*?)\)'
+    match = re.search(pattern, markdown_text)
+    if match:
+        image_url = match.group(1)
+        return f'<meta property="og:image" content="{image_url}">\n\t\t<meta name="twitter:image" content="{image_url}">'
+    else:
+        return ""
+
+
 # Convert navbar.md to HTML
 navbar_html = markdown_file_to_html(directory, 'navbar.md')
 
@@ -170,7 +181,7 @@ def render_folder(directory, output_dir):
                     'footer':footer_html, 
                     'title':title, 
                     'root':root,
-                    'head_extras':head_extras_html   
+                    'head_extras':head_extras_html + get_image_meta_tags_html(markdown_content)  
                 }
             )
             with open(os.path.join(output_dir, os.path.splitext(filename)[0].replace(' ', '-') + '.html'), 'w') as f:

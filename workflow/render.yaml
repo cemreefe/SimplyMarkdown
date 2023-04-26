@@ -37,6 +37,7 @@ jobs:
         git rm -r '*' 
     - name: Move new output into github pages branch
       run: |
+        shopt -s dotglob
         mv output/* ../ghp/${{ github.event.repository.name }}/
         
     - name: Commit changes
