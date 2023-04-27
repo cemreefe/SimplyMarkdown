@@ -121,6 +121,13 @@ def markdown_to_html(directory, markdown_str):
         ]
     )
 
+def read_html(directory, filename):
+    if os.path.exists(os.path.join(directory, filename)):
+        with open(os.path.join(directory, filename), 'r') as f:
+            return f.read()
+    else: 
+        return ""
+
 def markdown_file_to_html(directory, filename):
     if os.path.exists(os.path.join(directory, filename)):
         with open(os.path.join(directory, filename), 'r') as f:
@@ -149,8 +156,8 @@ socials_html = markdown_file_to_html(directory, 'socials_tag.md')
 # Convert footer.md to HTML
 footer_html = markdown_file_to_html(directory, 'footer.md')
 
-# Convert head_extras.md to HTML
-head_extras_html = markdown_file_to_html(directory, 'head_extras.md')
+# Load head_extras.html
+head_extras_html = read_html(directory, 'head_extras.html')
 
 def render_folder(directory, output_dir):
     os.makedirs(output_dir, exist_ok=True)
