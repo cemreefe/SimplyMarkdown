@@ -146,7 +146,7 @@ def get_image_meta_tags_html(markdown_text):
     if match:
         image_url = match.group(1)
         return f'<meta property="og:image" content="{image_url}">\n\t\t<meta name="twitter:image" content="{image_url}">'
-    else if os.path.exists(os.path.join(output_dir, 'static/img/default_img.png')):
+    elif os.path.exists(os.path.join(output_dir, 'static/img/default_img.png')):
         image_url = os.path.join(output_dir, 'static/img/default_img.png')
         return f'<meta property="og:image" content="{image_url}">\n\t\t<meta name="twitter:image" content="{image_url}">'
     else:
