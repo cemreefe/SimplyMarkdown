@@ -142,7 +142,7 @@ def markdown_file_to_html(directory, filename):
 def get_image_meta_tags_html(markdown_text):
     pattern = r'!\[[^\]]*\]\((.*?)\)'
     match = re.search(pattern, markdown_text)
-    if match:
+    if match and ('!default_meta_img' not in markdown_text):
         image_url = match.group(1)
         return f'<meta property="og:image" content="{image_url}">\n\t\t<meta name="twitter:image" content="{image_url}">'
     elif os.path.exists(os.path.join(directory, 'static/img/default_img.png')):
@@ -184,6 +184,8 @@ def render_folder(directory, output_dir):
                 title = f"{match.group(1)} | {title}"
             # if [SOCIALS] tag, replace with rendered socials module
             markdown_content = markdown_content.replace("[SOCIALS]", socials_html)
+            meta_tags_html = get_image_meta_tags_html(markdown_content)
+            markdown_content = markdown_content.replace("!default_meta_img", "")
             content_html = markdown_to_html(directory, markdown_content)
             template = env.get_template('base.html')
             rendered_html = template.render(
@@ -193,7 +195,7 @@ def render_folder(directory, output_dir):
                     'footer': footer_html, 
                     'title': title, 
                     'root': urlroot,
-                    'head_extras': head_extras_html + get_image_meta_tags_html(markdown_content),
+                    'head_extras': head_extras_html + meta_tags_html,
                     'favicon_path': favicon_path
                 }
             )
