@@ -19,15 +19,14 @@ parser.add_argument('-th', '--theme', type=str, help='CSS Theme file location')
 parser.add_argument('--root', type=str, help='Path to website root if different from url root')
 parser.add_argument('--favicon', type=str, help='Emoji favicon')
 
-
 args = parser.parse_args()
 
 directory = args.input_dir
 output_dir = args.output_dir if args.output_dir else os.path.join(directory, '../output')
 default_title = args.title if args.title else '<<Title>>'
 theme = args.theme if args.theme else 'themes/basic.css'
-root = args.root if args.root else ''
-favicon_path = f'https://emoji.dutl.uk/png/32x32/{args.favicon}.png' if args.favicon else f'{root}/static/favicon/favicon.png'
+urlroot = args.root if args.root else ''
+favicon_path = f'https://emoji.dutl.uk/png/32x32/{args.favicon}.png' if args.favicon else f'{urlroot}/static/favicon/favicon.png'
 
 # set up Jinja2 environment to load templates
 env = Environment(loader=FileSystemLoader('templates'))
@@ -147,7 +146,7 @@ def get_image_meta_tags_html(markdown_text):
         image_url = match.group(1)
         return f'<meta property="og:image" content="{image_url}">\n\t\t<meta name="twitter:image" content="{image_url}">'
     elif os.path.exists(os.path.join(directory, 'static/img/default_img.png')):
-        image_url = 'static/img/default_img.png'
+        image_url = urlroot + '/static/img/default_img.png'
         return f'<meta property="og:image" content="{image_url}">\n\t\t<meta name="twitter:image" content="{image_url}">'
     else:
         return ""
@@ -193,7 +192,7 @@ def render_folder(directory, output_dir):
                     'navbar': navbar_html, 
                     'footer': footer_html, 
                     'title': title, 
-                    'root': root,
+                    'root': urlroot,
                     'head_extras': head_extras_html + get_image_meta_tags_html(markdown_content),
                     'favicon_path': favicon_path
                 }
