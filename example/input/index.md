@@ -16,5 +16,3 @@ You're welcome!
 > -Person
 
 Go to [google](https://google.com/search?q=google) to find out more.
-
-!default_meta_img
