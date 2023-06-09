@@ -96,6 +96,7 @@
     display: inline-block;
     position: relative;
     overflow: hidden;
+    top: -20px;
   }
   
   .content blockquote {
