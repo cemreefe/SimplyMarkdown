@@ -226,6 +226,10 @@
     margin-bottom: 2em;
   }
 
+  .toc li ul {
+    margin-bottom: 0px;
+  }
+
   .categoryTag {
     border-radius: 2em;
     border: 1px solid gray;
