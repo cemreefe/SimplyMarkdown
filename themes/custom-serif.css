@@ -82,11 +82,20 @@
     margin-bottom: 20px;
   }
 
-  .content img.button, .content div.button {
+  .content a .button {
     margin-bottom: 0;
     width: 88px;
     height: 31px;
     display: inline-block;
+  }
+
+  .content a.button span {
+    border: 1px solid black;
+    height: 31px;
+    width: 88px;
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
   }
   
   .content blockquote {
