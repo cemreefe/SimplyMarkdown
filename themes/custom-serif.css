@@ -84,6 +84,9 @@
 
   .content img.button {
     margin-bottom: 0;
+    width: 88px;
+    height: 31px;
+    display: inline-block;
   }
   
   .content blockquote {
