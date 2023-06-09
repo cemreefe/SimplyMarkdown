@@ -82,7 +82,7 @@
     margin-bottom: 20px;
   }
 
-  .content img.button {
+  .content img.button, .content div.button {
     margin-bottom: 0;
     width: 88px;
     height: 31px;
