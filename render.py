@@ -153,6 +153,19 @@ def get_image_meta_tags_html(markdown_text):
     else:
         return ""
 
+def extract_first_paragraph(html):
+    # Find the first <p> block
+    match = re.search(r'<p>(.*?)</p>', html, re.DOTALL)
+    
+    if match:
+        paragraph_content = match.group(1)
+        
+        # Remove inner tags from the paragraph
+        paragraph_text = re.sub(r'<.*?>', '', paragraph_content)
+        
+        return paragraph_text.strip()
+    
+    return ""  # No <p> block found
 
 # Convert navbar.md to HTML
 navbar_html = markdown_file_to_html(directory, 'navbar.md')
@@ -199,7 +212,8 @@ def render_folder(directory, output_dir):
                     'root': urlroot,
                     'head_extras': head_extras_html + meta_tags_html,
                     'favicon_path': favicon_path,
-                    'lang': lang
+                    'lang': lang,
+                    'meta_description': extract_first_paragraph(content_html)
                 }
             )
             with open(os.path.join(output_dir, os.path.splitext(filename)[0].replace(' ', '-') + '.html'), 'w') as f:
