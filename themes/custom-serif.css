@@ -90,7 +90,8 @@
   }
 
   .content a.button span {
-    border: 1px solid black;
+    background-color: cornflowerblue;
+    color:white;
     height: 31px;
     width: 88px;
     display: inline-block;
