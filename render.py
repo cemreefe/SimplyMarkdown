@@ -18,6 +18,7 @@ parser.add_argument('-t', '--title', type=str, help='Title')
 parser.add_argument('-th', '--theme', type=str, help='CSS Theme file location')
 parser.add_argument('--root', type=str, help='Path to website root if different from url root')
 parser.add_argument('--favicon', type=str, help='Emoji favicon')
+parser.add_argument('--lang', type=str, help='Website language')
 
 args = parser.parse_args()
 
@@ -27,6 +28,7 @@ default_title = args.title if args.title else '<<Title>>'
 theme = args.theme if args.theme else 'themes/basic.css'
 urlroot = args.root if args.root else ''
 favicon_path = f'https://emoji.dutl.uk/png/32x32/{args.favicon}.png' if args.favicon else f'{urlroot}/static/favicon/favicon.png'
+lang = args.root if args.root else 'en'
 
 # set up Jinja2 environment to load templates
 env = Environment(loader=FileSystemLoader('templates'))
@@ -196,7 +198,8 @@ def render_folder(directory, output_dir):
                     'title': title, 
                     'root': urlroot,
                     'head_extras': head_extras_html + meta_tags_html,
-                    'favicon_path': favicon_path
+                    'favicon_path': favicon_path,
+                    'lang': lang
                 }
             )
             with open(os.path.join(output_dir, os.path.splitext(filename)[0].replace(' ', '-') + '.html'), 'w') as f:
