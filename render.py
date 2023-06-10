@@ -167,17 +167,39 @@ def extract_first_paragraph(html):
     
     return ""  # No <p> block found
 
-# Convert navbar.md to HTML
-navbar_html = markdown_file_to_html(directory, 'navbar.md')
+def extension(filename):
+    assert (len(filename.split('.')) == 2)
+    return filename.split('.')[-1]
 
-# Convert socials.md to HTML
-socials_html = markdown_file_to_html(directory, 'socials_tag.md')
+def barename(filename):
+    assert (len(filename.split('.')) == 2)
+    return filename.split('.')[0]
 
-# Convert footer.md to HTML
-footer_html = markdown_file_to_html(directory, 'footer.md')
+def get_modules():
+    modules_ = {}
+    modules_dir = os.path.join(directory, '_modules')
+    for filename in os.listdir(modules_dir):
+        filepath = os.path.join(modules_dir, filename)
+        if extension(filename) == 'md':
+            modules_[barename(filename)] = markdown_file_to_html('', filepath)
+        if extension(filename) == 'html':
+            modules_[barename(filename)] = read_html('', filepath)
+    return modules_
 
-# Load head_extras.html
-head_extras_html = read_html(directory, 'head_extras.html')
+
+# # Convert navbar.md to HTML
+# navbar_html = markdown_file_to_html(directory, '_modules/navbar.md')
+
+# # Convert socials.md to HTML
+# socials_html = markdown_file_to_html(directory, '_modules/socials_tag.md')
+
+# # Convert footer.md to HTML
+# footer_html = markdown_file_to_html(directory, '_modules/footer.md')
+
+# # Load head_extras.html
+# head_extras_html = read_html(directory, '_modules/head_extras.html')
+
+modules = get_modules()
 
 def render_folder(directory, output_dir):
     os.makedirs(output_dir, exist_ok=True)
@@ -198,7 +220,7 @@ def render_folder(directory, output_dir):
             if match:
                 title = f"{match.group(1)} | {title}"
             # if [SOCIALS] tag, replace with rendered socials module
-            markdown_content = markdown_content.replace("[SOCIALS]", socials_html)
+            markdown_content = markdown_content.replace("[SOCIALS]", modules.get('socials', ''))
             meta_tags_html = get_image_meta_tags_html(markdown_content)
             markdown_content = markdown_content.replace("!override_meta_img", "")
             content_html = markdown_to_html(directory, markdown_content)
@@ -206,11 +228,11 @@ def render_folder(directory, output_dir):
             rendered_html = template.render(
                 context = {
                     'content': content_html, 
-                    'navbar': navbar_html, 
-                    'footer': footer_html, 
+                    'navbar': modules.get('navbar', ''), 
+                    'footer': modules.get('footer', ''), 
                     'title': title, 
                     'root': urlroot,
-                    'head_extras': head_extras_html + meta_tags_html,
+                    'head_extras': modules.get('head_extras', '') + meta_tags_html,
                     'favicon_path': favicon_path,
                     'lang': lang,
                     'meta_description': extract_first_paragraph(content_html)
