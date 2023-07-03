@@ -152,7 +152,7 @@ def get_image_meta_tags_html(markdown_text, current_dir, title):
     if match and ('!override_meta_img' in markdown_text):
         image_url = match.group(1)
         if './' in image_url: 
-            image_url = image_url.replace(current_dir)
+            image_url = image_url.replace('./', current_dir)
         return f'<meta property="og:image" content="{image_url}">\n\t\t<meta name="twitter:image" content="{image_url}">' \
             + f'\n\t\t<meta name="twitter:title" content="{title}" />'
     elif os.path.exists(os.path.join(directory, 'static/img/default_img.png')):
