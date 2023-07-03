@@ -28,7 +28,7 @@ default_title = args.title if args.title else '<<Title>>'
 theme = args.theme if args.theme else 'themes/basic.css'
 urlroot = args.root if args.root else ''
 favicon_path = f'https://emoji.dutl.uk/png/32x32/{args.favicon}.png' if args.favicon else f'{urlroot}/static/favicon/favicon.png'
-lang = args.root if args.root else 'en'
+lang = args.lang if args.lang else 'en'
 
 # set up Jinja2 environment to load templates
 env = Environment(loader=FileSystemLoader('templates'))
