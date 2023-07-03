@@ -72,7 +72,7 @@ class SubdirLinkPattern(Pattern):
                     path = os.path.join(root, f)
                     relpath = os.path.relpath(path, full_path)
                     # TODO: handle non-html files
-                    href = './' + dirpath + '/' + os.path.splitext(relpath)[0].replace(' ', '-')
+                    href = './' + dirpath + '/' + os.path.splitext(relpath)[0].replace(', ', '-').replace(' ', '-')
                     link = ET.Element('a', href=href)
                     date = ET.Element('span')
                     date.text = '/'.join(relpath.split('/')[:-1]) + " "
