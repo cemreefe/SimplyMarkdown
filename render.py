@@ -186,19 +186,6 @@ def get_modules():
             modules_[barename(filename)] = read_html('', filepath)
     return modules_
 
-
-# # Convert navbar.md to HTML
-# navbar_html = markdown_file_to_html(directory, '_modules/navbar.md')
-
-# # Convert socials.md to HTML
-# socials_html = markdown_file_to_html(directory, '_modules/socials_tag.md')
-
-# # Convert footer.md to HTML
-# footer_html = markdown_file_to_html(directory, '_modules/footer.md')
-
-# # Load head_extras.html
-# head_extras_html = read_html(directory, '_modules/head_extras.html')
-
 modules = get_modules()
 
 def render_folder(directory, output_dir):
