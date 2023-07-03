@@ -67,6 +67,8 @@ class SubdirLinkPattern(Pattern):
             items = []
             for root, dirs, files in os.walk(full_path):
                 for f in files:
+                    if f.split('.')[-1] not in ['md', 'html']:
+                        continue
                     path = os.path.join(root, f)
                     relpath = os.path.relpath(path, full_path)
                     # TODO: handle non-html files
