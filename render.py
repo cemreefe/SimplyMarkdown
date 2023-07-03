@@ -165,6 +165,9 @@ def get_image_meta_tags_html(markdown_text, current_dir, title):
 def extract_first_paragraph(html):
     # Find the first <p> block
     match = re.search(r'<h2>.*?</h2>.*?<p>(.*?)</p>', html, re.DOTALL)
+
+    if not match:
+        match = re.search(r'<p>(.*?)</p>', html, re.DOTALL)
     
     if match:
         paragraph_content = match.group(1)
