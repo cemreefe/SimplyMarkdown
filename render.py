@@ -72,7 +72,7 @@ class SubdirLinkPattern(Pattern):
                     # TODO: handle non-html files
                     href = './' + dirpath + '/' + os.path.splitext(relpath)[0].replace(' ', '-')
                     link = ET.Element('a', href=href)
-                    link.text = os.path.splitext(f)[0]
+                    link.text = '/'.join(relpath.split('/')[:-1]) + " " + os.path.splitext(f)[0]
                     links.append(link)
 
             # create a new ul element
