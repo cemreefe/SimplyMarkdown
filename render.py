@@ -230,7 +230,7 @@ def render_folder(directory, output_dir):
                     'meta_description': extract_first_paragraph(content_html)
                 }
             )
-            with open(os.path.join(output_dir, os.path.splitext(filename)[0].replace(' ', '-') + '.html'), 'w') as f:
+            with open(os.path.join(output_dir, os.path.splitext(filename)[0].replace(', ', '-').replace(' ', '-') + '.html'), 'w') as f:
                 f.write(rendered_html)
         elif os.path.isdir(filepath):
             render_folder(filepath, os.path.join(output_dir, filename))
