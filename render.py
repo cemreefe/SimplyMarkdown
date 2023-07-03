@@ -146,14 +146,15 @@ def markdown_file_to_html(directory, filename):
         return ""
 
 
-def get_image_meta_tags_html(markdown_text, current_dir):
+def get_image_meta_tags_html(markdown_text, current_dir, title):
     pattern = r'!\[[^\]]*\]\((.*?)\)'
     match = re.search(pattern, markdown_text)
     if match and ('!override_meta_img' in markdown_text):
         image_url = match.group(1)
         if './' in image_url: 
             image_url = image_url.replace(current_dir)
-        return f'<meta property="og:image" content="{image_url}">\n\t\t<meta name="twitter:image" content="{image_url}">'
+        return f'<meta property="og:image" content="{image_url}">\n\t\t<meta name="twitter:image" content="{image_url}">' \
+            + f'\n\t\t<meta name="twitter:title" content="{title}" />'
     elif os.path.exists(os.path.join(directory, 'static/img/default_img.png')):
         image_url = urlroot + '/static/img/default_img.png'
         return f'<meta property="og:image" content="{image_url}">\n\t\t<meta name="twitter:image" content="{image_url}">'
@@ -215,7 +216,7 @@ def render_folder(directory, output_dir):
                 title = f"{match.group(1)} | {title}"
             # if [SOCIALS] tag, replace with rendered socials module
             markdown_content = markdown_content.replace("[SOCIALS]", modules.get('socials', ''))
-            meta_tags_html = get_image_meta_tags_html(markdown_content, directory)
+            meta_tags_html = get_image_meta_tags_html(markdown_content, directory, title)
             markdown_content = markdown_content.replace("!override_meta_img", "")
             content_html = markdown_to_html(directory, markdown_content)
             template = env.get_template('base.html')
