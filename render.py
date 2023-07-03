@@ -153,7 +153,7 @@ def get_image_meta_tags_html(markdown_text, current_dir, title):
         image_url = match.group(1)
         if './' in image_url: 
             dir_relpath = os.path.relpath(current_dir, directory)
-            image_url = image_url.replace('./', dir_relpath+'/')
+            image_url = image_url.replace('./', (urlroot + ('/' if urlroot else '') + dir_relpath + '/'))
         return f'<meta property="og:image" content="{image_url}">\n\t\t<meta name="twitter:image" content="{image_url}">' \
             + f'\n\t\t<meta name="twitter:title" content="{title}" />'
     elif os.path.exists(os.path.join(directory, 'static/img/default_img.png')):
