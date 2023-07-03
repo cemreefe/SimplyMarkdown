@@ -64,7 +64,7 @@ class SubdirLinkPattern(Pattern):
         dirpath = m.group(2)
         full_path = os.path.join(self.base_dir, dirpath)
         if os.path.isdir(full_path):
-            links = []
+            items = []
             for root, dirs, files in os.walk(full_path):
                 for f in files:
                     path = os.path.join(root, f)
@@ -72,13 +72,16 @@ class SubdirLinkPattern(Pattern):
                     # TODO: handle non-html files
                     href = './' + dirpath + '/' + os.path.splitext(relpath)[0].replace(' ', '-')
                     link = ET.Element('a', href=href)
-                    link.text = '/'.join(relpath.split('/')[:-1]) + " " + os.path.splitext(f)[0]
-                    links.append(link)
+                    date = ET.Element('span')
+                    date.text = '/'.join(relpath.split('/')[:-1]) + " "
+                    link.text = os.path.splitext(f)[0]
+                    items.append((date, link))
 
             # create a new ul element
             ul_elem = ET.Element('ul')
-            for link in links:
+            for date, link in items:
                 li_elem = ET.Element('li')
+                li_elem.append(date)
                 li_elem.append(link)
                 ul_elem.append(li_elem)
             return ul_elem
