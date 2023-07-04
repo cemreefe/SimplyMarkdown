@@ -174,8 +174,10 @@ def extract_first_paragraph(html):
         
         # Remove inner tags from the paragraph
         paragraph_text = re.sub(r'<.*?>', '', paragraph_content)
+
+        paragraph_text = paragraph_text.strip()
         
-        return paragraph_text.strip()
+        return paragraph_text[:155] + '...' if len(paragraph_text) > 160 else paragraph_text
     
     return ""  # No <p> block found
 
