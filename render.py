@@ -154,13 +154,13 @@ def get_image_meta_tags_html(markdown_text, current_dir, title):
         if './' in image_url: 
             dir_relpath = os.path.relpath(current_dir, directory)
             image_url = image_url.replace('./', (urlroot + ('/' if urlroot else '') + dir_relpath + '/'))
-        return f'<meta property="og:image" content="{image_url}">\n\t\t<meta name="twitter:image" content="{image_url}">' + \
-            f'\n\t\t<meta name="twitter:title" content="{title}" />'
+        tag = f'<meta property="og:image" content="{image_url}">\n\t\t<meta name="twitter:image" content="{image_url}">'
     elif os.path.exists(os.path.join(directory, 'static/img/default_img.png')):
         image_url = urlroot + '/static/img/default_img.png'
-        return f'<meta property="og:image" content="{image_url}">\n\t\t<meta name="twitter:image" content="{image_url}">'
+        tag =  f'<meta property="og:image" content="{image_url}">\n\t\t<meta name="twitter:image" content="{image_url}">'
     else:
-        return ""
+        tag = ""
+    return tag + f'\n\t\t<meta name="twitter:title" content="{title}" />'
 
 def extract_first_paragraph(html):
     # Find the first <p> block
