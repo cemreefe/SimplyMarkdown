@@ -25,7 +25,7 @@ def read_file_content(file_path):
 
 def convert_to_html(content):
     """Converts markdown content to HTML."""
-    extensions = [ModuleExtension(), MetaExtension()]
+    extensions = [ModuleExtension(), MetaExtension(), 'markdown.extensions.tables']
     md = markdown.Markdown(extensions=extensions)
     return md.convert(content)
 
