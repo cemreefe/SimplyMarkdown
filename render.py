@@ -5,27 +5,16 @@ import shutil
 from markdown.extensions import Extension
 from markdown.extensions.meta import MetaExtension
 from jinja2 import Environment, FileSystemLoader
-
-class ModuleExtension(Extension):
-    """Markdown extension to handle [[module_name]] tags."""
-
-    def extendMarkdown(self, md):
-        pattern = r'\[\[([^\]]+)\]\]'
-        md.inlinePatterns.register(ModulePattern(pattern), 'module', 175)
-
-class ModulePattern(markdown.inlinepatterns.Pattern):
-    def handleMatch(self, m):
-        module_name = m.group(2)
-        return markdown.util.etree.Element('module_{0}'.format(module_name))
+from subdirectory_helpers import PreviewExtension
 
 def read_file_content(file_path):
     """Reads and returns the content of a file."""
     with open(file_path, 'r') as file:
         return file.read()
 
-def convert_to_html(content):
+def convert_to_html(content, base_path=''):
     """Converts markdown content to HTML."""
-    extensions = [ModuleExtension(), MetaExtension(), 'markdown.extensions.tables']
+    extensions = [PreviewExtension(base_path=base_path, processor=convert_to_html), MetaExtension(), 'markdown.extensions.tables']
     md = markdown.Markdown(extensions=extensions)
     return md.convert(content)
 
@@ -46,7 +35,8 @@ def find_modules(directory):
     for root, _, files in os.walk(modules_dir):
         for file in files:
             file_path = os.path.join(root, file)
-            module_dict[get_filename_without_extension(file)] = convert_to_html(read_file_content(file_path))   
+            print(file_path)
+            module_dict[get_filename_without_extension(file)] = convert_to_html(read_file_content(file_path), os.path.dirname(file_path))   
     return module_dict
 
 def fill_template(context, template_path):
@@ -66,8 +56,11 @@ def copy_css_file(css_path, output_path):
 def get_dutluk_emoji_href(emoji):
     return f"https://emoji.dutl.uk/png/64x64/{emoji}.png"
 
-def process_file(input_path, output_path, css, template_path, favicon):
+def process_file(input_path, output_path, css, template_path, favicon, root):
     """Processes the input directory and saves the files in the output directory."""
+    # Copy the CSS file to the output directory
+    copy_css_file(css, output_path)
+    
     module_dict = find_modules(input_path)
 
     for root, dirs, files in os.walk(input_path):
@@ -93,19 +86,17 @@ def process_file(input_path, output_path, css, template_path, favicon):
             if file.lower().endswith('.md'):
                 # If the file is markdown, convert to HTML and replace module tags
                 content = read_file_content(file_path)
-                content = convert_to_html(content)
+                print(file)
+                content = convert_to_html(content, os.path.dirname(file_path))
 
                 # Change the file extension to '.html'
                 output_file = os.path.splitext(output_file)[0] + '.html'
-
-            # Copy the CSS file to the output directory
-            copy_css_file(css, output_path)
 
             # Fill in the template with the context information
             context = {
                 'lang': 'en',  # Add the appropriate values for these context variables
                 'meta_description': 'Website description',
-                'root': '',
+                'root': root,
                 'favicon_path': get_dutluk_emoji_href(favicon),
                 'title': 'Page Title',
                 'modules': module_dict,
@@ -123,8 +114,8 @@ if __name__ == "__main__":
     parser.add_argument('-o', '--output', help="Output directory path", required=True)
     parser.add_argument('--css', help="CSS to include", required=False, default='themes/basic.css')
     parser.add_argument('--template', help="Path to the HTML template", required=False, default='templates/base.html')
-    parser.add_argument('--root', help="Path to the HTML template", required=False, default='')
     parser.add_argument('--favicon', help="Favicon emoji", required=False, default='👤')
+    parser.add_argument('--root', help="Project url root", required=False, default='')
     args = parser.parse_args()
 
-    process_file(args.input, args.output, args.css, args.template, args.favicon)
+    process_file(args.input, args.output, args.css, args.template, args.favicon, args.root)
