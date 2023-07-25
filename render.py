@@ -4,8 +4,23 @@ import markdown
 import shutil
 from markdown.extensions import Extension
 from markdown.extensions.meta import MetaExtension
+from markdown.extensions.codehilite import CodeHiliteExtension
 from jinja2 import Environment, FileSystemLoader
 from subdirectory_helpers import PreviewExtension
+
+
+def setup_codehilite():
+    # Define the options for the CodeHiliteExtension
+    options = {
+        'noclasses': True,
+        'pygments_options': {'style': 'colorful'},
+        'css_class': 'highlight',
+        'use_pygments': True,
+        'inline_css': True,
+    }
+
+    # Create an instance of the CodeHiliteExtension with the modified options
+    return CodeHiliteExtension(**options)
 
 def read_file_content(file_path):
     """Reads and returns the content of a file."""
@@ -14,7 +29,14 @@ def read_file_content(file_path):
 
 def convert_to_html(content, base_path=''):
     """Converts markdown content to HTML."""
-    extensions = [PreviewExtension(base_path=base_path, processor=convert_to_html), MetaExtension(), 'markdown.extensions.tables']
+    extensions = [
+        PreviewExtension(base_path=base_path, processor=convert_to_html), 
+        MetaExtension(), 
+        'markdown.extensions.tables',
+        'markdown.extensions.fenced_code',
+        'markdown.extensions.toc',
+        setup_codehilite(),
+    ]
     md = markdown.Markdown(extensions=extensions)
     return md.convert(content)
 
@@ -35,7 +57,6 @@ def find_modules(directory):
     for root, _, files in os.walk(modules_dir):
         for file in files:
             file_path = os.path.join(root, file)
-            print(file_path)
             module_dict[get_filename_without_extension(file)] = convert_to_html(read_file_content(file_path), os.path.dirname(file_path))   
     return module_dict
 
@@ -86,7 +107,6 @@ def process_file(input_path, output_path, css, template_path, favicon, root):
             if file.lower().endswith('.md'):
                 # If the file is markdown, convert to HTML and replace module tags
                 content = read_file_content(file_path)
-                print(file)
                 content = convert_to_html(content, os.path.dirname(file_path))
 
                 # Change the file extension to '.html'

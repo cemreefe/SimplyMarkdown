@@ -8,6 +8,11 @@
     <link rel="icon" type="image/png" href="https://emoji.dutl.uk/png/64x64/👤.png">
     <title>Page Title</title>
     
+    <style>
+      .postPreview {
+        padding:1em;
+      }
+    </style>
   </head>
   <body>
     <div class="wrapper">
@@ -22,16 +27,16 @@
       </div>
       <div class="content">
         <main>
-          <h1>Creative Coding</h1>
+          <h1 id="creative-coding">Creative Coding</h1>
 <p>@ coding, dev</p>
 <p>This is a blog post with a code block</p>
-<p><code>java
-public class NotificationService {
-  private EmailService emailService = new SmsService(); // modify this line
-  public void sendNotification(String email, String message) {
-    emailService.sendEmail(email, message); // replace with emailService.sendSms(phone, message);
-  }
-}</code></p>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">public</span><span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">class</span> <span style="color: #0000FF; font-weight: bold">NotificationService</span><span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">private</span><span style="color: #bbbbbb"> </span>EmailService<span style="color: #bbbbbb"> </span>emailService<span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">new</span><span style="color: #bbbbbb"> </span>SmsService();<span style="color: #bbbbbb"> </span><span style="color: #3D7B7B; font-style: italic">// modify this line</span>
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">public</span><span style="color: #bbbbbb"> </span><span style="color: #B00040">void</span><span style="color: #bbbbbb"> </span><span style="color: #0000FF">sendNotification</span>(String<span style="color: #bbbbbb"> </span>email,<span style="color: #bbbbbb"> </span>String<span style="color: #bbbbbb"> </span>message)<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">    </span>emailService.<span style="color: #687822">sendEmail</span>(email,<span style="color: #bbbbbb"> </span>message);<span style="color: #bbbbbb"> </span><span style="color: #3D7B7B; font-style: italic">// replace with emailService.sendSms(phone, message);</span>
+<span style="color: #bbbbbb">  </span>}
+}
+</code></pre></div>
         </main>
       </div>
     </div>
