@@ -88,6 +88,7 @@ class PreviewBlockProcessor(markdown.blockprocessors.BlockProcessor):
                             file_content = md_file.read().strip()
                             components = file_content.split('\n\n')[:self.preview_limit]
                             content = '\n\n'.join(components) + '\n\n'
+                            content = re.sub(r'(\[.*?\]\()\.', r'\1 ' + self.directory_name + '/' + relpath + '/.', content)
                             content = self.processor(content)
                             contents.append(content)
                             dates.append(date)
