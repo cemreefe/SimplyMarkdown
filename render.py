@@ -32,6 +32,7 @@ def read_file_content(file_path):
 def convert_to_html(content, base_path=''):
     """Converts markdown content to HTML."""
     extensions = [
+        'markdown.extensions.extra',
         PreviewExtension(base_path=base_path, processor=convert_to_html), 
         TagsExtension(),
         MetaExtension(), 
