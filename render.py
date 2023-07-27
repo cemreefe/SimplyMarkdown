@@ -1,166 +1,84 @@
+import os
+import re
 import argparse
 import markdown
-import re
 import shutil
-import sys
-import os
-
-from jinja2 import Environment, FileSystemLoader
 from markdown.extensions import Extension
+from markdown.extensions.meta import MetaExtension
 from markdown.extensions.codehilite import CodeHiliteExtension
-from markdown.inlinepatterns import Pattern
-import xml.etree.ElementTree as ET
-
-parser = argparse.ArgumentParser(description='Argument parser example')
-parser.add_argument('-i', '--input_dir', type=str, help='Input directory')
-parser.add_argument('-o', '--output_dir', type=str, help='Output directory')
-parser.add_argument('-t', '--title', type=str, help='Title')
-parser.add_argument('-th', '--theme', type=str, help='CSS Theme file location')
-parser.add_argument('--root', type=str, help='Path to website root if different from url root')
-parser.add_argument('--favicon', type=str, help='Emoji favicon')
-parser.add_argument('--lang', type=str, help='Website language')
-
-args = parser.parse_args()
-
-directory = args.input_dir
-output_dir = args.output_dir if args.output_dir else os.path.join(directory, '../output')
-default_title = args.title if args.title else '<<Title>>'
-theme = args.theme if args.theme else 'themes/basic.css'
-urlroot = args.root if args.root else ''
-favicon_path = f'https://emoji.dutl.uk/png/32x32/{args.favicon}.png' if args.favicon else f'{urlroot}/static/favicon/favicon.png'
-lang = args.lang if args.lang else 'en'
-
-# set up Jinja2 environment to load templates
-env = Environment(loader=FileSystemLoader('templates'))
-
-# Define the options for the CodeHiliteExtension
-options = {
-    'noclasses': True,
-    'pygments_options': {'style': 'colorful'},
-    'css_class': 'highlight',
-    'use_pygments': True,
-    'inline_css': True,
-}
-
-# Create an instance of the CodeHiliteExtension with the modified options
-codehilite = CodeHiliteExtension(**options)
-
-# define a custom markdown extension that adds links to all files in subdirectories
-class SubdirLinkExtension(Extension):
-    def __init__(self, base_dir):
-        super().__init__()
-        self.base_dir = base_dir
-    def extendMarkdown(self, md):
-        subdir_link_pattern = SubdirLinkPattern(r'^%\s+([^\s]+)', md, self.base_dir)
-        md.inlinePatterns.register(subdir_link_pattern, 'subdir_link', 175)
-
-class SubdirLinkPattern(Pattern):
-    def __init__(self, pattern, md, base_dir):
-        super(SubdirLinkPattern, self).__init__(pattern)
-        self.md = md
-        self.base_dir = base_dir
-
-    def handleMatch(self, m):
-        dirpath = m.group(2)
-        full_path = os.path.join(self.base_dir, dirpath)
-        if os.path.isdir(full_path):
-            items = []
-            for root, dirs, files in os.walk(full_path):
-                for f in files:
-                    if f.split('.')[-1] not in ['md', 'html']:
-                        continue
-                    path = os.path.join(root, f)
-                    relpath = os.path.relpath(path, full_path)
-                    # TODO: handle non-html files
-                    href = './' + dirpath + '/' + os.path.splitext(relpath)[0].replace(', ', '-').replace(' ', '-')
-                    link = ET.Element('a', href=href)
-                    date = ET.Element('span')
-                    date.text = '/'.join(relpath.split('/')[:-1]) + " "
-                    link.text = os.path.splitext(f)[0]
-                    items.append((date, link))
-
-            # create a new ul element
-            ul_elem = ET.Element('ul')
-            for date, link in items:
-                li_elem = ET.Element('li')
-                li_elem.append(date)
-                li_elem.append(link)
-                ul_elem.append(li_elem)
-            return ul_elem
-        else:
-            return None
-
-# define a custom markdown extension that adds tags
-class TagsExtension(Extension):
-    def __init__(self):
-        super().__init__()
-        
-    def extendMarkdown(self, md):
-        tags_pattern = TagsPattern(r'^@\s+(.+)', md)
-        md.inlinePatterns.register(tags_pattern, 'tags', 180)
-
-class TagsPattern(Pattern):
-    def __init__(self, pattern, md):
-        super(TagsPattern, self).__init__(pattern)
-        self.md = md
-
-    def handleMatch(self, m):
-        tags = m.group(2)
-        tags = [tag.strip() for tag in tags.split(',')]
-        tags_container = ET.Element('div')
-        for tag in tags:
-            tag_block = ET.Element('div', {'class': 'categoryTag'}) # Add class attribute
-            tag_block.text = tag # Set tag as text content of div element
-            tags_container.append(tag_block)
-        return tags_container
+from jinja2 import Environment, FileSystemLoader
+from markdownTags import PreviewExtension, TagsExtension
+from generateSitemap import generate_sitemap
 
 
+def setup_codehilite():
+    # Define the options for the CodeHiliteExtension
+    options = {
+        'noclasses': True,
+        'pygments_options': {'style': 'colorful'},
+        'css_class': 'highlight',
+        'use_pygments': True,
+        'inline_css': True,
+    }
 
+    # Create an instance of the CodeHiliteExtension with the modified options
+    return CodeHiliteExtension(**options)
 
-def markdown_to_html(directory, markdown_str):
-    return markdown.markdown(
-        markdown_str, 
-        extensions=[
-            'markdown.extensions.extra', 
-            'markdown.extensions.fenced_code',
-            'markdown.extensions.toc', 
-            SubdirLinkExtension(directory),
-            TagsExtension(),
-            codehilite
-        ]
-    )
+def read_file_content(file_path):
+    """Reads and returns the content of a file."""
+    with open(file_path, 'r') as file:
+        return file.read()
 
-def read_html(directory, filename):
-    if os.path.exists(os.path.join(directory, filename)):
-        with open(os.path.join(directory, filename), 'r') as f:
-            return f.read()
-    else: 
-        return ""
+def convert_to_html(content, base_path=''):
+    """Converts markdown content to HTML."""
+    extensions = [
+        PreviewExtension(base_path=base_path, processor=convert_to_html), 
+        TagsExtension(),
+        MetaExtension(), 
+        'markdown.extensions.tables',
+        'markdown.extensions.fenced_code',
+        'markdown.extensions.toc',
+        setup_codehilite(),
+    ]
+    md = markdown.Markdown(extensions=extensions)
+    return md.convert(content)
 
-def markdown_file_to_html(directory, filename):
-    if os.path.exists(os.path.join(directory, filename)):
-        with open(os.path.join(directory, filename), 'r') as f:
-            markdown_str = f.read()
-        return markdown_to_html(directory, markdown_str)
-    else: 
-        return ""
+def get_filename_without_extension(full_path):
+    """Get the filename without extension from a full file path."""
+    file_name_with_extension = os.path.basename(full_path)
+    filename, _ = os.path.splitext(file_name_with_extension)
+    return filename
 
+def find_modules(directory):
+    """Finds and returns a dictionary containing module filenames and their content."""
+    module_dict = {}
+    modules_dir = os.path.join(directory, 'modules')
+    
+    if not os.path.exists(modules_dir):
+        return module_dict
+    
+    for root, _, files in os.walk(modules_dir):
+        for file in files:
+            file_path = os.path.join(root, file)
+            module_dict[get_filename_without_extension(file)] = convert_to_html(read_file_content(file_path), os.path.dirname(file_path))   
+    return module_dict
 
-def get_image_meta_tags_html(markdown_text, current_dir, title):
-    pattern = r'!\[[^\]]*\]\((.*?)\)'
-    match = re.search(pattern, markdown_text)
-    if match and ('!override_meta_img' in markdown_text):
-        image_url = match.group(1)
-        if './' in image_url: 
-            dir_relpath = os.path.relpath(current_dir, directory)
-            image_url = image_url.replace('./', (urlroot + ('/' if urlroot else '') + dir_relpath + '/'))
-        tag = f'<meta property="og:image" content="{image_url}">\n\t\t<meta name="twitter:image" content="{image_url}">'
-    elif os.path.exists(os.path.join(directory, 'static/img/default_img.png')):
-        image_url = urlroot + '/static/img/default_img.png'
-        tag =  f'<meta property="og:image" content="{image_url}">\n\t\t<meta name="twitter:image" content="{image_url}">'
-    else:
-        tag = ""
-    return tag + f'\n\t\t<meta name="twitter:title" content="{title}" />'
+def fill_template(context, template_path):
+    """Fills the HTML template with the given context."""
+    env = Environment(loader=FileSystemLoader(os.path.dirname(template_path)))
+    template = env.get_template(os.path.basename(template_path))
+    return template.render(context)
+
+def copy_css_file(css_path, output_path):
+    """Copy the CSS file to the output directory."""
+    css_file_name = "theme.css"
+    css_output_dir = os.path.join(output_path, 'static', 'css')
+    os.makedirs(css_output_dir, exist_ok=True)  # Create the directory if it doesn't exist
+    output_css_path = os.path.join(css_output_dir, css_file_name)
+    shutil.copy2(css_path, output_css_path)
+
+def get_dutluk_emoji_href(emoji):
+    return f"https://emoji.dutl.uk/png/64x64/{emoji}.png"
 
 def extract_first_paragraph(html):
     # Find the first <p> block
@@ -171,93 +89,115 @@ def extract_first_paragraph(html):
     
     if match:
         paragraph_content = match.group(1)
-        
         # Remove inner tags from the paragraph
         paragraph_text = re.sub(r'<.*?>', '', paragraph_content)
-
         paragraph_text = paragraph_text.strip()
-        
         return paragraph_text[:155] + '...' if len(paragraph_text) > 160 else paragraph_text
     
     return ""  # No <p> block found
 
-def extension(filename):
-    assert (len(filename.split('.')) == 2)
-    return filename.split('.')[-1]
+def get_image_meta_tags_html(markdown_text, current_dir, title, urlroot=''):
+    pattern = r'!\[[^\]]*\]\((.*?)\)'
+    match = re.search(pattern, markdown_text)
 
-def barename(filename):
-    assert (len(filename.split('.')) == 2)
-    return filename.split('.')[0]
+    if match and '! override_meta_img' in markdown_text:
+        image_url = match.group(1)
+        if image_url[:4] != 'http':
+            image_url = os.path.join(urlroot, current_dir.replace('./', '')) + image_url 
+    elif os.path.exists(os.path.join(current_dir, 'static/img/default_img.png')):
+        image_url = urlroot + '/static/img/default_img.png'
+    else:
+        return ""
 
-def get_modules():
-    modules_ = {}
-    modules_dir = os.path.join(directory, '_modules')
-    for filename in os.listdir(modules_dir):
-        filepath = os.path.join(modules_dir, filename)
-        if extension(filename) == 'md':
-            modules_[barename(filename)] = markdown_file_to_html('', filepath)
-        if extension(filename) == 'html':
-            modules_[barename(filename)] = read_html('', filepath)
-    return modules_
+    meta_tags = f'''
+    <meta property="og:image" content="{image_url}">
+    <meta name="twitter:image" content="{image_url}">
+    <meta name="twitter:title" content="{title}">
+    '''
 
-modules = get_modules()
+    return meta_tags
 
-def render_folder(directory, output_dir):
-    os.makedirs(output_dir, exist_ok=True)
-    for filename in os.listdir(directory):
-        # pre-rendered special files
-        if filename in ("navbar.md", "footer.md", "socials_tag.md", "head_extras.html"):
-            continue
-        # ignore files that start with _
-        if os.path.basename(filename)[0] == "_":
-            continue
-        filepath = os.path.join(directory, filename)
-        if os.path.isfile(filepath) and filepath.endswith('.md'):
-            with open(filepath, 'r') as f:
-                markdown_content = f.read()
-            title = default_title
-            # set page title to include the first h1 if exists
-            match = re.search(r'#\s*(.*)', markdown_content)
-            if match:
-                title = f"{match.group(1)} | {title}"
-            # if [SOCIALS] tag, replace with rendered socials module
-            markdown_content = markdown_content.replace("[SOCIALS]", modules.get('socials', ''))
-            meta_tags_html = get_image_meta_tags_html(markdown_content, directory, title)
-            markdown_content = markdown_content.replace("!override_meta_img", "")
-            content_html = markdown_to_html(directory, markdown_content)
-            template = env.get_template('base.html')
-            rendered_html = template.render(
-                context = {
-                    'content': content_html, 
-                    'navbar': modules.get('navbar', ''), 
-                    'footer': modules.get('footer', ''), 
-                    'title': title, 
-                    'root': urlroot,
-                    'head_extras': modules.get('head_extras', '') + meta_tags_html,
-                    'favicon_path': favicon_path,
-                    'lang': lang,
-                    'meta_description': extract_first_paragraph(content_html)
-                }
-            )
-            with open(os.path.join(output_dir, os.path.splitext(filename)[0].replace(', ', '-').replace(' ', '-') + '.html'), 'w') as f:
-                f.write(rendered_html)
-        elif os.path.isdir(filepath):
-            render_folder(filepath, os.path.join(output_dir, filename))
-        else:
-            shutil.copy(filepath, os.path.join(output_dir, filename))
+def get_first_title(markdown_or_html_text):
+    pattern = r'(<h[1-6]>.*?</h[1-6]>)|^#+(\s+(.*?))$'
+    match = re.search(pattern, markdown_or_html_text, re.MULTILINE | re.IGNORECASE | re.DOTALL)
+    if match:
+        title = re.sub(r'<[^>]+>', '', match.group(0)).strip() # Strip HTML tags if present
+        title = re.sub(r'#+ +', '', title)
+        return title
+    return None
 
+def process_file(input_path, output_path, css, template_path, favicon, urlroot):
+    """Processes the input directory and saves the files in the output directory."""
+    # Copy the CSS file to the output directory
+    copy_css_file(css, output_path)
+    
+    module_dict = find_modules(input_path)
 
-def copy_static():
-    static_dir = os.path.join(directory, 'static')
-    output_static_dir = os.path.join(output_dir, 'static')
-    os.makedirs(output_static_dir, exist_ok=True)
-    if os.path.exists(static_dir):
-        shutil.copytree(static_dir, output_static_dir, dirs_exist_ok=True)
-    if theme != 'none':
-        os.makedirs(os.path.join(output_static_dir, 'css'), exist_ok=True)
-        theme_css = os.path.join(output_static_dir, 'css', 'theme.css')
-        shutil.copy(theme, theme_css)
+    def match_to_module(match):
+        return module_dict.get(match.group(1), None) if match else ""
+
+    for root, dirs, files in os.walk(input_path):
+        for dir_name in dirs:
+            input_dir = os.path.join(root, dir_name)
+            output_dir = input_dir.replace(input_path, output_path)
+            os.makedirs(output_dir, exist_ok=True)
+
+        for file in files:
+            file_path = os.path.join(root, file)
+            relative_path = file_path.replace(input_path, '').lstrip('/\\')
+            output_file = os.path.join(output_path, relative_path)
+
+            title, meta_tags = None, None
+
+            if 'modules' in file_path:
+                # For files in 'modules', already handled in find_modules()
+                continue
+
+            if not file.lower().endswith(('.md', '.html')):
+                # For non-md and non-html files, copy them as is to the output directory
+                shutil.copy2(file_path, output_file)
+                continue
+            
+            content = read_file_content(file_path)
+            title = get_first_title(content)
+            
+            if file.lower().endswith('.md'):
+                # If the file is markdown, convert to HTML and replace module tags
+                meta_tags = get_image_meta_tags_html(content, root, title, urlroot)
+                content = re.sub('! include (.+)', match_to_module, content, flags=re.I)
+                content = re.sub('! .+', '', content) # clean out meta tags
+                content = convert_to_html(content, os.path.dirname(file_path))
 
 
-render_folder(directory, output_dir)
-copy_static()
+                # Change the file extension to '.html'
+                output_file = os.path.splitext(output_file)[0].replace(', ', '-').replace(' ', '-') + '.html'
+
+            # Fill in the template with the context information
+            context = {
+                'lang': 'en',  # Add the appropriate values for these context variables
+                'meta_description': extract_first_paragraph(content),
+                'root': urlroot,
+                'favicon_path': get_dutluk_emoji_href(favicon),
+                'title': title,
+                'modules': module_dict,
+                'content': content,
+                'meta_tags': meta_tags
+            }
+            filled_template = fill_template({'context': context}, template_path)
+
+            with open(output_file, 'w') as output_file:
+                output_file.write(filled_template)
+
+if __name__ == "__main__":
+    # Argument parsing
+    parser = argparse.ArgumentParser(description="Process files in input directory.")
+    parser.add_argument('-i', '--input', help="Input directory path", required=True)
+    parser.add_argument('-o', '--output', help="Output directory path", required=True)
+    parser.add_argument('--css', help="CSS to include", required=False, default='themes/basic.css')
+    parser.add_argument('--template', help="Path to the HTML template", required=False, default='templates/base.html')
+    parser.add_argument('--favicon', help="Favicon emoji", required=False, default='👤')
+    parser.add_argument('--root', help="Project url root", required=False, default='')
+    args = parser.parse_args()
+
+    process_file(args.input, args.output, args.css, args.template, args.favicon, args.root)
+    generate_sitemap(args.output, args.root)

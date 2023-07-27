@@ -7,13 +7,14 @@
     <link rel="stylesheet" href="{{ context.root }}/static/css/theme.css">
     <link rel="icon" type="image/png" href="{{ context.favicon_path }}">
     <title>{{ context.title }}</title>
-    {{ context.head_extras }}
+    {{ context.meta_tags }}
+    {{ context.modules.head_extras }}
   </head>
   <body>
     <div class="wrapper">
       <div class="content">
         <nav>
-          {{ context.navbar }}
+          {{ context.modules.navbar }}
         </nav>
       </div>
       <div class="content">
@@ -21,9 +22,9 @@
           {{ context.content }}
         </main>
       </div>
+      <footer>
+        {{ context.modules.footer }}
+      </footer>
     </div>
-    <footer>
-      {{ context.footer }}
-    </footer>
   </body>
 </html>
