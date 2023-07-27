@@ -124,7 +124,7 @@ def get_first_title(markdown_or_html_text):
         title = re.sub(r'<[^>]+>', '', match.group(0)).strip() # Strip HTML tags if present
         title = re.sub(r'#+ +', '', title)
         return title
-    return None
+    return ""
 
 def process_file(input_path, output_path, css, template_path, favicon, urlroot, website_title):
     """Processes the input directory and saves the files in the output directory."""
