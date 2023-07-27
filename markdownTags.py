@@ -2,6 +2,8 @@ import os
 import re
 import markdown
 import xml.etree.ElementTree as ET
+from markdown.extensions import Extension
+from markdown.inlinepatterns import Pattern
 
 class PreviewExtension(markdown.extensions.Extension):
     """Markdown extension to handle the special tag for previews."""
@@ -48,9 +50,13 @@ class PreviewBlockProcessor(markdown.blockprocessors.BlockProcessor):
             text_div = ET.Element('div')
             text_div.text = content
 
+            more_div = ET.Element('div', attrib={'style': 'text-align: right'})
+            more_div.text = 'Read more'
+
             wrapper = ET.Element('div', attrib={'class': 'postPreview'})
             wrapper.append(date_div)
             wrapper.append(text_div)
+            wrapper.append(more_div)
 
             # Create the anchor (<a>) element with the provided href
             a = ET.Element('a', attrib={'href': href, 'class':'previewHref'})
@@ -74,7 +80,8 @@ class PreviewBlockProcessor(markdown.blockprocessors.BlockProcessor):
                 relpath = os.path.relpath(root, directory_path)
                 for file in files:
                     date = relpath
-                    href = ('./' + relpath + '/' + os.path.splitext(file)[0].replace(', ', '-').replace(' ', '-'))
+                    href =  (self.directory_name + '/' + relpath + '/' + os.path.splitext(file)[0].replace(', ', '-').replace(' ', '-')) 
+                    href = href +  (os.path.splitext(file)[1] if not os.path.splitext(file)[1] == '.md' else '.html')
                     if file.lower().endswith('.md'):
                         file_path = os.path.join(root, file)
                         with open(file_path, 'r') as md_file:
@@ -89,3 +96,26 @@ class PreviewBlockProcessor(markdown.blockprocessors.BlockProcessor):
         return contents, dates, hrefs
 
 
+# define a custom markdown extension that adds tags
+class TagsExtension(Extension):
+    def __init__(self):
+        super().__init__()
+        
+    def extendMarkdown(self, md):
+        tags_pattern = TagsPattern(r'^@\s+(.+)', md)
+        md.inlinePatterns.register(tags_pattern, 'tags', 180)
+
+class TagsPattern(Pattern):
+    def __init__(self, pattern, md):
+        super(TagsPattern, self).__init__(pattern)
+        self.md = md
+
+    def handleMatch(self, m):
+        tags = m.group(2)
+        tags = [tag.strip() for tag in tags.split(',')]
+        tags_container = ET.Element('div')
+        for tag in tags:
+            tag_block = ET.Element('div', {'class': 'categoryTag'}) # Add class attribute
+            tag_block.text = tag # Set tag as text content of div element
+            tags_container.append(tag_block)
+        return tags_container

@@ -1,4 +1,5 @@
 import os
+import re
 import argparse
 import markdown
 import shutil
@@ -6,7 +7,8 @@ from markdown.extensions import Extension
 from markdown.extensions.meta import MetaExtension
 from markdown.extensions.codehilite import CodeHiliteExtension
 from jinja2 import Environment, FileSystemLoader
-from subdirectory_helpers import PreviewExtension
+from markdownTags import PreviewExtension, TagsExtension
+from generateSitemap import generate_sitemap
 
 
 def setup_codehilite():
@@ -31,6 +33,7 @@ def convert_to_html(content, base_path=''):
     """Converts markdown content to HTML."""
     extensions = [
         PreviewExtension(base_path=base_path, processor=convert_to_html), 
+        TagsExtension(),
         MetaExtension(), 
         'markdown.extensions.tables',
         'markdown.extensions.fenced_code',
@@ -77,12 +80,45 @@ def copy_css_file(css_path, output_path):
 def get_dutluk_emoji_href(emoji):
     return f"https://emoji.dutl.uk/png/64x64/{emoji}.png"
 
-def process_file(input_path, output_path, css, template_path, favicon, root):
+def get_image_meta_tags_html(markdown_text, current_dir, title, urlroot=''):
+    pattern = r'!\[[^\]]*\]\((.*?)\)'
+    match = re.search(pattern, markdown_text)
+
+    if match and '! override_meta_img' in markdown_text:
+        image_url = match.group(1)
+        if image_url[:4] != 'http':
+            image_url = os.path.join(urlroot, current_dir.replace('./', '')) + image_url 
+    elif os.path.exists(os.path.join(current_dir, 'static/img/default_img.png')):
+        image_url = urlroot + '/static/img/default_img.png'
+    else:
+        return ""
+
+    meta_tags = f'''
+    <meta property="og:image" content="{image_url}">
+    <meta name="twitter:image" content="{image_url}">
+    <meta name="twitter:title" content="{title}">
+    '''
+
+    return meta_tags
+
+def get_first_title(markdown_or_html_text):
+    pattern = r'(<h[1-6]>.*?</h[1-6]>)|^#+(\s+(.*?))$'
+    match = re.search(pattern, markdown_or_html_text, re.MULTILINE | re.IGNORECASE | re.DOTALL)
+    if match:
+        title = re.sub(r'<[^>]+>', '', match.group(0)).strip() # Strip HTML tags if present
+        title = re.sub(r'#+ +', '', title)
+        return title
+    return None
+
+def process_file(input_path, output_path, css, template_path, favicon, urlroot):
     """Processes the input directory and saves the files in the output directory."""
     # Copy the CSS file to the output directory
     copy_css_file(css, output_path)
     
     module_dict = find_modules(input_path)
+
+    def match_to_module(match):
+        return module_dict.get(match.group(1), None) if match else ""
 
     for root, dirs, files in os.walk(input_path):
         for dir_name in dirs:
@@ -95,6 +131,8 @@ def process_file(input_path, output_path, css, template_path, favicon, root):
             relative_path = file_path.replace(input_path, '').lstrip('/\\')
             output_file = os.path.join(output_path, relative_path)
 
+            title, meta_tags = None, None
+
             if 'modules' in file_path:
                 # For files in 'modules', already handled in find_modules()
                 continue
@@ -103,24 +141,31 @@ def process_file(input_path, output_path, css, template_path, favicon, root):
                 # For non-md and non-html files, copy them as is to the output directory
                 shutil.copy2(file_path, output_file)
                 continue
-
+            
+            content = read_file_content(file_path)
+            title = get_first_title(content)
+            
             if file.lower().endswith('.md'):
                 # If the file is markdown, convert to HTML and replace module tags
-                content = read_file_content(file_path)
+                meta_tags = get_image_meta_tags_html(content, root, title, urlroot)
+                content = re.sub('! include (.+)', match_to_module, content, flags=re.I)
+                content = re.sub('! .+', '', content) # clean out meta tags
                 content = convert_to_html(content, os.path.dirname(file_path))
 
+
                 # Change the file extension to '.html'
-                output_file = os.path.splitext(output_file)[0] + '.html'
+                output_file = os.path.splitext(output_file)[0].replace(', ', '-').replace(' ', '-') + '.html'
 
             # Fill in the template with the context information
             context = {
                 'lang': 'en',  # Add the appropriate values for these context variables
                 'meta_description': 'Website description',
-                'root': root,
+                'root': urlroot,
                 'favicon_path': get_dutluk_emoji_href(favicon),
-                'title': 'Page Title',
+                'title': title,
                 'modules': module_dict,
                 'content': content,
+                'meta_tags': meta_tags
             }
             filled_template = fill_template({'context': context}, template_path)
 
@@ -139,3 +184,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     process_file(args.input, args.output, args.css, args.template, args.favicon, args.root)
+    generate_sitemap(args.output, args.root)

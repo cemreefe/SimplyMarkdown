@@ -4,19 +4,50 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Website description">
-    <link rel="stylesheet" href="example/input/posts/2023/07/03/static/css/theme.css">
+    <link rel="stylesheet" href="/static/css/theme.css">
     <link rel="icon" type="image/png" href="https://emoji.dutl.uk/png/64x64/👤.png">
-    <title>Page Title</title>
+    <title>Creative Coding</title>
+    
     <style>
     .postPreview {
       padding:1em;
+      border-bottom: 1px solid gray;
     }
     .previewHref {
-      text-decoration: none;
+      text-decoration: none !important;
       color: inherit;
     }
     .previewHref:hover {
       color: inherit;
+    }
+    .categoryTag {
+      display: inline-block;
+      background-color: #ddd;
+    }
+    .wrapper {
+      max-width: 800px;
+      margin: auto;
+    }
+    .img {
+      width:auto;
+    }
+    .toc {
+      margin-bottom: 2em;
+    }
+
+    .toc li ul {
+      margin-bottom: 0px;
+    }
+
+    .categoryTag {
+      border-radius: 2em;
+      border: 1px solid gray;
+      padding-inline: 0.4em;
+      padding-block: 0.1em;
+      display: inline-block;
+      font-family: monospace;
+      margin-bottom: 1em;
+      font-size: 1.1em;
     }
 </style>
   </head>
@@ -24,17 +55,21 @@
     <div class="wrapper">
       <div class="content">
         <nav>
-          <p><img alt="" src="/static/img/dutluk_wordart.png" /></p>
-<p>A kind-hearted blog about everything me.</p>
+          <p>A kind-hearted blog about everything me.</p>
 <p><a href="/index.html">Home</a>
 <a href="/about.html">Me</a>
-<a href="/blog/blog.html">Blog</a></p>
+<a href="/blog.html">Blog</a></p>
         </nav>
       </div>
       <div class="content">
         <main>
           <h1 id="creative-coding">Creative Coding</h1>
-<p>@ coding, dev</p>
+<p>
+<div>
+<div class="categoryTag">coding</div>
+<div class="categoryTag">dev</div>
+</div>
+</p>
 <p>This is a blog post with a code block</p>
 <div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">public</span><span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">class</span> <span style="color: #0000FF; font-weight: bold">NotificationService</span><span style="color: #bbbbbb"> </span>{
 <span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">private</span><span style="color: #bbbbbb"> </span>EmailService<span style="color: #bbbbbb"> </span>emailService<span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">new</span><span style="color: #bbbbbb"> </span>SmsService();<span style="color: #bbbbbb"> </span><span style="color: #3D7B7B; font-style: italic">// modify this line</span>
@@ -45,9 +80,9 @@
 </code></pre></div>
         </main>
       </div>
+      <footer>
+        <p>2023 - Made with <a href="https://github.com/cemreefe/SimplyMarkdown">SimpyMarkdown</a></p>
+      </footer>
     </div>
-    <footer>
-      <p>2023 - Made with <a href="https://github.com/cemreefe/SimplyMarkdown">SimpyMarkdown</a></p>
-    </footer>
   </body>
 </html>
