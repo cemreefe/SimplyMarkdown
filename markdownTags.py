@@ -51,18 +51,18 @@ class PreviewBlockProcessor(markdown.blockprocessors.BlockProcessor):
             text_div.text = content
 
             more_div = ET.Element('div', attrib={'style': 'text-align: right'})
-            more_div.text = 'Read more'
+            more_div.text = '▶ Read more'
+
+            # Create the anchor (<a>) element with the provided href
+            a = ET.Element('a', attrib={'href': href, 'class':'previewHref'})
+            a.append(more_div)
 
             wrapper = ET.Element('div', attrib={'class': 'postPreview'})
             wrapper.append(date_div)
             wrapper.append(text_div)
-            wrapper.append(more_div)
+            wrapper.append(a)
 
-            # Create the anchor (<a>) element with the provided href
-            a = ET.Element('a', attrib={'href': href, 'class':'previewHref'})
-            a.append(wrapper)
-
-            parent.append(a)
+            parent.append(wrapper)
 
     def get_preview_content(self):
         if not self.directory_name:
@@ -88,6 +88,7 @@ class PreviewBlockProcessor(markdown.blockprocessors.BlockProcessor):
                             file_content = md_file.read().strip()
                             components = file_content.split('\n\n')[:self.preview_limit]
                             content = '\n\n'.join(components) + '\n\n'
+                            content = re.sub(r'(\[.*?\]\()\.', r'\1 ' + self.directory_name + '/' + relpath + '/.', content)
                             content = self.processor(content)
                             contents.append(content)
                             dates.append(date)
