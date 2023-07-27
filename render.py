@@ -80,6 +80,22 @@ def copy_css_file(css_path, output_path):
 def get_dutluk_emoji_href(emoji):
     return f"https://emoji.dutl.uk/png/64x64/{emoji}.png"
 
+def extract_first_paragraph(html):
+    # Find the first <p> block
+    match = re.search(r'<h2>.*?</h2>.*?<p>(.*?)</p>', html, re.DOTALL)
+
+    if not match:
+        match = re.search(r'<p>(.*?)</p>', html, re.DOTALL)
+    
+    if match:
+        paragraph_content = match.group(1)
+        # Remove inner tags from the paragraph
+        paragraph_text = re.sub(r'<.*?>', '', paragraph_content)
+        paragraph_text = paragraph_text.strip()
+        return paragraph_text[:155] + '...' if len(paragraph_text) > 160 else paragraph_text
+    
+    return ""  # No <p> block found
+
 def get_image_meta_tags_html(markdown_text, current_dir, title, urlroot=''):
     pattern = r'!\[[^\]]*\]\((.*?)\)'
     match = re.search(pattern, markdown_text)
@@ -159,7 +175,7 @@ def process_file(input_path, output_path, css, template_path, favicon, urlroot):
             # Fill in the template with the context information
             context = {
                 'lang': 'en',  # Add the appropriate values for these context variables
-                'meta_description': 'Website description',
+                'meta_description': extract_first_paragraph(content),
                 'root': urlroot,
                 'favicon_path': get_dutluk_emoji_href(favicon),
                 'title': title,
