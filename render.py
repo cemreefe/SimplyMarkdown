@@ -149,7 +149,7 @@ def process_file(input_path, output_path, css, template_path, favicon, urlroot, 
 
             title, meta_tags = None, None
 
-            if 'modules' in file_path:
+            if relative_path.startswith('modules/') or relative_path.startswith('_'):
                 # For files in 'modules', already handled in find_modules()
                 continue
 
