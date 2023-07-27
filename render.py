@@ -147,7 +147,7 @@ def process_file(input_path, output_path, css, template_path, favicon, urlroot, 
             relative_path = file_path.replace(input_path, '').lstrip('/\\')
             output_file = os.path.join(output_path, relative_path)
 
-            title, meta_tags = None, None
+            title, meta_tags = "", ""
 
             if relative_path.startswith('modules/') or relative_path.startswith('_'):
                 # For files in 'modules', already handled in find_modules()
