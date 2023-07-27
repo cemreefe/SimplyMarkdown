@@ -126,7 +126,7 @@ def get_first_title(markdown_or_html_text):
         return title
     return None
 
-def process_file(input_path, output_path, css, template_path, favicon, urlroot):
+def process_file(input_path, output_path, css, template_path, favicon, urlroot, website_title):
     """Processes the input directory and saves the files in the output directory."""
     # Copy the CSS file to the output directory
     copy_css_file(css, output_path)
@@ -178,7 +178,7 @@ def process_file(input_path, output_path, css, template_path, favicon, urlroot):
                 'meta_description': extract_first_paragraph(content),
                 'root': urlroot,
                 'favicon_path': get_dutluk_emoji_href(favicon),
-                'title': title,
+                'title': title if not website_title else title + ' | '  + website_title,
                 'modules': module_dict,
                 'content': content,
                 'meta_tags': meta_tags
@@ -197,7 +197,8 @@ if __name__ == "__main__":
     parser.add_argument('--template', help="Path to the HTML template", required=False, default='templates/base.html')
     parser.add_argument('--favicon', help="Favicon emoji", required=False, default='👤')
     parser.add_argument('--root', help="Project url root", required=False, default='')
+    parser.add_argument('--title', help="Website title", required=False, default='')
     args = parser.parse_args()
 
-    process_file(args.input, args.output, args.css, args.template, args.favicon, args.root)
+    process_file(args.input, args.output, args.css, args.template, args.favicon, args.root, args.title)
     generate_sitemap(args.output, args.root)
