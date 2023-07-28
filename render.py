@@ -119,7 +119,7 @@ def get_image_meta_tags_html(markdown_text, current_dir, title, urlroot=''):
     return meta_tags
 
 def get_first_title(markdown_or_html_text):
-    pattern = r'(<h[1-6]>.*?</h[1-6]>)|^#+(\s+(.*?))$'
+    pattern = r'(<h[1-6].*?>.*?</h[1-6]>)|^#+(\s+(.*?))$'
     match = re.search(pattern, markdown_or_html_text, re.MULTILINE | re.IGNORECASE | re.DOTALL)
     if match:
         title = re.sub(r'<[^>]+>', '', match.group(0)).strip() # Strip HTML tags if present
