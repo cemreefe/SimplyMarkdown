@@ -161,6 +161,11 @@ def process_file(input_path, output_path, css, template_path, favicon, urlroot, 
             
             content = read_file_content(file_path)
             title = get_first_title(content)
+
+            if file.lower().endswith('.html') and '<keep-html>' in content:
+                # don't convert to website page if keep-html tag is present
+                shutil.copy2(file_path, output_file)
+                continue
             
             if file.lower().endswith('.md'):
                 # If the file is markdown, convert to HTML and replace module tags
