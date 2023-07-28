@@ -97,15 +97,15 @@ def extract_first_paragraph(html):
     
     return ""  # No <p> block found
 
-def get_image_meta_tags_html(markdown_text, current_dir, title, urlroot=''):
+def get_image_meta_tags_html(markdown_text, current_dir, input_path, title, urlroot=''):
     pattern = r'!\[[^\]]*\]\((.*?)\)'
     match = re.search(pattern, markdown_text)
 
     if match and '! override_meta_img' in markdown_text:
         image_url = match.group(1)
         if image_url[:4] != 'http':
-            image_url = os.path.join(urlroot, current_dir.replace('./', '')) + image_url 
-    elif os.path.exists(os.path.join(current_dir, 'static/img/default_img.png')):
+            image_url = os.path.join(urlroot, current_dir) + image_url 
+    elif os.path.exists(os.path.join(input_path, 'static/img/default_img.png')):
         image_url = urlroot + '/static/img/default_img.png'
     else:
         return ""
@@ -166,10 +166,10 @@ def process_file(input_path, output_path, css, template_path, favicon, urlroot, 
                 # don't convert to website page if keep-html tag is present
                 shutil.copy2(file_path, output_file)
                 continue
-            
+
             if file.lower().endswith('.md'):
                 # If the file is markdown, convert to HTML and replace module tags
-                meta_tags = get_image_meta_tags_html(content, root, title, urlroot)
+                meta_tags = get_image_meta_tags_html(content, root, input_path, title, urlroot)
                 content = re.sub('! include (.+)', match_to_module, content, flags=re.I)
                 content = re.sub('! .+', '', content) # clean out meta tags
                 content = convert_to_html(content, os.path.dirname(file_path))
