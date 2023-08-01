@@ -10,7 +10,7 @@ class PreviewExtension(markdown.extensions.Extension):
 
     def __init__(self, base_path=None, processor=None, **kwargs):
         self.config = {
-            'preview_limit': [5, "The number of components to show in the preview"]
+            'preview_limit': [4, "The number of components to show in the preview"]
         }
         self.base_path = base_path
         self.processor = processor
@@ -39,34 +39,66 @@ class PreviewBlockProcessor(markdown.blockprocessors.BlockProcessor):
     def run(self, parent, blocks):
         block = blocks.pop(0)  # Get the special tag line
         self.directory_name = re.match(r'^%\s*([^>]+)$', block).group(1).strip()
-        contents, dates, hrefs = self.get_preview_content()
+        contents, dates, hrefs, detailed = self.get_preview_content()
 
-        for content, date, href in zip(contents, dates, hrefs):
+        if detailed:
+            for content, date, href in zip(contents, dates, hrefs):
 
-            # Create the child <div> element for the date with the class 'previewDate'
-            date_div = ET.Element('div', attrib={'class': 'previewDate'})
-            date_div.text = date
+                # Create the child <div> element for the date with the class 'previewDate'
+                date_div = ET.Element('div', attrib={'class': 'previewDate'})
+                date_div.text = date
 
-            text_div = ET.Element('div')
-            text_div.text = content
+                text_div = ET.Element('div')
+                text_div.text = content + '(Read more)'
 
-            more_div = ET.Element('div', attrib={'style': 'text-align: right'})
-            more_div.text = '▶ Read more'
+                # Create the anchor (<a>) element with the provided href
+                a = ET.Element('a', attrib={'href': href, 'class':'previewHref'})
+                a.append(text_div)
 
-            # Create the anchor (<a>) element with the provided href
-            a = ET.Element('a', attrib={'href': href, 'class':'previewHref'})
-            a.append(more_div)
+                wrapper = ET.Element('div', attrib={'class': 'postPreview'})
+                wrapper.append(date_div)
+                wrapper.append(a)
 
-            wrapper = ET.Element('div', attrib={'class': 'postPreview'})
-            wrapper.append(date_div)
-            wrapper.append(text_div)
-            wrapper.append(a)
+                parent.append(wrapper)
+        
+        else:
+            prev_yr = None
+            for content, date, href in zip(contents, dates, hrefs):
+                yr = date.split('/')[0]
 
-            parent.append(wrapper)
+                wrapper = ET.Element('div', attrib={'class': 'postTitle'})
+                
 
+                if yr != prev_yr:
+
+                    # Create the child <div> element for the date with the class 'previewDate'
+                    date_div = ET.Element('div', attrib={'class': 'dateTab'})
+                    date_div.text = yr
+                    wrapper.append(date_div)
+                    prev_yr = yr
+
+                from render import get_first_title
+
+                title_div = ET.Element('div')
+                title_div.text = get_first_title(content)
+
+                # Create the anchor (<a>) element with the provided href
+                a = ET.Element('a', attrib={'href': href})
+                a.append(title_div)
+
+                wrapper.append(a)
+
+                parent.append(wrapper)
     def get_preview_content(self):
         if not self.directory_name:
-            return ''
+            return [], [], [], False
+
+
+        detailed = False
+
+        if ':detailed' in self.directory_name:
+            self.directory_name = self.directory_name.replace(':detailed', '')
+            detailed = True
 
         if self.base_path:
             directory_path = os.path.join(self.base_path, self.directory_name)
@@ -89,12 +121,13 @@ class PreviewBlockProcessor(markdown.blockprocessors.BlockProcessor):
                             components = file_content.split('\n\n')[:self.preview_limit]
                             content = '\n\n'.join(components) + '\n\n'
                             content = re.sub(r'(\[.*?\]\()\.', r'\1 ' + self.directory_name + '/' + relpath + '/.', content)
+                            content = re.sub(r'<a\b[^>]*>(.*?)</a>', r'\1', content) # remove links
                             content = self.processor(content)
                             contents.append(content)
                             dates.append(date)
                             hrefs.append(href)
 
-        return contents, dates, hrefs
+        return contents, dates, hrefs, detailed
 
 
 # define a custom markdown extension that adds tags
