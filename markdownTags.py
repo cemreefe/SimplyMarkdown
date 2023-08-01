@@ -122,8 +122,10 @@ class PreviewBlockProcessor(markdown.blockprocessors.BlockProcessor):
                             components = file_content.split('\n\n')[:self.preview_limit]
                             content = '\n\n'.join(components) + '\n\n'
                             content = re.sub(r'(\[.*?\]\()\.', r'\1 ' + self.directory_name + '/' + relpath + '/.', content)
-                            content = re.sub(r'<a\b[^>]*>(.*?)</a>', r'\1', content) # remove links
                             content = self.processor(content)
+                            content = re.sub(r'<a\b[^>]*>(.*?)</a>', r'\1', content) # remove links
+                            content = re.sub(r'<h[3-4]\b[^>]*>(.*?)</h[3-4]>', r'\1', content) # remove headers below h2
+                            content = re.sub(r'<h[1-2]\b[^>]*>(.*?)</h[1-2]>', r'<h3>\1</h3>', content) # make headers above h3 into h3
                             contents.append(content)
                             dates.append(date)
                             hrefs.append(href)
