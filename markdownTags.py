@@ -127,7 +127,7 @@ class PreviewBlockProcessor(markdown.blockprocessors.BlockProcessor):
                             dates.append(date)
                             hrefs.append(href)
 
-        return contents, dates, hrefs, detailed
+        return reversed(contents), reversed(dates), reversed(hrefs), detailed
 
 
 # define a custom markdown extension that adds tags
