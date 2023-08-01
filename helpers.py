@@ -99,11 +99,13 @@ def extract_first_paragraph(html):
 def get_image_meta_tags_html(markdown_text, current_dir, input_path, title, urlroot=''):
     pattern = r'!\[[^\]]*\]\((.*?)\)'
     match = re.search(pattern, markdown_text)
+    
+    current_dir_relpath = os.path.relpath(current_dir, input_path)
 
     if match and '! override_meta_img' in markdown_text:
         image_url = match.group(1)
         if image_url[:4] != 'http':
-            image_url = os.path.join(urlroot, current_dir) + image_url 
+            image_url = os.path.join(urlroot, current_dir_relpath, image_url) 
     elif os.path.exists(os.path.join(input_path, 'static/img/default_img.png')):
         image_url = urlroot + '/static/img/default_img.png'
     else:
