@@ -48,8 +48,8 @@ def process_file(input_path, output_path, css, template_path, favicon, urlroot, 
             if file.lower().endswith('.md'):
                 # If the file is markdown, convert to HTML and replace module tags
                 meta_tags = get_image_meta_tags_html(content, root, input_path, title, urlroot)
-                content = re.sub('! include (.+)', match_to_module, content, flags=re.I)
-                content = re.sub('! .+', '', content) # clean out meta tags
+                content = re.sub('\n! include (.+)', match_to_module, content, flags=re.I)
+                content = re.sub('\n! .+', '', content) # clean out meta tags
                 content = convert_to_html(content, os.path.dirname(file_path))
 
 
