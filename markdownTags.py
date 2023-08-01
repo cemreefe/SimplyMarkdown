@@ -108,7 +108,7 @@ class PreviewBlockProcessor(markdown.blockprocessors.BlockProcessor):
         contents, dates, hrefs = [], [], []
 
         if os.path.exists(directory_path) and os.path.isdir(directory_path):
-            for root, _, files in os.walk(directory_path):
+            for root, _, files in sorted(os.walk(directory_path)):
                 files.sort()
                 relpath = os.path.relpath(root, directory_path)
                 for file in files:
