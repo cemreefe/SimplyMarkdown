@@ -1,5 +1,6 @@
 # Hogwarts Legacy
 
+! emoji 🏰
 @ gaming
 
 This is a blog post

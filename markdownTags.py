@@ -39,7 +39,12 @@ class PreviewBlockProcessor(markdown.blockprocessors.BlockProcessor):
     def run(self, parent, blocks):
         block = blocks.pop(0)  # Get the special tag line
         self.directory_name = re.match(r'^%\s*([^>]+)$', block).group(1).strip()
-        contents, dates, hrefs, detailed = self.get_preview_content()
+        content_context = self.get_preview_content()
+        contents = content_context.get('contents', [])
+        dates = content_context.get('dates', [])
+        hrefs = content_context.get('hrefs', [])
+        emojis = content_context.get('emojis', [])
+        detailed = content_context.get('detailed', False)
 
         if detailed:
             for content, date, href in zip(contents, dates, hrefs):
@@ -63,7 +68,7 @@ class PreviewBlockProcessor(markdown.blockprocessors.BlockProcessor):
         
         else:
             prev_yr = None
-            for content, date, href in zip(contents, dates, hrefs):
+            for content, date, href, emoji in zip(contents, dates, hrefs, emojis):
                 yr = date.split('/')[0]
 
                 wrapper = ET.Element('div', attrib={'class': 'postTitle'})
@@ -80,7 +85,7 @@ class PreviewBlockProcessor(markdown.blockprocessors.BlockProcessor):
                 from render import get_first_title
 
                 title_div = ET.Element('div')
-                title_div.text = get_first_title(content)
+                title_div.text = emoji + get_first_title(content)
 
                 # Create the anchor (<a>) element with the provided href
                 a = ET.Element('a', attrib={'href': href})
@@ -91,7 +96,7 @@ class PreviewBlockProcessor(markdown.blockprocessors.BlockProcessor):
                 parent.append(wrapper)
     def get_preview_content(self):
         if not self.directory_name:
-            return [], [], [], False
+            return {}
 
 
         detailed = False
@@ -105,7 +110,7 @@ class PreviewBlockProcessor(markdown.blockprocessors.BlockProcessor):
         else:
             directory_path = self.directory_name
 
-        contents, dates, hrefs = [], [], []
+        contents, dates, hrefs, emojis = [], [], [], []
 
         if os.path.exists(directory_path) and os.path.isdir(directory_path):
             for root, _, files in sorted(os.walk(directory_path)):
@@ -122,6 +127,8 @@ class PreviewBlockProcessor(markdown.blockprocessors.BlockProcessor):
                             components = file_content.split('\n\n')[:self.preview_limit]
                             content = '\n\n'.join(components) + '\n\n'
                             content = re.sub(r'(\[.*?\]\()\.', r'\1 ' + self.directory_name + '/' + relpath + '/.', content)
+                            emoji_match = re.search(r'! emoji (.)', content)
+                            emojis.append(emoji_match.group(1) + ' ' if emoji_match else '')
                             content = self.processor(content)
                             content = re.sub(r'<a\b[^>]*>(.*?)</a>', r'\1', content) # remove links
                             content = re.sub(r'<h[3-4]\b[^>]*>(.*?)</h[3-4]>', r'\1', content) # remove headers below h2
@@ -130,7 +137,13 @@ class PreviewBlockProcessor(markdown.blockprocessors.BlockProcessor):
                             dates.append(date)
                             hrefs.append(href)
 
-        return reversed(contents), reversed(dates), reversed(hrefs), detailed
+        return {
+            'contents': reversed(contents), 
+            'dates': reversed(dates), 
+            'hrefs': reversed(hrefs), 
+            'detailed': detailed,
+            'emojis': reversed(emojis)
+        }
 
 
 # define a custom markdown extension that adds tags
