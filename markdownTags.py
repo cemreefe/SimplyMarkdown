@@ -127,7 +127,7 @@ class PreviewBlockProcessor(markdown.blockprocessors.BlockProcessor):
                             components = file_content.split('\n\n')[:self.preview_limit]
                             content = '\n\n'.join(components) + '\n\n'
                             content = re.sub(r'(\[.*?\]\()\.', r'\1 ' + self.directory_name + '/' + relpath + '/.', content)
-                            emoji_match = re.search(r'! emoji (.)', content)
+                            emoji_match = re.search(r'! emoji (.+)', content)
                             emojis.append(emoji_match.group(1) + ' ' if emoji_match else '')
                             content = self.processor(content)
                             content = re.sub(r'<a\b[^>]*>(.*?)</a>', r'\1', content) # remove links
