@@ -80,7 +80,7 @@ class PreviewBlockProcessor(markdown.blockprocessors.BlockProcessor):
                     # Create the child <div> element for the date with the class 'previewDate'
                     date_div = ET.Element('div', attrib={'class': 'dateTab'})
                     date_div.text = yr
-                    parent.append(date_div)
+                    wrapper.append(date_div)
                     prev_yr = yr
 
                 from render import get_first_title
