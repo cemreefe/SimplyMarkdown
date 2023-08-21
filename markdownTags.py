@@ -46,6 +46,8 @@ class PreviewBlockProcessor(markdown.blockprocessors.BlockProcessor):
         emojis = content_context.get('emojis', [])
         detailed = content_context.get('detailed', False)
 
+        wrapper = ET.Element('div', attrib={'class': 'postsListWrapper'})
+
         if detailed:
             for content, date, href in zip(contents, dates, hrefs):
 
@@ -60,19 +62,18 @@ class PreviewBlockProcessor(markdown.blockprocessors.BlockProcessor):
                 a = ET.Element('a', attrib={'href': href, 'class':'previewHref'})
                 a.append(text_div)
 
-                wrapper = ET.Element('div', attrib={'class': 'postPreview'})
-                wrapper.append(date_div)
-                wrapper.append(a)
+                post_wrapper = ET.Element('div', attrib={'class': 'postPreview'})
+                post_wrapper.append(date_div)
+                post_wrapper.append(a)
 
-                parent.append(wrapper)
+                wrapper.append(post_wrapper)
         
         else:
             prev_yr = None
             for content, date, href, emoji in zip(contents, dates, hrefs, emojis):
                 yr = date.split('/')[0]
 
-                wrapper = ET.Element('div', attrib={'class': 'postTitle'})
-                
+                post_wrapper = ET.Element('div', attrib={'class': 'postTitle'})
 
                 if yr != prev_yr:
 
@@ -91,9 +92,12 @@ class PreviewBlockProcessor(markdown.blockprocessors.BlockProcessor):
                 a = ET.Element('a', attrib={'href': href})
                 a.append(title_div)
 
-                wrapper.append(a)
+                post_wrapper.append(a)
 
-                parent.append(wrapper)
+                wrapper.append(post_wrapper)
+
+        parent.append(wrapper)
+                
     def get_preview_content(self):
         if not self.directory_name:
             return {}
