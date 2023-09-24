@@ -21,6 +21,7 @@ def generate_sitemap(root_directory, urlroot=''):
         for file_path in html_files:
             url = file_path.replace(root_directory, urlroot + '/').replace('\\', '/').lstrip('/')
             url = url.replace('//', '/')
+            url = url.replace('https:/', 'https://')
             sitemap_file.write(f'  <url>\n')
             sitemap_file.write(f'    <loc>{url}</loc>\n')
             sitemap_file.write(f'  </url>\n')
