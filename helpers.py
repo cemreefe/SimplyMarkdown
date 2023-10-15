@@ -85,7 +85,7 @@ def extract_first_paragraph(html):
     match = re.search(r'<h2>.*?</h2>.*?<p>(.{30,}?)</p>', html, re.DOTALL)
 
     if not match:
-        match = re.search(r'<p>(.*?)</p>', html, re.DOTALL)
+        match = re.search(r'<p>(.{30,}?)</p>', html, re.DOTALL)
     
     if match:
         paragraph_content = match.group(1)
