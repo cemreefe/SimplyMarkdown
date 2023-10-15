@@ -82,7 +82,7 @@ def get_dutluk_emoji_href(emoji):
 
 def extract_first_paragraph(html):
     # Find the first <p> block
-    match = re.search(r'<h2>.*?</h2>.*?<p>(.*?)</p>', html, re.DOTALL)
+    match = re.search(r'<h2>.*?</h2>.*?<p>(.{30,}?)</p>', html, re.DOTALL)
 
     if not match:
         match = re.search(r'<p>(.*?)</p>', html, re.DOTALL)
