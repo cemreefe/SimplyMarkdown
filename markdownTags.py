@@ -134,8 +134,8 @@ class PreviewBlockProcessor(markdown.blockprocessors.BlockProcessor):
                             emoji_match = re.search(r'! emoji (.+)', content)
                             emojis.append(emoji_match.group(1) + ' ' if emoji_match else '')
                             content = self.processor(content)
-                            content = re.sub(r'<p\b[^>]*>! emoji(.*?)</p>', r'\1', content) # remove emoji descriptor
-                            content = re.sub(r'<p\b[^>]*>@ (.*?)</p>', r'\1', content) # remove tags
+                            content = re.sub(r'<p[^>]*>! emoji(.*?)</p>', r'\1', content) # remove emoji descriptor
+                            content = re.sub(r'<p[^>]*>@ (.*?)</p>', r'\1', content) # remove tags
                             content = re.sub(r'<a\b[^>]*>(.*?)</a>', r'\1', content) # remove links
                             content = re.sub(r'<h[3-4]\b[^>]*>(.*?)</h[3-4]>', r'<b>\1</b>', content) # remove make headers below h2 b
                             content = re.sub(r'<h[1-2]\b[^>]*>(.*?)</h[1-2]>', r'<b>\1</b>', content) # make headers above h3 into ~h3~ b
