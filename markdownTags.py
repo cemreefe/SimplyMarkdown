@@ -137,8 +137,8 @@ class PreviewBlockProcessor(markdown.blockprocessors.BlockProcessor):
                             content = re.sub(r'<p\b[^>]*>! emoji(.*?)</p>', r'\1', content) # remove emoji descriptor
                             content = re.sub(r'<p\b[^>]*>@ (.*?)</p>', r'\1', content) # remove tags
                             content = re.sub(r'<a\b[^>]*>(.*?)</a>', r'\1', content) # remove links
-                            content = re.sub(r'<h[3-4]\b[^>]*>(.*?)</h[3-4]>', r'\1', content) # remove headers below h2
-                            content = re.sub(r'<h[1-2]\b[^>]*>(.*?)</h[1-2]>', r'<h3>\1</h3>', content) # make headers above h3 into h3
+                            content = re.sub(r'<h[3-4]\b[^>]*>(.*?)</h[3-4]>', r'<b>\1</b>', content) # remove make headers below h2 b
+                            content = re.sub(r'<h[1-2]\b[^>]*>(.*?)</h[1-2]>', r'<b>\1</b>', content) # make headers above h3 into ~h3~ b
                             contents.append(content)
                             dates.append(date)
                             hrefs.append(href)
