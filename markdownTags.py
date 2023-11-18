@@ -49,14 +49,14 @@ class PreviewBlockProcessor(markdown.blockprocessors.BlockProcessor):
         wrapper = ET.Element('div', attrib={'class': 'postsListWrapper'})
 
         if detailed:
-            for content, date, href in zip(contents, dates, hrefs):
+            for content, date, href, emoji in zip(contents, dates, hrefs, emojis):
 
                 # Create the child <div> element for the date with the class 'previewDate'
                 date_div = ET.Element('div', attrib={'class': 'previewDate'})
                 date_div.text = date
 
                 text_div = ET.Element('div')
-                text_div.text = content + '(Read more)'
+                text_div.text = emoji + content + '(Read more)'
 
                 # Create the anchor (<a>) element with the provided href
                 a = ET.Element('a', attrib={'href': href, 'class':'previewHref'})
