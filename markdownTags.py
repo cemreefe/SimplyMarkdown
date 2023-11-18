@@ -56,7 +56,7 @@ class PreviewBlockProcessor(markdown.blockprocessors.BlockProcessor):
                 date_div.text = date
 
                 text_div = ET.Element('div')
-                text_div.text = emoji + content + '(Read more)'
+                text_div.text = content + '(Read more)'
 
                 # Create the anchor (<a>) element with the provided href
                 a = ET.Element('a', attrib={'href': href, 'class':'previewHref'})
@@ -139,7 +139,7 @@ class PreviewBlockProcessor(markdown.blockprocessors.BlockProcessor):
                             content = self.processor(content)
                             content = re.sub(r'<a\b[^>]*>(.*?)</a>', r'\1', content) # remove links
                             content = re.sub(r'<h[2-4]\b[^>]*>(.*?)</h[2-4]>', r'<b>\1</b>', content) # remove make headers below h1 b
-                            content = re.sub(r'<h1\b[^>]*>(.*?)</h1>', r'<b class="preview-title">\1</b>', content) # make h1 headers into large b
+                            content = re.sub(r'<h1\b[^>]*>(.*?)</h1>', r'<div class="preview-title"><b>\1</b></div>', content) # make h1 headers into large b
                             contents.append(content)
                             dates.append(date)
                             hrefs.append(href)
