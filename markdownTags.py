@@ -133,8 +133,8 @@ class PreviewBlockProcessor(markdown.blockprocessors.BlockProcessor):
                             content = re.sub(r'(\[.*?\]\()\.', r'\1 ' + self.directory_name + '/' + relpath + '/.', content)
                             emoji_match = re.search(r'! emoji (.+)', content)
                             emojis.append(emoji_match.group(1) + ' ' if emoji_match else '')
-                            content = re.sub(r'^! emoji .*', '', content) # remove emoji descriptor
-                            content = re.sub(r'^@ .*', '', content) # remove tags
+                            content = re.sub(r'\n! emoji [^\n]*', '', content, re.MULTILINE) # remove emoji descriptor
+                            content = re.sub(r'\n@ [^\n]*', '', content, re.MULTILINE) # remove tags
                             
                             content = self.processor(content)
                             content = re.sub(r'<a\b[^>]*>(.*?)</a>', r'\1', content) # remove links
