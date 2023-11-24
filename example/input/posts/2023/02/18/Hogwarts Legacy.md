@@ -1,7 +1,11 @@
-# Hogwarts Legacy
+---
+emoji: 🏰
+tags:
+  - gaming
+  - dev
+---
 
-! emoji 🏰
-@ gaming
+# Hogwarts Legacy
 
 This is a blog post
 

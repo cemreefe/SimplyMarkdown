@@ -1,7 +1,7 @@
 import os 
 import re
 import shutil 
-from markdownTags import PreviewExtension, TagsExtension
+from markdownTags import PreviewExtension
 from markdown.extensions.meta import MetaExtension
 from markdown.extensions.codehilite import CodeHiliteExtension
 import markdown
@@ -33,7 +33,6 @@ def convert_to_html(content, base_path=''):
     extensions = [
         'markdown.extensions.extra',
         PreviewExtension(base_path=base_path, processor=convert_to_html), 
-        TagsExtension(),
         MetaExtension(), 
         'markdown.extensions.tables',
         'markdown.extensions.fenced_code',
@@ -48,20 +47,6 @@ def get_filename_without_extension(full_path):
     file_name_with_extension = os.path.basename(full_path)
     filename, _ = os.path.splitext(file_name_with_extension)
     return filename
-
-def find_modules(directory):
-    """Finds and returns a dictionary containing module filenames and their content."""
-    module_dict = {}
-    modules_dir = os.path.join(directory, 'modules')
-    
-    if not os.path.exists(modules_dir):
-        return module_dict
-    
-    for root, _, files in os.walk(modules_dir):
-        for file in files:
-            file_path = os.path.join(root, file)
-            module_dict[get_filename_without_extension(file)] = convert_to_html(read_file_content(file_path), os.path.dirname(file_path))   
-    return module_dict
 
 def fill_template(context, template_path):
     """Fills the HTML template with the given context."""

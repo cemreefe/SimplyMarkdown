@@ -1,7 +1,11 @@
-# Creative Coding
+---
+emoji: 💻
+tags:
+  - coding
+  - dev
+---
 
-! emoji 💻
-@ coding, dev
+# Creative Coding
 
 This is a blog post with a code block
 
