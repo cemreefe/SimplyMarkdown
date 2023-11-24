@@ -1,7 +1,7 @@
 import os 
 import re
 import shutil 
-from markdownTags import PreviewExtension
+from markdownTags import PreviewExtension, TagsExtension
 from markdown.extensions.meta import MetaExtension
 from markdown.extensions.codehilite import CodeHiliteExtension
 import markdown
@@ -33,6 +33,7 @@ def convert_to_html(content, base_path=''):
     extensions = [
         'markdown.extensions.extra',
         PreviewExtension(base_path=base_path, processor=convert_to_html), 
+        TagsExtension(),
         MetaExtension(), 
         'markdown.extensions.tables',
         'markdown.extensions.fenced_code',

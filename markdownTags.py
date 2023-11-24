@@ -8,12 +8,11 @@ from markdown.blockprocessors import BlockProcessor
 import frontmatter 
 
 class ContentItem:
-    def __init__(self, content, date, href, emoji, tags):
+    def __init__(self, content, date, href, emoji):
         self.content = content
         self.date = date
         self.href = href
         self.emoji = emoji
-        self.tags = tags
 
 class PreviewExtension(Extension):
     """Markdown extension to handle the special tag for previews."""
@@ -132,7 +131,7 @@ class PreviewBlockProcessor(BlockProcessor):
 
                             emoji = post.metadata.get('emoji', '')
                             tags = post.metadata.get('tags', '')
-                            content_items.append(ContentItem(content, date, href, emoji, tags=[]))
+                            content_items.append(ContentItem(content, date, href, emoji))
 
         return {
             'content_items': list(reversed(content_items)),

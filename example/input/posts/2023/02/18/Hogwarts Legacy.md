@@ -1,11 +1,10 @@
 ---
 emoji: 🏰
-tags:
-  - gaming
-  - dev
 ---
 
 # Hogwarts Legacy
+
+@ gaming
 
 This is a blog post
 
