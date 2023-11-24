@@ -124,13 +124,14 @@ class PreviewBlockProcessor(BlockProcessor):
                             content = post.content.strip()
                             components = content.split('\n\n')[:self.preview_limit]
                             content = '\n\n'.join(components) + '\n\n'
+                            content = re.sub(r'\n@ [^\n]*', '', content, re.MULTILINE) # remove tags
+                            content = re.sub(r'(\[.*?\]\()\.', r'\1 ' + self.directory_name + '/' + relpath + '/.', content)
                             content = self.processor(content)
                             content = re.sub(r'<a\b[^>]*>(.*?)</a>', r'\1', content)
                             content = re.sub(r'<h[2-4]\b[^>]*>(.*?)</h[2-4]>', r'<b>\1</b>', content)
                             content = re.sub(r'<h1\b[^>]*>(.*?)</h1>', r'<div class="preview-title"><b>\1</b></div>', content)
 
                             emoji = post.metadata.get('emoji', '')
-                            tags = post.metadata.get('tags', '')
                             content_items.append(ContentItem(content, date, href, emoji))
 
         return {
@@ -138,19 +139,26 @@ class PreviewBlockProcessor(BlockProcessor):
             'detailed': detailed
         }
 
-# Define a custom markdown extension that adds tags
+# define a custom markdown extension that adds tags
 class TagsExtension(Extension):
+    def __init__(self):
+        super().__init__()
+        
     def extendMarkdown(self, md):
         tags_pattern = TagsPattern(r'^@\s+(.+)', md)
         md.inlinePatterns.register(tags_pattern, 'tags', 180)
 
 class TagsPattern(Pattern):
+    def __init__(self, pattern, md):
+        super(TagsPattern, self).__init__(pattern)
+        self.md = md
+
     def handleMatch(self, m):
         tags = m.group(2)
         tags = [tag.strip() for tag in tags.split(',')]
         tags_container = ET.Element('div')
         for tag in tags:
-            tag_block = ET.Element('div', {'class': 'categoryTag'})
-            tag_block.text = tag
+            tag_block = ET.Element('div', {'class': 'categoryTag'}) # Add class attribute
+            tag_block.text = tag # Set tag as text content of div element
             tags_container.append(tag_block)
         return tags_container
