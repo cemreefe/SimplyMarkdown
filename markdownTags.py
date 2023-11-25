@@ -8,16 +8,11 @@ from markdown.blockprocessors import BlockProcessor
 import frontmatter 
 
 def get_first_title(markdown_or_html_text):
-    print(markdown_or_html_text)
     pattern = r'(<h[1-6].*?>.+?</h[1-6]>)|#+(\s+(.*?))$'
     match = re.search(pattern, markdown_or_html_text, re.MULTILINE | re.IGNORECASE | re.DOTALL)
-    print(match)        
     if match:
-        print(match.group(0))
         title = re.sub(r'<[^>]+>', '', match.group(0)).strip() # Strip HTML tags if present
-        print(title)
         title = re.sub(r'#+ +', '', title)
-        print(title)
         return title
     return ""
 
