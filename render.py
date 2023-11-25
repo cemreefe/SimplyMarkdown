@@ -5,6 +5,7 @@ import yaml
 
 from generateSitemap import generate_sitemap
 from helpers import *
+from markdownTags import get_first_title
 
 def find_modules(directory):
     """Finds and returns a dictionary containing module filenames and their content."""

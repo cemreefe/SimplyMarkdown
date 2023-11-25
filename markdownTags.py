@@ -7,12 +7,28 @@ from markdown.blockprocessors import BlockProcessor
 
 import frontmatter 
 
+def get_first_title(markdown_or_html_text):
+    print(markdown_or_html_text)
+    pattern = r'(<h[1-6].*?>.+?</h[1-6]>)|#+(\s+(.*?))$'
+    match = re.search(pattern, markdown_or_html_text, re.MULTILINE | re.IGNORECASE | re.DOTALL)
+    print(match)        
+    if match:
+        print(match.group(0))
+        title = re.sub(r'<[^>]+>', '', match.group(0)).strip() # Strip HTML tags if present
+        print(title)
+        title = re.sub(r'#+ +', '', title)
+        print(title)
+        return title
+    return ""
+
 class ContentItem:
-    def __init__(self, content, date, href, emoji):
+    def __init__(self, content, date, href, emoji, tags, title):
         self.content = content
         self.date = date
         self.href = href
         self.emoji = emoji
+        self.tags = tags
+        self.title = title
 
 class PreviewExtension(Extension):
     """Markdown extension to handle the special tag for previews."""
@@ -74,7 +90,7 @@ class PreviewBlockProcessor(BlockProcessor):
         else:
             prev_yr = None
             for item in content_items:
-                yr = item.date.split('/')[0]
+                yr = str(item.date.year)
 
                 post_wrapper = ET.Element('div', attrib={'class': 'postTitle'})
 
@@ -84,10 +100,9 @@ class PreviewBlockProcessor(BlockProcessor):
                     wrapper.append(date_div)
                     prev_yr = yr
 
-                from render import get_first_title
-
                 title_div = ET.Element('div')
-                title_div.text = item.emoji + get_first_title(item.content)
+                
+                title_div.text = item.emoji + " " + item.title
 
                 a = ET.Element('a', attrib={'href': item.href})
                 a.append(title_div)
@@ -98,6 +113,7 @@ class PreviewBlockProcessor(BlockProcessor):
         parent.append(wrapper)
 
     def get_preview_content(self):
+
         if not self.directory_name:
             return {}
 
@@ -113,7 +129,6 @@ class PreviewBlockProcessor(BlockProcessor):
                 files.sort()
                 relpath = os.path.relpath(root, directory_path)
                 for file in files:
-                    date = relpath
                     href = f"{self.directory_name}/{relpath}/{os.path.splitext(file)[0].replace(', ', '-').replace(' ', '-')}"
                     href += os.path.splitext(file)[1] if not os.path.splitext(file)[1] == '.md' else '.html'
 
@@ -122,6 +137,7 @@ class PreviewBlockProcessor(BlockProcessor):
                         with open(file_path, 'r') as md_file:
                             post = frontmatter.load(md_file)
                             content = post.content.strip()
+                            title = get_first_title(content)
                             components = content.split('\n\n')[:self.preview_limit]
                             content = '\n\n'.join(components) + '\n\n'
                             content = re.sub(r'\n@ [^\n]*', '', content, re.MULTILINE) # remove tags
@@ -132,7 +148,9 @@ class PreviewBlockProcessor(BlockProcessor):
                             content = re.sub(r'<h1\b[^>]*>(.*?)</h1>', r'<div class="preview-title"><b>\1</b></div>', content)
 
                             emoji = post.metadata.get('emoji', '')
-                            content_items.append(ContentItem(content, date, href, emoji))
+                            date = post.metadata.get('date', '')
+                            tags = post.metadata.get('tags', '')
+                            content_items.append(ContentItem(content, date, href, emoji, tags, title))
 
         return {
             'content_items': list(reversed(content_items)),

@@ -1,5 +1,8 @@
 ---
 emoji: 🏰
+tags:
+ - gaming
+date: 2023-02-18
 ---
 
 # Hogwarts Legacy

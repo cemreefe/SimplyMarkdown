@@ -8,8 +8,6 @@ import markdown
 from markdown.extensions import Extension
 from jinja2 import Environment, FileSystemLoader
 
-
-
 def setup_codehilite():
     # Define the options for the CodeHiliteExtension
     options = {
@@ -105,12 +103,3 @@ def get_image_meta_tags_html(markdown_text, current_dir, input_path, title, urlr
     '''
 
     return meta_tags
-
-def get_first_title(markdown_or_html_text):
-    pattern = r'(<h[1-6].*?>.*?</h[1-6]>)|^#+(\s+(.*?))$'
-    match = re.search(pattern, markdown_or_html_text, re.MULTILINE | re.IGNORECASE | re.DOTALL)
-    if match:
-        title = re.sub(r'<[^>]+>', '', match.group(0)).strip() # Strip HTML tags if present
-        title = re.sub(r'#+ +', '', title)
-        return title
-    return ""
