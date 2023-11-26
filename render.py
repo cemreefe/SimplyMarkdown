@@ -50,7 +50,7 @@ def process_markdown_file(input_path, file_path, output_file, module_dict, root,
         'title': meta_title,
         'modules': module_dict,
         'content': content,
-        'meta': input_path,
+        'meta_tags': meta_tags,
         'category_tags': category_tags
     }
     filled_template = fill_template({'context': context}, template_path)
@@ -80,7 +80,7 @@ def process_directory(input_path, output_path, css, template_path, favicon, urlr
             if relative_path.startswith('modules/') or relative_path.startswith('_'):
                 # For files in 'modules', already handled in find_modules()
                 continue
-                
+
             if not file.lower().endswith(('.md')):
                 # For non-md and non-html files, copy them as is to the output directory
                 shutil.copy2(file_path, output_file)
