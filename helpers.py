@@ -94,7 +94,7 @@ def get_meta_tags(meta_img_override, meta_title, meta_description, urlroot='', c
     <meta property="og:image" content="{meta_img}">
     <meta name="twitter:image" content="{meta_img}">
     <meta name="twitter:title" content="{meta_title}">
-    <meta name="description" content="{{ meta_description }}">
+    <meta name="description" content="{ meta_description }">
     '''
 
     return meta_tags
