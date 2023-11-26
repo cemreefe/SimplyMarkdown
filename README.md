@@ -58,50 +58,6 @@ The following command line arguments are available for this script:
 - **--root**: Project URL root, this is almost always the CNAME of your domain i.e. `https://myblog.com`. (default: '')
 - **--title**: Website title (default: '')
 
-
-## Templates
-
-Templates are html files that you supply to set the style of your website's pages. SimplyMarkdown the following junja template. You can create your own template if desired. However this is rarely necessary.
-
-```
-<!DOCTYPE html>
-<html lang="{{ context.lang }}">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="{{ context.root }}/static/css/theme.css">
-    <link rel="icon" type="image/png" href="{{ context.favicon_path }}">
-    <title>{{ context.title }}</title>
-    {{ context.meta_tags }}
-    {{ context.modules.head_extras }}
-  </head>
-  <body>
-    <div class="wrapper">
-      <div class="content">
-        <nav>
-          {{ context.modules.navbar }}
-        </nav>
-      </div>
-      <div class="content">
-        <main>
-          {% for tag in context.category_tags %}
-          <div class="categoryTag">
-            {{ tag }}
-          </div>
-          {% endfor %}
-          {{ context.content }}
-        </main>
-      </div>
-      <footer>
-        {{ context.modules.footer }}
-      </footer>
-    </div>
-  </body>
-</html>
-```
-
-Where the `{{ navbar }}` and `{{ footer }}` are going to be replaced by the rendered `navbar.md` and `footer.md`, `{{ content }}` will be replaced by the rendered markdown files specific to pages.
-
 ## Special Tags
 
 I have introduced the `%` tag for easier rendering in SimplyMarkdown. If you use 
@@ -156,3 +112,8 @@ Using SimplyMarkdown with github pages is very simple.
 1. Populate your markdown directory as you wish. **To see an example check out [my personal website](https://github.com/cemreefe/cemreefe.github.io)**.
 1. When you push to your `main` branch, SimplyMarkdown workflow will trigger, and update your `gh-pages` branch.
 
+
+
+## Templates
+
+Templates are html files that you supply to set the style of your website's pages. SimplyMarkdown the following junja template. You can create your own template if desired. However this is rarely necessary.
