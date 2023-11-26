@@ -69,10 +69,14 @@ class PreviewBlockProcessor(BlockProcessor):
                 date_div.text = item.date
 
                 text_div = ET.Element('div')
-                text_div.text = item.content + '(Read more)'
+                text_div.text = item.content
+                
+                read_more_a = ET.Element('a')
+                read_more_a.text = '(Read more)'
 
                 a = ET.Element('a', attrib={'href': item.href, 'class': 'previewHref'})
                 a.append(text_div)
+                a.append(read_more_a)
 
                 post_wrapper = ET.Element('div', attrib={'class': 'postPreview'})
                 post_wrapper.append(date_div)
