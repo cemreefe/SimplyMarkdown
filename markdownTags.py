@@ -29,7 +29,7 @@ class PreviewExtension(Extension):
     def __init__(self, base_path=None, processor=None, **kwargs):
         super().__init__(**kwargs)
         self.config = {
-            'preview_limit': [4, "The number of components to show in the preview"]
+            'preview_limit': [5, "The number of components to show in the preview"]
         }
         self.base_path = base_path
         self.processor = processor
