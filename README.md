@@ -8,7 +8,7 @@ So whether you're a blogger, writer, or just someone who wants to share their th
 
 # Setup
 
-Clone the repository
+To setup SimplyMarkdown locally, the only thing you need to do is to clone the repository. Read further for automated github pages integration.
 
 # How to use
 
@@ -19,55 +19,83 @@ You can create a new directory with your desired structure to form your website.
 ```
 example/input/
 ├── about.md
-├── blog
+├── index.md
+├── blog/
 │   ├── blog.md
 │   └── posts
 │       ├── coding.md
 │       └── hogwarts.md
-├── index.md
-├── navbar.md
-└── static
+├── modules/
+│   ├── navbar.md
+│   ├── footer.md
+│   ├── custom-module.md
+└── static/
+│   ├── images/
+│   ├── css/
 ```
 
-This will form the basis of your website. In the output directory, the tree structure will be kept and all markdown files are going to be rendered into html files according to the template.
+This will form the basis of your website. SimplyMarkdown will clone your directory and process each file to form your website. Markdown files will be rendered as html files.
 
 
-Here, `navbar.md`, `footer.md` and `static` are reserved names for specific purposes. 
-- `navbar.md` will be used to render the navigation bar for all html files. 
-- `footer.md` will be used to render the footer for all html files. 
-- `static` will be used for holding static files to be served, like media, css, js and downloadable content.
+In SimplyMarkdown, `modules/` is a reserved directory. 
+- `modules/navbar.md` will be used to render the navigation bar for all html files. 
+- `modules/footer.md` will be used to render the footer for all html files.
+- You can create your own custom modules under the `modules/` directory. To render a custom module in a web page, just inclue the module in your markdown sourcefile such as `! include custom-module` to include `modules/custom-module.md`. 
 
 To render your website, simply run 
 
 ```
-python3 render.py -i /path/to/directory
+python3 render.py -i /path/to/directory -o /path/to/output/directory
 ```
 
-The output directory will be formed inside the parent folder of the input directory.
+The following command line arguments are available for this script:
 
-Additionally you can use `-t` to set a website title, and -o to specify output location.
+- **-i, --input**: Input directory path (required)
+- **-o, --output**: Output directory path (required)
+- **--css**: CSS to include (default: 'themes/basic.css')
+- **--template**: Path to the HTML template (default: 'templates/base.html')
+- **--favicon**: Favicon emoji (default: '👤')
+- **--root**: Project URL root, this is almost always the CNAME of your domain i.e. `https://myblog.com`. (default: '')
+- **--title**: Website title (default: '')
+
 
 ## Templates
 
-Templates are html files that you supply to set the style of your website's pages. SimplyMarkdown uses a simple junja template as a MVP.
+Templates are html files that you supply to set the style of your website's pages. SimplyMarkdown the following junja template. You can create your own template if desired. However this is rarely necessary.
 
 ```
 <!DOCTYPE html>
-<html>
+<html lang="{{ context.lang }}">
   <head>
     <meta charset="utf-8">
-    <title>Rendered Markdown</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ context.root }}/static/css/theme.css">
+    <link rel="icon" type="image/png" href="{{ context.favicon_path }}">
+    <title>{{ context.title }}</title>
+    {{ context.meta_tags }}
+    {{ context.modules.head_extras }}
   </head>
   <body>
-    <nav>
-      {{ navbar }}
-    </nav>
-    <div class="content">
-      {{ content }}
+    <div class="wrapper">
+      <div class="content">
+        <nav>
+          {{ context.modules.navbar }}
+        </nav>
+      </div>
+      <div class="content">
+        <main>
+          {% for tag in context.category_tags %}
+          <div class="categoryTag">
+            {{ tag }}
+          </div>
+          {% endfor %}
+          {{ context.content }}
+        </main>
+      </div>
+      <footer>
+        {{ context.modules.footer }}
+      </footer>
     </div>
-    <footer>
-      {{ footer }}
-    </footer>
   </body>
 </html>
 ```
@@ -77,19 +105,54 @@ Where the `{{ navbar }}` and `{{ footer }}` are going to be replaced by the rend
 ## Special Tags
 
 I have introduced the `%` tag for easier rendering in SimplyMarkdown. If you use 
+
 ```
-% <directory>`
+% <relative-directory>`
 ```
+
 SimplyMarkdown will render a list of links to all files under that directory. You can see an example usage in the `blog.md` file in `example/input/blog`.
+
+If you are in `misc/archive.md`, use `% posts` to list md files in `misc/posts` and its subdirectories. 
+
+If you want detailed post overviews rahter than only titles, use 
+
+```
+% <relative-directory>:detailed
+```
+
+## Frontmatter
+
+SimplyMarkdown supports frontmatter for markdown files. You can use the following syntax:
+
+```
+---
+title: <meta title>
+emoji: <overview emoji>
+date:  <post date>
+tags:  <category-tag-1>
+       <category-tag-2>
+image: <img path>
+---
+
+# Your title
+
+Your post
+```
+
+If you use the emoji tag an emoji will be shown alongside your posts in non-detailed overview mode.
+Date metadata helps sort and date your posts on overview.
+Tags add category tags to the top of your page.
+Title helps you override the metadata title property for your page if page title is too long.
+Image helps you override the metadata image tag of your page. If you don't use this property `static/img/default_img.png` will be used.
 
 ## Github Pages Integration
 
 Using SimplyMarkdown with github pages is very simple. 
 
-1. If you have a website on your github pages repository `<username>/<username>.github.io`, checkout into a new branch and push it there as a backup.
-1. Create a new branch on your github pages repository `<username>/<username>.github.io`, named `source`
-1. Delete everything in your branch `source`, add the [worklfow](/workflow/render.yaml) into a new directory `.github/workflows`
-1. Create a folder in your `source` branch, let's call it `./source`, this is going to act as the root of your markdown directory
-1. Populate your markdown directory as needed. **To see an example check out [my personal website](https://github.com/cemreefe/cemreefe.github.io)**.
-1. When you push to your source branch, the workflow will trigger, clear out your `main` branch, and populate it with the rendered SimplyMarkdown website based on your source files
+1. If you have a website on your github pages repository `<username>/<username>.github.io`, checkout into a new branch called `backup` and push your blog there as backup.
+1. Create a new branch on your github pages repository `<username>/<username>.github.io`, named `gh-pages`
+1. On `main` branch, add the SimplyMarkdown rendering [worklfow](/workflow/render.yaml) into a new directory called `.github/workflows`
+1. Create a folder in your `main` branch, call it `source`, this is going to act as the root of your website.
+1. Populate your markdown directory as you wish. **To see an example check out [my personal website](https://github.com/cemreefe/cemreefe.github.io)**.
+1. When you push to your `main` branch, SimplyMarkdown workflow will trigger, and update your `gh-pages` branch.
 
