@@ -134,6 +134,7 @@ class PreviewBlockProcessor(BlockProcessor):
                         with open(file_path, 'r') as md_file:
                             content = md_file.read().strip()
                             title = get_first_title(content)
+                            content = content.replace('[TOC]', '')
                             components = content.split('\n\n')[:self.preview_limit]
                             content = '\n\n'.join(components) + '\n\n'
                             content = re.sub(r'\n@ [^\n]*', '', content, re.MULTILINE) # remove tags
