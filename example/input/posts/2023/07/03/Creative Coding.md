@@ -1,11 +1,11 @@
 ---
-emoji: 💻
-date: 2023-07-03
+emoji:  💻
+date:   2023-07-03
+tags:   coding
+        dev
 ---
 
 # Creative Coding
-
-@ coding, dev
 
 This is a blog post with a code block
 

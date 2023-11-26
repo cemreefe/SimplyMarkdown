@@ -5,8 +5,6 @@ from markdown.extensions import Extension
 from markdown.inlinepatterns import Pattern
 from markdown.blockprocessors import BlockProcessor
 
-import frontmatter 
-
 def get_first_title(markdown_or_html_text):
     pattern = r'(<h[1-6].*?>.+?</h[1-6]>)|#+(\s+(.*?))$'
     match = re.search(pattern, markdown_or_html_text, re.MULTILINE | re.IGNORECASE | re.DOTALL)
@@ -85,7 +83,7 @@ class PreviewBlockProcessor(BlockProcessor):
         else:
             prev_yr = None
             for item in content_items:
-                yr = str(item.date.year)
+                yr = str(item.date.split('-')[0])
 
                 post_wrapper = ET.Element('div', attrib={'class': 'postTitle'})
 
@@ -130,21 +128,20 @@ class PreviewBlockProcessor(BlockProcessor):
                     if file.lower().endswith('.md'):
                         file_path = os.path.join(root, file)
                         with open(file_path, 'r') as md_file:
-                            post = frontmatter.load(md_file)
-                            content = post.content.strip()
+                            content = md_file.read().strip()
                             title = get_first_title(content)
                             components = content.split('\n\n')[:self.preview_limit]
                             content = '\n\n'.join(components) + '\n\n'
                             content = re.sub(r'\n@ [^\n]*', '', content, re.MULTILINE) # remove tags
                             content = re.sub(r'(\[.*?\]\()\.', r'\1 ' + self.directory_name + '/' + relpath + '/.', content)
-                            content = self.processor(content)
+                            content, meta = self.processor(content)
                             content = re.sub(r'<a\b[^>]*>(.*?)</a>', r'\1', content)
                             content = re.sub(r'<h[2-4]\b[^>]*>(.*?)</h[2-4]>', r'<b>\1</b>', content)
                             content = re.sub(r'<h1\b[^>]*>(.*?)</h1>', r'<div class="preview-title"><b>\1</b></div>', content)
 
-                            emoji = post.metadata.get('emoji', '')
-                            date = post.metadata.get('date', '')
-                            tags = post.metadata.get('tags', '')
+                            emoji = meta.get('emoji', '')[0]
+                            date = meta.get('date', '')[0]
+                            tags = meta.get('tags', '')
                             content_items.append(ContentItem(content, date, href, emoji, tags, title))
 
         return {
@@ -152,26 +149,3 @@ class PreviewBlockProcessor(BlockProcessor):
             'detailed': detailed
         }
 
-# define a custom markdown extension that adds tags
-class TagsExtension(Extension):
-    def __init__(self):
-        super().__init__()
-        
-    def extendMarkdown(self, md):
-        tags_pattern = TagsPattern(r'^@\s+(.+)', md)
-        md.inlinePatterns.register(tags_pattern, 'tags', 180)
-
-class TagsPattern(Pattern):
-    def __init__(self, pattern, md):
-        super(TagsPattern, self).__init__(pattern)
-        self.md = md
-
-    def handleMatch(self, m):
-        tags = m.group(2)
-        tags = [tag.strip() for tag in tags.split(',')]
-        tags_container = ET.Element('div')
-        for tag in tags:
-            tag_block = ET.Element('div', {'class': 'categoryTag'}) # Add class attribute
-            tag_block.text = tag # Set tag as text content of div element
-            tags_container.append(tag_block)
-        return tags_container

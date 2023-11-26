@@ -18,33 +18,41 @@ def find_modules(directory):
     for root, _, files in os.walk(modules_dir):
         for file in files:
             file_path = os.path.join(root, file)
-            module_dict[get_filename_without_extension(file)] = convert_to_html(read_file_content(file_path), os.path.dirname(file_path))   
+            module_dict[get_filename_without_extension(file)], _ = convert_to_html(read_file_content(file_path), os.path.dirname(file_path))   
     return module_dict
 
 def process_markdown_file(input_path, file_path, output_file, module_dict, root, urlroot, favicon, website_title, template_path):
     """Processes a Markdown file, converts it to HTML, and fills in the template."""
     content = read_file_content(file_path)
     title = get_first_title(content)
-    meta_tags = get_image_meta_tags_html(content, root, input_path, title, urlroot)
     
     # Replace module tags in the content
     content = re.sub('\n! include (.+)', lambda match: module_dict.get(match.group(1), ""), content, flags=re.I)
-    content = re.sub('\n! .+', '', content)  # Clean out meta tags
-    content = convert_to_html(content, os.path.dirname(file_path))
+    content, meta = convert_to_html(content, os.path.dirname(file_path))
+
+    meta_img_override = meta.get('image', None)
+    meta_title = meta.get('title', title)
+    meta_description = meta.get('description', extract_first_paragraph(content))
+
+    meta_tags = get_meta_tags(meta_img_override, meta_title, meta_description, urlroot, root, input_path)
+
+    meta_lang = meta.get('language', 'en')
+
+    category_tags = meta.get('tags', [])
 
     # Change the file extension to '.html'
     output_file = os.path.splitext(output_file)[0].replace(', ', '-').replace(' ', '-') + '.html'
 
     # Fill in the template with the context information
     context = {
-        'lang': 'en',  # Add the appropriate values for these context variables
-        'meta_description': extract_first_paragraph(content),
+        'lang': meta_lang,
         'root': urlroot,
         'favicon_path': get_dutluk_emoji_href(favicon),
-        'title': title if not website_title else title + ' | '  + website_title,
+        'title': meta_title,
         'modules': module_dict,
         'content': content,
-        'meta_tags': meta_tags
+        'meta': input_path,
+        'category_tags': category_tags
     }
     filled_template = fill_template({'context': context}, template_path)
 
