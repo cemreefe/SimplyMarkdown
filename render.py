@@ -1,7 +1,6 @@
 import os
 import re
 import argparse
-import yaml 
 
 from generateSitemap import generate_sitemap
 from helpers import *
