@@ -83,7 +83,7 @@ class PreviewBlockProcessor(BlockProcessor):
         else:
             prev_yr = None
             for item in content_items:
-                yr = str(item.date.split('-')[0])
+                yr = str(item.date.split('-')[0]) if item.date else None
 
                 post_wrapper = ET.Element('div', attrib={'class': 'postTitle'})
 
