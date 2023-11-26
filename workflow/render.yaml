@@ -3,7 +3,7 @@ name: Render with SimplyMarkdown
 on:
   push:
     branches: 
-    - source
+    - main
 
 jobs:
   run_script:
@@ -17,24 +17,26 @@ jobs:
     - name: Install dependencies
       run: |
         python3 -m pip install --upgrade pip
-        pip3 install markdown jinja2 Pygments
+        pip3 install markdown==3.3.4 jinja2 Pygments
     - name: Clone SimplyMarkdown
       run: git clone https://github.com/cemreefe/SimplyMarkdown
     - name: Run SimplyMarkdown
       run: |
         cd SimplyMarkdown
-        python3 render.py -i ../source -o ../output -t "My Blog" -th themes/basic.css --root 'https://exampleblog.com'
+        python3 render.py -i ../source -o ../output --title "Example Blog" --css ../source/static/css/theme.css --favicon 🟢 --root 'https://mypage.com'
     - name: Cleanup repo
       run: |
         rm -r SimplyMarkdown
-    - name: Clone github pages branch and clean its contents
+    - name: Clone github pages branch and clean its contents, keep sitemap
       run: |
         cd ..
         mkdir ghp
         cd ghp
-        git clone -b master https://github.com/${{ github.actor }}/${{ github.event.repository.name }}
+        git clone -b gh-pages https://github.com/${{ github.actor }}/${{ github.event.repository.name }}
         cd ${{ github.event.repository.name }}
         git rm -r '*' 
+        git reset sitemap.xml || echo 
+        git checkout -- sitemap.xml || echo
     - name: Move new output into github pages branch
       run: |
         shopt -s dotglob
@@ -47,4 +49,4 @@ jobs:
         git config --global user.email '${{ github.actor }}@users.noreply.github.com'
         git remote set-url origin https://x-access-token:${{ secrets.AUTO_RENDER_PAT }}@github.com/$GITHUB_REPOSITORY
         git add -A 
-        git diff-index --quiet HEAD || git commit -m "Automatically rendered by SimplyMarkdown on `date +'%Y-%m-%d %H:%M:%S'`" && git push    
+        git diff-index --quiet HEAD || git commit -m "Rendered by SimplyMarkdown - ${{ github.event.head_commit.message }}" && git push    
