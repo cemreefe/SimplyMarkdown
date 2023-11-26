@@ -80,18 +80,12 @@ def process_directory(input_path, output_path, css, template_path, favicon, urlr
             if relative_path.startswith('modules/') or relative_path.startswith('_'):
                 # For files in 'modules', already handled in find_modules()
                 continue
-
-            if not file.lower().endswith(('.md', '.html')):
+                
+            if not file.lower().endswith(('.md')):
                 # For non-md and non-html files, copy them as is to the output directory
                 shutil.copy2(file_path, output_file)
-                continue
 
-            if file.lower().endswith('.html') and '<keep-html>' in read_file_content(file_path):
-                # don't convert to website page if keep-html tag is present
-                shutil.copy2(file_path, output_file)
-                continue
-
-            if file.lower().endswith('.md'):
+            else:
                 # If the file is markdown, convert to HTML and replace module tags
                 process_markdown_file(input_path, file_path, output_file, module_dict, root, urlroot, favicon, website_title, template_path)
 
