@@ -139,9 +139,9 @@ class PreviewBlockProcessor(BlockProcessor):
                             content = re.sub(r'<h[2-4]\b[^>]*>(.*?)</h[2-4]>', r'<b>\1</b>', content)
                             content = re.sub(r'<h1\b[^>]*>(.*?)</h1>', r'<div class="preview-title"><b>\1</b></div>', content)
 
-                            emoji = meta.get('emoji', '')[0]
-                            date = meta.get('date', '')[0]
-                            tags = meta.get('tags', '')
+                            emoji = meta.get('emoji', [''])[0]
+                            date = meta.get('date', [''])[0]
+                            tags = meta.get('tags', [''])
                             content_items.append(ContentItem(content, date, href, emoji, tags, title))
 
         return {
