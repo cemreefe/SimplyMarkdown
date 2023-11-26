@@ -30,13 +30,13 @@ def process_markdown_file(input_path, file_path, output_file, module_dict, root,
     content = re.sub('\n! include (.+)', lambda match: module_dict.get(match.group(1), ""), content, flags=re.I)
     content, meta = convert_to_html(content, os.path.dirname(file_path))
 
-    meta_img_override = meta.get('image', None)
-    meta_title = meta.get('title', title)
-    meta_description = meta.get('description', extract_first_paragraph(content))
+    meta_img_override = meta.get('image', [None])[0]
+    meta_title = meta.get('title', [title])[0]
+    meta_description = meta.get('description', [extract_first_paragraph(content)])[0]
 
     meta_tags = get_meta_tags(meta_img_override, meta_title, meta_description, urlroot, root, input_path)
 
-    meta_lang = meta.get('language', 'en')
+    meta_lang = meta.get('language', ['en'])[0]
 
     category_tags = meta.get('tags', [])
 
