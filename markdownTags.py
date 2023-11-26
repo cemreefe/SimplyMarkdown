@@ -71,7 +71,7 @@ class PreviewBlockProcessor(BlockProcessor):
                 text_div = ET.Element('div')
                 text_div.text = item.content
                 
-                read_more = ET.Element('span', 'class': 'a')
+                read_more = ET.Element('span', attrib={'class': 'a'})
                 read_more.text = '(Read more)'
 
                 a = ET.Element('a', attrib={'href': item.href, 'class': 'previewHref'})
