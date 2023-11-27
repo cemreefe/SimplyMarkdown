@@ -29,6 +29,7 @@ example/input/
 │   ├── navbar.md
 │   ├── footer.md
 │   ├── custom-module.md
+│   ├── head_extras.html
 └── static/
 │   ├── images/
 │   ├── css/
@@ -40,6 +41,7 @@ This will form the basis of your website. SimplyMarkdown will clone your directo
 In SimplyMarkdown, `modules/` is a reserved directory. 
 - `modules/navbar.md` will be used to render the navigation bar for all html files. 
 - `modules/footer.md` will be used to render the footer for all html files.
+- `modules/head_extras.html` can be used to add extra tags to the `<head>` section of your website.
 - You can create your own custom modules under the `modules/` directory. To render a custom module in a web page, just inclue the module in your markdown sourcefile such as `! include custom-module` to include `modules/custom-module.md`. 
 
 To render your website, simply run 
