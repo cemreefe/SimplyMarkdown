@@ -81,13 +81,13 @@ def process_directory(input_path, output_path, css, template_path, favicon, urlr
                 # For files in 'modules', already handled in find_modules()
                 continue
 
-            if file.lower().endswith(('.md')) or (file.lower().endswith(('.html')) and '<convertsm>' in file.read()) :
-                # For non-md and non-html files, copy them as is to the output directory
-                shutil.copy2(file_path, output_file)
-
-            else:
+            if file.lower().endswith(('.md')) or (file.lower().endswith(('.html')) and '<convertsm>' in open(file_path).read()) :
                 # If the file is markdown, convert to HTML and replace module tags
                 process_markdown_file(input_path, file_path, output_file, module_dict, root, urlroot, favicon, website_title, template_path)
+
+            else:
+                # For non-md and non-html files, copy them as is to the output directory
+                shutil.copy2(file_path, output_file)
 
 if __name__ == "__main__":
     # Argument parsing
