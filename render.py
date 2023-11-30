@@ -81,7 +81,7 @@ def process_directory(input_path, output_path, css, template_path, favicon, urlr
                 # For files in 'modules', already handled in find_modules()
                 continue
 
-            if not file.lower().endswith(('.md')):
+            if file.lower().endswith(('.md')) or (file.lower().endswith(('.html')) and '<convertsm>' in file.read()) :
                 # For non-md and non-html files, copy them as is to the output directory
                 shutil.copy2(file_path, output_file)
 
