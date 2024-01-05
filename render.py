@@ -20,13 +20,14 @@ def find_modules(directory):
             module_dict[get_filename_without_extension(file)], _ = convert_to_html(read_file_content(file_path), os.path.dirname(file_path))   
     return module_dict
 
-def process_markdown_file(input_path, file_path, output_file, module_dict, root, urlroot, favicon, website_title, template_path, relative_path):
+def process_markdown_file(input_path, file_path, output_file, module_dict, root, urlroot, favicon, website_title, template_path, output_path):
     """Processes a Markdown file, converts it to HTML, and fills in the template."""
     content = read_file_content(file_path)
     title = get_first_title(content)
     
     # Change the file extension to '.html'
-    output_file_writepath = os.path.splitext(output_file)[0].replace(', ', '-').replace(' ', '-') + '.html'
+    output_file = os.path.splitext(output_file)[0].replace(', ', '-').replace(' ', '-') + '.html'
+    output_file_relpath = os.path.relpath(output_file, output_path)
     
     # Replace module tags in the content
     content = re.sub('\n! include (.+)', lambda match: module_dict.get(match.group(1), ""), content, flags=re.I)
@@ -36,7 +37,7 @@ def process_markdown_file(input_path, file_path, output_file, module_dict, root,
     meta_title = meta.get('title', [title])[0]
     meta_description = meta.get('description', [extract_first_paragraph(content)])[0]
 
-    meta_tags = get_meta_tags(meta_img_override, meta_title, meta_description, urlroot, root, input_path, relative_path)
+    meta_tags = get_meta_tags(meta_img_override, meta_title, meta_description, urlroot, root, input_path, output_file_relpath)
 
     meta_lang = meta.get('language', ['en'])[0]
 
@@ -55,7 +56,7 @@ def process_markdown_file(input_path, file_path, output_file, module_dict, root,
     }
     filled_template = fill_template({'context': context}, template_path)
 
-    with open(output_file_writepath, 'w') as f:
+    with open(output_file, 'w') as f:
         f.write(filled_template)
 
 
