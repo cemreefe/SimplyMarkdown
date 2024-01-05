@@ -20,13 +20,13 @@ def find_modules(directory):
             module_dict[get_filename_without_extension(file)], _ = convert_to_html(read_file_content(file_path), os.path.dirname(file_path))   
     return module_dict
 
-def process_markdown_file(input_path, file_path, output_file, module_dict, root, urlroot, favicon, website_title, template_path, output_path):
+def process_markdown_file(input_path, file_path, output_file_, module_dict, root, urlroot, favicon, website_title, template_path, output_path):
     """Processes a Markdown file, converts it to HTML, and fills in the template."""
     content = read_file_content(file_path)
     title = get_first_title(content)
     
     # Change the file extension to '.html'
-    output_file = os.path.splitext(output_file)[0].replace(', ', '-').replace(' ', '-') + '.html'
+    output_file = os.path.splitext(output_file_)[0].replace(', ', '-').replace(' ', '-') + '.html'
     output_file_relpath = os.path.relpath(output_file, output_path)
     
     # Replace module tags in the content
@@ -84,7 +84,7 @@ def process_directory(input_path, output_path, css, template_path, favicon, urlr
 
             if file.lower().endswith(('.md')) or (file.lower().endswith(('.html')) and '<convertsm>' in open(file_path).read()) :
                 # If the file is markdown, convert to HTML and replace module tags
-                process_markdown_file(input_path, file_path, output_file, module_dict, root, urlroot, favicon, website_title, template_path, relative_path)
+                process_markdown_file(input_path, file_path, output_file, module_dict, root, urlroot, favicon, website_title, template_path, output_path)
 
             else:
                 # For non-md and non-html files, copy them as is to the output directory
