@@ -20,7 +20,7 @@ def find_modules(directory):
             module_dict[get_filename_without_extension(file)], _ = convert_to_html(read_file_content(file_path), os.path.dirname(file_path))   
     return module_dict
 
-def process_markdown_file(input_path, file_path, output_file, module_dict, root, urlroot, favicon, website_title, template_path):
+def process_markdown_file(input_path, file_path, output_file, module_dict, root, urlroot, favicon, website_title, template_path, relative_path):
     """Processes a Markdown file, converts it to HTML, and fills in the template."""
     content = read_file_content(file_path)
     title = get_first_title(content)
@@ -36,7 +36,7 @@ def process_markdown_file(input_path, file_path, output_file, module_dict, root,
     meta_title = meta.get('title', [title])[0]
     meta_description = meta.get('description', [extract_first_paragraph(content)])[0]
 
-    meta_tags = get_meta_tags(meta_img_override, meta_title, meta_description, urlroot, root, input_path, output_file_writepath)
+    meta_tags = get_meta_tags(meta_img_override, meta_title, meta_description, urlroot, root, input_path, relative_path)
 
     meta_lang = meta.get('language', ['en'])[0]
 
@@ -83,7 +83,7 @@ def process_directory(input_path, output_path, css, template_path, favicon, urlr
 
             if file.lower().endswith(('.md')) or (file.lower().endswith(('.html')) and '<convertsm>' in open(file_path).read()) :
                 # If the file is markdown, convert to HTML and replace module tags
-                process_markdown_file(input_path, file_path, output_file, module_dict, root, urlroot, favicon, website_title, template_path)
+                process_markdown_file(input_path, file_path, output_file, module_dict, root, urlroot, favicon, website_title, template_path, relative_path)
 
             else:
                 # For non-md and non-html files, copy them as is to the output directory
