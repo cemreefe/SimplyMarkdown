@@ -79,7 +79,7 @@ def extract_first_paragraph(html):
     return ""  # No significant <p> block found
 
 
-def get_meta_tags(meta_img_override, meta_title, meta_description, urlroot='', current_dir='', input_path=''):
+def get_meta_tags(meta_img_override, meta_title, meta_description, urlroot='', current_dir='', input_path='', write_path=''):
     
     current_dir_relpath = os.path.relpath(current_dir, input_path)
 
@@ -96,6 +96,7 @@ def get_meta_tags(meta_img_override, meta_title, meta_description, urlroot='', c
     <meta property="og:description" name="description" content="{meta_description}">
     <meta property="twitter:title" name="title" content="{meta_title}">
     <meta property="twitter:image" name="image" content="{meta_img}">
+    <link rel="canonical" href="{os.path.join(urlroot, write_path)}" />
     '''
 
     return meta_tags
