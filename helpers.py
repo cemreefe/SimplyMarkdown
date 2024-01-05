@@ -91,10 +91,11 @@ def get_meta_tags(meta_img_override, meta_title, meta_description, urlroot='', c
         meta_img = urlroot + '/static/img/default_img.png'
 
     meta_tags = f'''
-    <meta property="og:image" content="{meta_img}">
-    <meta name="twitter:image" content="{meta_img}">
-    <meta name="twitter:title" content="{meta_title}">
-    <meta name="description" content="{ meta_description }">
+    <meta property="og:title" name="title" content="{meta_title}">
+    <meta property="og:image" name="image" content="{meta_img}">
+    <meta property="og:description" name="description" content="{meta_description}">
+    <meta property="twitter:title" name="title" content="{meta_title}">
+    <meta property="twitter:image" name="image" content="{meta_img}">
     '''
 
     return meta_tags
