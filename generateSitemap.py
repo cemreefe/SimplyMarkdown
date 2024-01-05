@@ -33,6 +33,8 @@ def generate_sitemap(root_directory, urlroot=''):
                 url = urlroot + '/about'
             if url == urlroot + '/cv.html':
                 url = urlroot + '/cv'
+            if url == urlroot + '/archive.html':
+                url = urlroot + '/archive'
             sitemap_file.write(f'  <url>\n')
             sitemap_file.write(f'    <loc>{url}</loc>\n')
             sitemap_file.write(f'  </url>\n')
