@@ -83,6 +83,9 @@ def get_meta_tags(meta_img_override, meta_title, meta_description, urlroot='', c
     
     current_dir_relpath = os.path.relpath(current_dir, input_path)
 
+    canonical_uri = os.path.relpath(writepath, input_path)
+    canonical_url = os.path.join(urlroot, canonical_uri)
+
     if meta_img_override:
         meta_img = meta_img_override
         if meta_img[:4] != 'http':
@@ -96,7 +99,7 @@ def get_meta_tags(meta_img_override, meta_title, meta_description, urlroot='', c
     <meta property="og:description" name="description" content="{meta_description}">
     <meta property="twitter:title" name="title" content="{meta_title}">
     <meta property="twitter:image" name="image" content="{meta_img}">
-    <link rel="canonical" href="{os.path.join(urlroot, write_path)}" />
+    <link rel="canonical" href="{canonical_url}" />
     '''
 
     return meta_tags
