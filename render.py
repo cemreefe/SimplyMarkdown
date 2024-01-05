@@ -25,6 +25,9 @@ def process_markdown_file(input_path, file_path, output_file, module_dict, root,
     content = read_file_content(file_path)
     title = get_first_title(content)
     
+    # Change the file extension to '.html'
+    output_file_writepath = os.path.splitext(output_file)[0].replace(', ', '-').replace(' ', '-') + '.html'
+    
     # Replace module tags in the content
     content = re.sub('\n! include (.+)', lambda match: module_dict.get(match.group(1), ""), content, flags=re.I)
     content, meta = convert_to_html(content, os.path.dirname(file_path))
@@ -33,14 +36,11 @@ def process_markdown_file(input_path, file_path, output_file, module_dict, root,
     meta_title = meta.get('title', [title])[0]
     meta_description = meta.get('description', [extract_first_paragraph(content)])[0]
 
-    meta_tags = get_meta_tags(meta_img_override, meta_title, meta_description, urlroot, root, input_path)
+    meta_tags = get_meta_tags(meta_img_override, meta_title, meta_description, urlroot, root, input_path, output_file, output_file_writepath)
 
     meta_lang = meta.get('language', ['en'])[0]
 
     category_tags = meta.get('tags', [])
-
-    # Change the file extension to '.html'
-    output_file = os.path.splitext(output_file)[0].replace(', ', '-').replace(' ', '-') + '.html'
 
     # Fill in the template with the context information
     context = {
@@ -55,8 +55,8 @@ def process_markdown_file(input_path, file_path, output_file, module_dict, root,
     }
     filled_template = fill_template({'context': context}, template_path)
 
-    with open(output_file, 'w') as output_file:
-        output_file.write(filled_template)
+    with open(output_file_writepath, 'w') as f:
+        f.write(filled_template)
 
 
 def process_directory(input_path, output_path, css, template_path, favicon, urlroot, website_title):
