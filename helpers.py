@@ -83,7 +83,7 @@ def get_meta_tags(meta_img_override, meta_title, meta_description, urlroot='', c
     
     current_dir_relpath = os.path.relpath(current_dir, input_path)
 
-    canonical_uri = os.path.relpath(writepath, input_path)
+    canonical_uri = os.path.relpath(write_path, input_path)
     canonical_url = os.path.join(urlroot, canonical_uri)
 
     if meta_img_override:
