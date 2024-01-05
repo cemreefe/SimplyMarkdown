@@ -7,7 +7,7 @@ def generate_sitemap(root_directory, urlroot=''):
             for file in files:
                 if file.lower().endswith('.html'):
                     file_path = os.path.join(root, file)
-                    html_files.append(file_path[:-5])
+                    html_files.append(file_path)
         return html_files
 
     html_files = get_html_files(root_directory)
