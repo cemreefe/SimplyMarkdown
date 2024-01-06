@@ -36,8 +36,9 @@ def process_markdown_file(input_path, file_path, output_file_, module_dict, root
     meta_img_override = meta.get('image', [None])[0]
     meta_title = meta.get('title', [title])[0]
     meta_description = meta.get('description', [extract_first_paragraph(content)])[0]
+    meta_canonical_uri = meta.get('canonical_uri')
 
-    meta_tags = get_meta_tags(meta_img_override, meta_title, meta_description, urlroot, root, input_path, output_file_relpath)
+    meta_tags = get_meta_tags(meta_img_override, meta_title, meta_description, urlroot, root, input_path, output_file_relpath, meta_canonical_uri)
 
     meta_lang = meta.get('language', ['en'])[0]
 
