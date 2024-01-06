@@ -79,11 +79,11 @@ def extract_first_paragraph(html):
     return ""  # No significant <p> block found
 
 
-def get_meta_tags(meta_img_override, meta_title, meta_description, urlroot='', current_dir='', input_path='', output_file_relpath=''):
+def get_meta_tags(meta_img_override, meta_title, meta_description, urlroot='', current_dir='', input_path='', output_file_relpath='', meta_canonical_url_override=None):
     
     current_dir_relpath = os.path.relpath(current_dir, input_path)
 
-    canonical_url = os.path.join(urlroot, output_file_relpath)
+    canonical_url = meta_canonical_url_override or os.path.join(urlroot, output_file_relpath)
 
     if meta_img_override:
         meta_img = meta_img_override
