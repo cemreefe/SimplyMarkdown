@@ -22,7 +22,7 @@ example/input/
 ├── index.md
 ├── blog/
 │   ├── blog.md
-│   └── posts
+│   └── posts/
 │       ├── coding.md
 │       └── hogwarts.md
 ├── modules/
