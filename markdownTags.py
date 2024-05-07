@@ -128,6 +128,7 @@ class PreviewBlockProcessor(BlockProcessor):
                 for file in files:
                     href = f"{self.directory_name}/{relpath}/{os.path.splitext(file)[0].replace(', ', '-').replace(' ', '-')}"
                     href += os.path.splitext(file)[1] if not os.path.splitext(file)[1] == '.md' else '.html'
+                    href = href.replace(".html", "")
 
                     if file.lower().endswith('.md'):
                         file_path = os.path.join(root, file)
