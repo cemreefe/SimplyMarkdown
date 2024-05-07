@@ -22,17 +22,7 @@ def generate_sitemap(root_directory, urlroot=''):
             url = file_path.replace(root_directory, urlroot + '/').replace('\\', '/').lstrip('/')
             url = url.replace('//', '/')
             url = url.replace('https:/', 'https://')
-            # hack, to be removed later in favor of overriding via markdown tag
-            if url == urlroot + '/index.html':
-                url = urlroot
-            if url == urlroot + '/blog.html':
-                url = urlroot + '/blog'
-            if url == urlroot + '/contact.html':
-                url = urlroot + '/contact'
-            if url == urlroot + '/about.html':
-                url = urlroot + '/about'
-            if url == urlroot + '/archive.html':
-                url = urlroot + '/archive'
+            url = url.replace(".html", "")
             sitemap_file.write(f'  <url>\n')
             sitemap_file.write(f'    <loc>{url}</loc>\n')
             sitemap_file.write(f'  </url>\n')
