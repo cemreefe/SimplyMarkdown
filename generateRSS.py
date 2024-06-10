@@ -51,7 +51,7 @@ def generate_rss_feed(root_directory, urlroot=''):
         guid_elem.text = url
         if pub_date:
             pub_date_elem = SubElement(item, 'pubDate')
-            pub_date_elem.text = datetime.strptime(pub_date, '%Y-%m-%d').strftime('%a, %d %b %Y %H:%M:%S +0000')
+            pub_date_elem.text = pub_date
 
     output_file = os.path.join(root_directory, 'rss.xml')
     ElementTree(rss).write(output_file, encoding='utf-8', xml_declaration=True)
