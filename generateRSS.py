@@ -6,7 +6,9 @@ from bs4 import BeautifulSoup
 def extract_metadata(html_content):
     soup = BeautifulSoup(html_content, 'html.parser')
     title = soup.find('title').text if soup.find('title') else 'No title'
-    pub_date = soup.find('meta', {'name': 'pubDate'}) or soup.find('meta', {'name': 'pubdate'})
+    pub_date_meta = soup.find('meta', {'name': 'pubDate'}) or soup.find('meta', {'name': 'pubdate'})
+    pub_date = pub_date_meta['content'] if pub_date_meta else None
+
     return title, pub_date
 
 def generate_rss_feed(root_directory, urlroot=''):
