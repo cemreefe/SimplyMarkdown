@@ -3,6 +3,7 @@ import re
 import argparse
 
 from generateSitemap import generate_sitemap
+from generateRSS import generate_rss
 from helpers import *
 from markdownTags import get_first_title
 
@@ -105,3 +106,4 @@ if __name__ == "__main__":
 
     process_directory(args.input, args.output, args.css, args.template, args.favicon, args.root, args.title)
     generate_sitemap(args.output, args.root)
+    generate_rss(args.output, args.root)
