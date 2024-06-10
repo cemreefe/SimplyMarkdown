@@ -51,10 +51,5 @@ def generate_rss_feed(root_directory, urlroot=''):
             pub_date_elem = SubElement(item, 'pubDate')
             pub_date_elem.text = datetime.strptime(pub_date, '%Y-%m-%d').strftime('%a, %d %b %Y %H:%M:%S +0000')
 
-    output_file = os.path.join(root_directory, 'rss_feed.xml')
+    output_file = os.path.join(root_directory, 'rss.xml')
     ElementTree(rss).write(output_file, encoding='utf-8', xml_declaration=True)
-
-if __name__ == "__main__":
-    root_directory = input("Enter the root directory of your HTML files: ")
-    urlroot = input("Enter the URL root (e.g., https://www.example.com): ")
-    generate_rss_feed(root_directory, urlroot)
