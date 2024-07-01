@@ -65,7 +65,8 @@ def generate_rss_feed(root_directory, urlroot='', uri_whitelist='*', feed_title=
         url = url.replace('https:/', 'https://')
         url = url.replace(".html", "")
 
-        if not is_uri_whitelisted(url, whitelist_patterns):
+        uri = file_path.replace(root_directory, '')
+        if not is_uri_whitelisted(uri, whitelist_patterns):
             continue
 
         parsed_content = parse_main_content(main_content)
