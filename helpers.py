@@ -80,7 +80,7 @@ def extract_first_paragraph(html):
     return ""  # No significant <p> block found
 
 
-def get_meta_tags(meta_img_override, meta_title, meta_description, urlroot='', current_dir='', input_path='', output_file_relpath='', meta_canonical_uri_override=None):
+def get_meta_tags(meta_img_override, meta_title, meta_description, meta_pubdate='', urlroot='', current_dir='', input_path='', output_file_relpath='', meta_canonical_uri_override=None):
     current_dir_relpath = os.path.relpath(current_dir, input_path)
 
     canonical_url = os.path.join(urlroot, meta_canonical_uri_override or output_file_relpath)
@@ -95,11 +95,8 @@ def get_meta_tags(meta_img_override, meta_title, meta_description, urlroot='', c
 
     # Determine the last modification date of the file
     file_path = os.path.join(current_dir, output_file_relpath)
-    if os.path.exists(file_path):
-        timestamp = os.path.getmtime(file_path)
-        pub_date = datetime.utcfromtimestamp(timestamp).strftime('%a, %d %b %Y %H:%M:%S +0000')
-    else:
-        pub_date = None
+    pub_date = meta_pubdate.strftime('%a, %d %b %Y %H:%M:%S +0000') if meta_pubdate else None
+
 
     meta_tags = f'''
     <meta property="og:title" name="title" content="{meta_title}" />
