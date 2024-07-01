@@ -39,8 +39,9 @@ def generate_rss_feed(root_directory, urlroot='', uri_whitelist='*', feed_title=
 
     def is_uri_whitelisted(uri, whitelist_patterns):
         for pattern in whitelist_patterns:
-            print(">>", pattern, whitelist_patterns)
+            print(">>", uri, pattern, whitelist_patterns)
             if fnmatch.fnmatch(uri, pattern):
+                print("match!")
                 return True
         return False
 
