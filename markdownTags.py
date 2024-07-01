@@ -138,8 +138,8 @@ class PreviewBlockProcessor(BlockProcessor):
                             content = content.replace('[TOC]', '')
                             components = content.split('\n\n')[:self.preview_limit]
                             content = '\n\n'.join(components) + '\n\n'
-                            print(">1>>>", content)
-                            print(">2>>>", content, re.search(r'\n<parsers-ignore>.*?</parsers-ignore>\n', content, re.MULTILINE | re.DOTALL))
+                            # print(">1>>>", content)
+                            # print(">2>>>", content, re.search(r'\n<parsers-ignore>.*?</parsers-ignore>\n', content, re.MULTILINE | re.DOTALL))
                             content = re.sub(r'\n<parsers-ignore>.*?</parsers-ignore>\n', '', content, re.MULTILINE | re.DOTALL) # remove parsers-ignore tags
                             print(">3>>>", content)
                             content = re.sub(r'\n@ [^\n]*', '', content, re.MULTILINE) # remove tags
