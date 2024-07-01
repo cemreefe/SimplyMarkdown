@@ -17,7 +17,7 @@ def parse_main_content(main_content):
     soup = BeautifulSoup(main_content, 'html.parser')
 
     # Remove all <script> and <style> elements
-    for script_or_style in soup(['script', 'style']):
+    for script_or_style in soup(['script', 'style', 'parsers-ignore']):
         script_or_style.decompose()
 
     # Remove all style attributes
