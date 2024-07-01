@@ -138,7 +138,6 @@ class PreviewBlockProcessor(BlockProcessor):
                             content = content.replace('[TOC]', '')
                             components = content.split('\n\n')[:self.preview_limit]
                             content = '\n\n'.join(components) + '\n\n'
-                            content = re.sub(r'<parsers-ignore\b[^>]*>(.*?)</parsers-ignore>', r'\1', content, re.MULTILINE) # remove parsers-ignore tags
                             content = re.sub(r'\n@ [^\n]*', '', content, re.MULTILINE) # remove tags
                             content = re.sub(r'\n! [^\n]*', '', content, re.MULTILINE) # remove includes
                             content = re.sub(r'\n% [^\n]*', '', content, re.MULTILINE) # remove recursive path calls
@@ -147,6 +146,7 @@ class PreviewBlockProcessor(BlockProcessor):
                             content = re.sub(r'<a\b[^>]*>(.*?)</a>', r'\1', content)
                             content = re.sub(r'<h[2-4]\b[^>]*>(.*?)</h[2-4]>', r'<b>\1</b>', content)
                             content = re.sub(r'<h1\b[^>]*>(.*?)</h1>', r'<div class="preview-title"><b>\1</b></div>', content)
+                            content = re.sub(r'<parsers-ignore\b?[^>]*>(.*?)</parsers-ignore>', r'\1', content, re.MULTILINE) # remove parsers-ignore tags
 
                             emoji = meta.get('emoji', [''])[0]
                             date = meta.get('date', [''])[0]
