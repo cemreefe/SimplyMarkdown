@@ -70,7 +70,8 @@ def extract_first_paragraph(html):
     # Iterate through the extracted <p> tags and find the first significant one
     for p_content in p_tags:
         # Remove inner tags from the paragraph
-        paragraph_text = re.sub(r'<.*?>', '', p_content)
+        paragraph_text = re.sub(r'<parsers-ignore>.*?</parsers-ignore>', '', p_content)
+        paragraph_text = re.sub(r'<.*?>', '', paragraph_text)
         paragraph_text = paragraph_text.strip()
 
         # Check if the paragraph is significant (contains at least 30 characters)
