@@ -102,8 +102,10 @@ if __name__ == "__main__":
     parser.add_argument('--favicon', help="Favicon emoji", required=False, default='👤')
     parser.add_argument('--root', help="Project url root", required=False, default='')
     parser.add_argument('--title', help="Website title", required=False, default='')
+    parser.add_argument('--rss-whitelist', default='*', help='Comma-separated list of URI patterns to include in the feed (supports wildcards).')
+    parser.add_argument('--rss-description', default='This is an RSS feed of my website.', help='Description of the RSS feed.')
     args = parser.parse_args()
 
     process_directory(args.input, args.output, args.css, args.template, args.favicon, args.root, args.title)
     generate_sitemap(args.output, args.root)
-    generate_rss_feed(args.output, args.root)
+    generate_rss_feed(args.output, args.root, args.rss_whitelist, args.title, args.rss_description)
