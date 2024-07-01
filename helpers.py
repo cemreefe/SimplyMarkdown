@@ -95,8 +95,7 @@ def get_meta_tags(meta_img_override, meta_title, meta_description, meta_pubdate=
 
     # Determine the last modification date of the file
     file_path = os.path.join(current_dir, output_file_relpath)
-    pub_date = meta_pubdate.strftime('%a, %d %b %Y %H:%M:%S +0000') if meta_pubdate else None
-
+    pub_date = datetime.strptime(meta_pubdate).strftime('%a, %d %b %Y %H:%M:%S +0000') if meta_pubdate else None
 
     meta_tags = f'''
     <meta property="og:title" name="title" content="{meta_title}" />
