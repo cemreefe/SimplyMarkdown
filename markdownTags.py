@@ -146,7 +146,8 @@ class PreviewBlockProcessor(BlockProcessor):
                             content = re.sub(r'<a\b[^>]*>(.*?)</a>', r'\1', content)
                             content = re.sub(r'<h[2-4]\b[^>]*>(.*?)</h[2-4]>', r'<b>\1</b>', content)
                             content = re.sub(r'<h1\b[^>]*>(.*?)</h1>', r'<div class="preview-title"><b>\1</b></div>', content)
-                            content = re.sub(r'<parsers-ignore>(.*?)</parsers-ignore>', '', content, re.DOTALL) # remove parsers-ignore tags
+                            print(">>>", content)
+                            content = re.sub(r'<parsers-ignore>(.*?)</parsers-ignore>', '', content, re.MULTILINE | re.DOTALL) # remove parsers-ignore tags
 
                             emoji = meta.get('emoji', [''])[0]
                             date = meta.get('date', [''])[0]
