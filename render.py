@@ -46,6 +46,8 @@ def process_markdown_file(input_path, file_path, output_file_, module_dict, root
 
     category_tags = meta.get('tags', [])
 
+    meta_title = f"{meta_title} - {website_title}"
+
     # Fill in the template with the context information
     context = {
         'lang': meta_lang,
