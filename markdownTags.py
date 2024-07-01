@@ -136,12 +136,10 @@ class PreviewBlockProcessor(BlockProcessor):
                             content = md_file.read().strip()
                             title = get_first_title(content)
                             content = content.replace('[TOC]', '')
-                            content = re.sub(r'<parsers-ignore>.*?</parsers-ignore>', '', content, re.MULTILINE) # remove parsers-ignore tags
-                            components = content.split('\n\n')[:self.preview_limit]
+                            components = content.split('\n\n')
+                            components = [component for component in components if '<parsers-ignore>' not in component]
+                            components = components[:self.preview_limit]
                             content = '\n\n'.join(components) + '\n\n'
-                            # print(">1>>>", content)
-                            # print(">2>>>", content, re.search(r'\n<parsers-ignore>.*?</parsers-ignore>\n', content, re.MULTILINE | re.DOTALL))
-                            # print(">3>>>", content)
                             content = re.sub(r'\n@ [^\n]*', '', content, re.MULTILINE) # remove tags
                             content = re.sub(r'\n! [^\n]*', '', content, re.MULTILINE) # remove includes
                             content = re.sub(r'\n% [^\n]*', '', content, re.MULTILINE) # remove recursive path calls
