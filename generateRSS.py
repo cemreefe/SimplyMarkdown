@@ -9,7 +9,7 @@ def extract_metadata(html_content):
     title = soup.find('title').text if soup.find('title') else 'No title'
     pub_date_meta = soup.find('meta', {'name': 'pubDate'}) or soup.find('meta', {'name': 'pubdate'})
     pub_date = pub_date_meta['content'] if pub_date_meta else None
-    main_content = soup.find('main').text if soup.find('main') else 'No content'
+    main_content = str(soup.find('main')) if soup.find('main') else 'No content'
 
     return title, pub_date, main_content
 
