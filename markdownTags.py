@@ -138,6 +138,10 @@ class PreviewBlockProcessor(BlockProcessor):
                             content = content.replace('[TOC]', '')
                             components = content.split('\n\n')[:self.preview_limit]
                             content = '\n\n'.join(components) + '\n\n'
+                            print(">1>>>", content)
+                            print(">2>>>", content, re.search(r'<parsers-ignore>(.*?)</parsers-ignore>', content, re.MULTILINE | re.DOTALL))
+                            content = re.sub(r'<parsers-ignore>(.*?)</parsers-ignore>', '', content, re.MULTILINE | re.DOTALL) # remove parsers-ignore tags
+                            print(">3>>>", content)
                             content = re.sub(r'\n@ [^\n]*', '', content, re.MULTILINE) # remove tags
                             content = re.sub(r'\n! [^\n]*', '', content, re.MULTILINE) # remove includes
                             content = re.sub(r'\n% [^\n]*', '', content, re.MULTILINE) # remove recursive path calls
@@ -146,10 +150,6 @@ class PreviewBlockProcessor(BlockProcessor):
                             content = re.sub(r'<a\b[^>]*>(.*?)</a>', r'\1', content)
                             content = re.sub(r'<h[2-4]\b[^>]*>(.*?)</h[2-4]>', r'<b>\1</b>', content)
                             content = re.sub(r'<h1\b[^>]*>(.*?)</h1>', r'<div class="preview-title"><b>\1</b></div>', content)
-                            print(">1>>>", content)
-                            print(">2>>>", content, re.search(r'<parsers-ignore>(.*?)</parsers-ignore>', content, re.MULTILINE | re.DOTALL))
-                            content = re.sub(r'<parsers-ignore>(.*?)</parsers-ignore>', '', content, re.MULTILINE | re.DOTALL) # remove parsers-ignore tags
-                            print(">3>>>", content)
 
                             emoji = meta.get('emoji', [''])[0]
                             date = meta.get('date', [''])[0]
