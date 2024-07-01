@@ -138,6 +138,7 @@ class PreviewBlockProcessor(BlockProcessor):
                             content = content.replace('[TOC]', '')
                             components = content.split('\n\n')[:self.preview_limit]
                             content = '\n\n'.join(components) + '\n\n'
+                            content = re.sub(r'<parsers-ignore\b[^>]*>(.*?)</parsers-ignore>', r'\1', content) # remove parsers-ignore tags
                             content = re.sub(r'\n@ [^\n]*', '', content, re.MULTILINE) # remove tags
                             content = re.sub(r'\n! [^\n]*', '', content, re.MULTILINE) # remove includes
                             content = re.sub(r'\n% [^\n]*', '', content, re.MULTILINE) # remove recursive path calls
