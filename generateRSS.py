@@ -1,7 +1,7 @@
 import os
 import fnmatch
 import argparse
-from xml.etree.ElementTree import Element, SubElement, ElementTree
+from xml.etree.ElementTree import Element, SubElement, ElementTree, CDATA
 from bs4 import BeautifulSoup
 
 def extract_metadata(html_content):
@@ -12,6 +12,20 @@ def extract_metadata(html_content):
     main_content = str(soup.find('main')) if soup.find('main') else 'No content'
 
     return title, pub_date, main_content
+
+def parse_main_content(main_content):
+    soup = BeautifulSoup(main_content, 'html.parser')
+
+    # Remove all <script> and <style> elements
+    for script_or_style in soup(['script', 'style']):
+        script_or_style.decompose()
+
+    # Remove all style attributes
+    for tag in soup.find_all(True):
+        tag.attrs = {key: value for key, value in tag.attrs.items() if key != 'style'}
+
+    cleaned_content = str(soup)
+    return f'<![CDATA[{cleaned_content}]]>'
 
 def generate_rss_feed(root_directory, urlroot='', uri_whitelist='*', feed_title='My RSS Feed', feed_description='This is an RSS feed of my website.'):
     def get_html_files(directory):
@@ -54,6 +68,8 @@ def generate_rss_feed(root_directory, urlroot='', uri_whitelist='*', feed_title=
         if not is_uri_whitelisted(url, whitelist_patterns):
             continue
 
+        parsed_content = parse_main_content(main_content)
+
         item = SubElement(channel, 'item')
         item_title_elem = SubElement(item, 'title')
         item_title_elem.text = item_title
@@ -65,7 +81,7 @@ def generate_rss_feed(root_directory, urlroot='', uri_whitelist='*', feed_title=
             pub_date_elem = SubElement(item, 'pubDate')
             pub_date_elem.text = pub_date
         description_elem = SubElement(item, 'description')
-        description_elem.text = main_content
+        description_elem.append(CDATA(parsed_content))
 
     output_file = os.path.join(root_directory, 'rss.xml')
     ElementTree(rss).write(output_file, encoding='utf-8', xml_declaration=True)
