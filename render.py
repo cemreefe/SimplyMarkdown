@@ -21,10 +21,10 @@ def find_modules(directory):
             module_dict[get_filename_without_extension(file)], _ = convert_to_html(read_file_content(file_path), os.path.dirname(file_path))   
     return module_dict
 
-def replace_relative_src_links(html_content, root_url):
+def replace_relative_src_links(html_content, reldir, root_url):
     root_url = root_url.rstrip('/')
     html_content = re.sub(r'src=[\"\']\/?((?!([a-z]+):\/\/).+)[\'\"]', r'src="{0}/\1"'.format(root_url), html_content)
-    html_content = re.sub(r'\/\.\/', '/', html_content)
+    html_content = html_content.replace('/./', '/')
     return html_content
 
 def process_markdown_file(input_path, file_path, output_file_, module_dict, root, urlroot, favicon, website_title, template_path, output_path):
@@ -39,7 +39,7 @@ def process_markdown_file(input_path, file_path, output_file_, module_dict, root
     # Replace module tags in the content
     content = re.sub('\n! include (.+)', lambda match: module_dict.get(match.group(1), ""), content, flags=re.I)
     content, meta = convert_to_html(content, os.path.dirname(file_path))
-    content = replace_relative_src_links(content, urlroot)
+    content = replace_relative_src_links(content, output_file_relpath, urlroot)
 
     meta_img_override = meta.get('image', [None])[0]
     meta_title = meta.get('title', [title])[0]
