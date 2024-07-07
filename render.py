@@ -21,6 +21,11 @@ def find_modules(directory):
             module_dict[get_filename_without_extension(file)], _ = convert_to_html(read_file_content(file_path), os.path.dirname(file_path))   
     return module_dict
 
+def replace_relative_links(html_content, root_url):
+    root_url = root_url.rstrip('/')
+    html_content = re.sub(r'href=[\"\']\/?((?!([a-z]+):\/\/).+)[\'\"]', f'href="{root_url}/$1"')
+    return html_content
+
 def process_markdown_file(input_path, file_path, output_file_, module_dict, root, urlroot, favicon, website_title, template_path, output_path):
     """Processes a Markdown file, converts it to HTML, and fills in the template."""
     content = read_file_content(file_path)
@@ -33,6 +38,7 @@ def process_markdown_file(input_path, file_path, output_file_, module_dict, root
     # Replace module tags in the content
     content = re.sub('\n! include (.+)', lambda match: module_dict.get(match.group(1), ""), content, flags=re.I)
     content, meta = convert_to_html(content, os.path.dirname(file_path))
+    content = replace_relative_links(content)
 
     meta_img_override = meta.get('image', [None])[0]
     meta_title = meta.get('title', [title])[0]
