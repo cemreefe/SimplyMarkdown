@@ -22,8 +22,10 @@ def find_modules(directory):
     return module_dict
 
 def replace_relative_src_links(html_content, reldir, root_url):
+
     root_url = root_url.rstrip('/')
-    html_content = re.sub(r'src=[\"\']\/?((?!([a-z]+):\/\/).+)[\'\"]', r'src="{0}/{1}/\1"'.format(root_url, reldir), html_content)
+    html_content = re.sub(r'src=[\"\']((?!(([a-z]+):\/\/)|\/).+)[\'\"]', r'src="{0}/{1}/\1"'.format(root_url, reldir), html_content)
+    html_content = re.sub(r'src=[\"\'](\/.+)[\'\"]', r'src="{0}/\1"'.format(root_url, reldir), html_content)
     html_content = html_content.replace('/./', '/')
     return html_content
 
