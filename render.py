@@ -22,11 +22,12 @@ def find_modules(directory):
     return module_dict
 
 def replace_relative_src_links(html_content, reldir, root_url):
-
+    # Hacky, make this better
     root_url = root_url.rstrip('/')
     html_content = re.sub(r'src=[\"\']((?!(([a-z]+):\/\/)|\/).+)[\'\"]', r'src="{0}/{1}/\1"'.format(root_url, reldir), html_content)
     html_content = re.sub(r'src=[\"\'](\/.+)[\'\"]', r'src="{0}/\1"'.format(root_url, reldir), html_content)
     html_content = html_content.replace('/./', '/')
+    html_content = html_content.replace('src="//', 'src="/')
     return html_content
 
 def process_markdown_file(input_path, file_path, output_file_, module_dict, root, urlroot, favicon, website_title, template_path, output_path):
