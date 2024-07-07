@@ -24,6 +24,10 @@ def parse_main_content(main_content):
     for tag in soup.find_all(True):
         tag.attrs = {key: value for key, value in tag.attrs.items() if key != 'style'}
 
+    # Add max-width:100% to all img elements
+    for img in soup.find_all('img'):
+        img['style'] = 'max-width:100%;'
+
     cleaned_content = str(soup)
     return cleaned_content
 
