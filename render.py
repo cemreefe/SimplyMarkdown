@@ -27,10 +27,6 @@ def replace_relative_src_links(html_content, reldir, root_url):
     html_content = html_content.replace('/./', '/')
     return html_content
 
-def setup_max_img_widths(html_content):
-    html_content = re.sub(r'<img(.+?)>', r'<img\1 style="max-width:100%">', html_content)
-    return html_content
-
 def process_markdown_file(input_path, file_path, output_file_, module_dict, root, urlroot, favicon, website_title, template_path, output_path):
     """Processes a Markdown file, converts it to HTML, and fills in the template."""
     content = read_file_content(file_path)
@@ -45,7 +41,6 @@ def process_markdown_file(input_path, file_path, output_file_, module_dict, root
     content = re.sub('\n! include (.+)', lambda match: module_dict.get(match.group(1), ""), content, flags=re.I)
     content, meta = convert_to_html(content, os.path.dirname(file_path))
     content = replace_relative_src_links(content, output_dir_relpath, urlroot)
-    content = setup_max_img_widths(content)
 
     meta_img_override = meta.get('image', [None])[0]
     meta_title = meta.get('title', [title])[0]
