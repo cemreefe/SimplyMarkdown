@@ -28,9 +28,11 @@ def generate_sitemap(root_directory, urlroot=''):
         sitemap_file.write('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n')
 
         for file_path in html_files:
+            print('-------in-----')
             canonical_url = get_canonical_url(file_path)
+            print(canonical_url, file_path)
             if canonical_url:
-                if not canonical_url.startswith(urlroot)
+                if not canonical_url.startswith(urlroot):
                     url = (urlroot + canonical_url).replace('//', '/')
                     url = url.replace('https:/', 'https://')
                 else:
