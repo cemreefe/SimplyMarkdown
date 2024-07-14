@@ -9,6 +9,8 @@ tags:   gaming
 
 This is a blog post
 
+![](./example_photo.jpeg)
+
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer non mattis diam. Vivamus fermentum eu nunc sit amet condimentum. Suspendisse tempus, dui in fringilla vehicula, mauris ipsum blandit lorem, sed convallis velit dui sed metus. Pellentesque non felis rhoncus, commodo eros sodales, luctus lacus. Nulla maximus lacus nec nunc dapibus molestie quis vel massa. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum pulvinar vestibulum posuere. Donec lacinia purus et molestie vestibulum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Cras viverra semper nisl et gravida. Mauris dapibus tortor sed dapibus rhoncus.
 
 > "Lorem Ipsum" -Dolor sit Amed
@@ -16,8 +18,6 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer non mattis diam
 Fusce rhoncus nec enim at convallis. Proin venenatis molestie eros, vitae congue ligula ultrices nec. Pellentesque hendrerit, tellus sit amet faucibus ultrices, ex ante ultrices enim, non sodales massa augue vel lorem. Nam consequat dictum blandit. Quisque lorem lectus, scelerisque sit amet vestibulum fermentum, venenatis lobortis nisl. Nunc ullamcorper dictum mollis. Proin vel ante nisl. Praesent mattis pharetra nunc non ultricies. Sed fermentum imperdiet quam sed eleifend.
 
 Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Curabitur auctor enim leo, ac porta velit tincidunt vel. Sed eu lacus sed urna rutrum luctus. Integer dolor nunc, viverra in mollis nec, convallis id augue. Quisque et sem in tortor volutpat lobortis. Curabitur nulla ex, aliquam vitae est ornare, tincidunt ullamcorper arcu. Sed semper sit amet risus a gravida. Mauris in lectus ac nunc vestibulum euismod.
-
-![](./example_photo.jpeg)
 
 ![](https://s3-eu-west-1.amazonaws.com/kooness-stage-bucket/uploads/archive/film-2205325_1280.jpg)
 

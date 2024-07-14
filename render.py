@@ -6,6 +6,8 @@ from generateSitemap import generate_sitemap
 from generateRSS import generate_rss_feed
 from helpers import *
 from markdownTags import get_first_title
+from bs4 import BeautifulSoup
+from urllib.parse import urljoin
 
 def find_modules(directory):
     """Finds and returns a dictionary containing module filenames and their content."""
@@ -22,13 +24,30 @@ def find_modules(directory):
     return module_dict
 
 def replace_relative_src_links(html_content, reldir, root_url):
-    # Hacky, make this better
+    # Ensure root_url does not end with a slash
     root_url = root_url.rstrip('/')
-    html_content = re.sub(r'src=[\"\']((?!(([a-z]+):\/\/)|\/).+)[\'\"]', r'src="{0}/{1}/\1"'.format(root_url, reldir), html_content)
-    html_content = re.sub(r'src=[\"\'](\/.+)[\'\"]', r'src="{0}/\1"'.format(root_url, reldir), html_content)
-    html_content = html_content.replace('/./', '/')
-    html_content = html_content.replace('src="//', 'src="/')
-    return html_content
+    reldir = reldir.lstrip('/').rstrip('/')
+    
+    # Parse the HTML content
+    soup = BeautifulSoup(html_content, 'html.parser')
+    
+    # Find all elements with a src attribute
+    for tag in soup.find_all(src=True):
+        src = tag['src']
+        
+        # Check if the src is a relative path (does not start with http://, https://, or /)
+        if not src.startswith(('http://', 'https://', '/')):
+            # Construct the new src value
+            new_src = urljoin(f'{root_url}/{reldir}/', src)
+            tag['src'] = new_src
+        elif src.startswith('/'):
+            # Handle absolute paths relative to the root URL
+            src = src.lstrip('/')
+            new_src = urljoin(root_url, src)
+            tag['src'] = new_src
+    
+    # Return the modified HTML content as a string
+    return str(soup)
 
 def process_markdown_file(input_path, file_path, output_file_, module_dict, root, urlroot, favicon, website_title, template_path, output_path):
     """Processes a Markdown file, converts it to HTML, and fills in the template."""

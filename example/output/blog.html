@@ -83,9 +83,23 @@
           <h2 id="blog">Blog</h2>
 <p>Here you can see all of my blog posts! I talk about indie and tech.</p>
 <div class="postsListWrapper">
-<div class="dateTab">2023</div>
-<div class="postTitle"><a href="posts/2023/07/03/Creative-Coding"><div>💻 Creative Coding</div></a></div>
-<div class="postTitle"><a href="posts/2023/02/18/Hogwarts-Legacy"><div>🏰 Hogwarts Legacy</div></a></div>
+<div class="postPreview">
+<div class="previewDate">2023-07-03</div>
+<a class="previewHref" href="posts/2023/07/03/Creative-Coding"><div><div class="preview-title"><b>Creative Coding</b></div>
+<p>This is a blog post with a code block</p>
+<div class="highlight" style="background: #f8f8f8"><pre style="line-height: 125%;"><span></span><code><span style="color: #008000; font-weight: bold">public</span><span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">class</span> <span style="color: #0000FF; font-weight: bold">NotificationService</span><span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">private</span><span style="color: #bbbbbb"> </span>EmailService<span style="color: #bbbbbb"> </span>emailService<span style="color: #bbbbbb"> </span><span style="color: #666666">=</span><span style="color: #bbbbbb"> </span><span style="color: #008000; font-weight: bold">new</span><span style="color: #bbbbbb"> </span>SmsService();<span style="color: #bbbbbb"> </span><span style="color: #3D7B7B; font-style: italic">// modify this line</span>
+<span style="color: #bbbbbb">  </span><span style="color: #008000; font-weight: bold">public</span><span style="color: #bbbbbb"> </span><span style="color: #B00040">void</span><span style="color: #bbbbbb"> </span><span style="color: #0000FF">sendNotification</span>(String<span style="color: #bbbbbb"> </span>email,<span style="color: #bbbbbb"> </span>String<span style="color: #bbbbbb"> </span>message)<span style="color: #bbbbbb"> </span>{
+<span style="color: #bbbbbb">    </span>emailService.<span style="color: #687822">sendEmail</span>(email,<span style="color: #bbbbbb"> </span>message);<span style="color: #bbbbbb"> </span><span style="color: #3D7B7B; font-style: italic">// replace with emailService.sendSms(phone, message);</span>
+<span style="color: #bbbbbb">  </span>}
+}
+</code></pre></div></div><span class="a">(Read more)</span></a></div>
+<div class="postPreview">
+<div class="previewDate">2023-02-18</div>
+<a class="previewHref" href="posts/2023/02/18/Hogwarts-Legacy"><div><div class="preview-title"><b>Hogwarts Legacy</b></div>
+<p>This is a blog post</p>
+<p><img alt="" src="/posts/2023/02/18/example_photo.jpeg"/></p>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer non mattis diam. Vivamus fermentum eu nunc sit amet condimentum. Suspendisse tempus, dui in fringilla vehicula, mauris ipsum blandit lorem, sed convallis velit dui sed metus. Pellentesque non felis rhoncus, commodo eros sodales, luctus lacus. Nulla maximus lacus nec nunc dapibus molestie quis vel massa. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum pulvinar vestibulum posuere. Donec lacinia purus et molestie vestibulum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Cras viverra semper nisl et gravida. Mauris dapibus tortor sed dapibus rhoncus.</p></div><span class="a">(Read more)</span></a></div>
 </div>
         </main>
       </div>
