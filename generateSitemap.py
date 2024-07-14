@@ -30,8 +30,11 @@ def generate_sitemap(root_directory, urlroot=''):
         for file_path in html_files:
             canonical_url = get_canonical_url(file_path)
             if canonical_url:
-                url = (urlroot + canonical_url).replace('//', '/')
-                url = url.replace('https:/', 'https://')
+                if not canonical_url.startswith(urlroot)
+                    url = (urlroot + canonical_url).replace('//', '/')
+                    url = url.replace('https:/', 'https://')
+                else:
+                    url = canonical_url
             else:
                 url = file_path.replace(root_directory, urlroot + '/').replace('\\', '/').lstrip('/')
                 url = url.replace('//', '/')
