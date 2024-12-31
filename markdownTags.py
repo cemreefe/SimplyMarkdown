@@ -75,7 +75,7 @@ class PreviewBlockProcessor(BlockProcessor):
                 a = ET.Element('a', attrib={'href': item.href, 'class': 'previewHref'})
                 a.append(text_div)
 
-                if truncated:
+                if item.truncated:
                     read_more = ET.Element('span', attrib={'class': 'a'})
                     read_more.text = '(Read more)'
                     a.append(read_more)
