@@ -15,13 +15,14 @@ def get_first_title(markdown_or_html_text):
     return ""
 
 class ContentItem:
-    def __init__(self, content, date, href, emoji, tags, title):
+    def __init__(self, content, date, href, emoji, tags, title, truncated):
         self.content = content
         self.date = date
         self.href = href
         self.emoji = emoji
         self.tags = tags
         self.title = title
+        self.truncated = truncated
 
 class PreviewExtension(Extension):
     """Markdown extension to handle the special tag for previews."""
@@ -70,13 +71,14 @@ class PreviewBlockProcessor(BlockProcessor):
 
                 text_div = ET.Element('div')
                 text_div.text = item.content
-                
-                read_more = ET.Element('span', attrib={'class': 'a'})
-                read_more.text = '(Read more)'
 
                 a = ET.Element('a', attrib={'href': item.href, 'class': 'previewHref'})
                 a.append(text_div)
-                a.append(read_more)
+
+                if truncated:
+                    read_more = ET.Element('span', attrib={'class': 'a'})
+                    read_more.text = '(Read more)'
+                    a.append(read_more)
 
                 post_wrapper = ET.Element('div', attrib={'class': 'postPreview'})
                 post_wrapper.append(date_div)
@@ -138,6 +140,7 @@ class PreviewBlockProcessor(BlockProcessor):
                             content = content.replace('[TOC]', '')
                             components = content.split('\n\n')
                             components = [component for component in components if '<parsers-ignore>' not in component]
+                            truncated = self.preview_limit > len(components)
                             components = components[:self.preview_limit]
                             content = '\n\n'.join(components) + '\n\n'
                             content = re.sub(r'\n@ [^\n]*', '', content, re.MULTILINE) # remove tags
@@ -152,7 +155,7 @@ class PreviewBlockProcessor(BlockProcessor):
                             emoji = meta.get('emoji', [''])[0]
                             date = meta.get('date', [''])[0]
                             tags = meta.get('tags', [''])
-                            content_items.append(ContentItem(content, date, href, emoji, tags, title))
+                            content_items.append(ContentItem(content, date, href, emoji, tags, title, truncated))
 
         return {
             'content_items': list(reversed(content_items)),
