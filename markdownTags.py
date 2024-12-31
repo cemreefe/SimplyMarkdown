@@ -140,7 +140,7 @@ class PreviewBlockProcessor(BlockProcessor):
                             content = content.replace('[TOC]', '')
                             components = content.split('\n\n')
                             components = [component for component in components if '<parsers-ignore>' not in component]
-                            truncated = self.preview_limit > len(components)
+                            truncated = self.preview_limit < len(components)
                             components = components[:self.preview_limit]
                             content = '\n\n'.join(components) + '\n\n'
                             content = re.sub(r'\n@ [^\n]*', '', content, re.MULTILINE) # remove tags
