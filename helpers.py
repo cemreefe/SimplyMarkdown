@@ -104,10 +104,11 @@ def get_meta_tags(meta_img_override, meta_title, meta_description, meta_pubdate=
     <meta property="og:description" name="description" content="{meta_description}" />
     <meta property="og:type" content="website" />
     <meta property="og:url" name="url" content="{canonical_url}">
-    <meta property="twitter:title" name="title" content="{meta_title}" />
-    <meta property="twitter:image" name="image" content="{meta_img}" />
     <link rel="canonical" href="{canonical_url}" />
     '''
+    #     Commenting out to test something.
+    #     <meta property="twitter:title" name="title" content="{meta_title}" />
+    #     <meta property="twitter:image" name="image" content="{meta_img}" />
 
     if pub_date:
         meta_tags += f'<meta property="og:pubdate" name="pubdate" content="{pub_date}" />\n'
