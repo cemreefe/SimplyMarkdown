@@ -67,18 +67,19 @@ def extract_first_paragraph(html):
     # Find all <p> tags and their inner text
     p_tags = re.findall(r'<p>(.*?)</p>', html, re.DOTALL)
 
-    # Iterate through the extracted <p> tags and find the first significant one
+    text_content = ""
+    # Iterate through the extracted <p> tags and construct content
     for p_content in p_tags:
         # Remove inner tags from the paragraph
         paragraph_text = re.sub(r'<parsers-ignore>.*?</parsers-ignore>', '', p_content)
         paragraph_text = re.sub(r'<.*?>', '', paragraph_text)
         paragraph_text = paragraph_text.strip()
 
-        # Check if the paragraph is significant (contains at least 30 characters)
-        if len(paragraph_text) >= 30:
-            return paragraph_text[:155] + '...' if len(paragraph_text) > 160 else paragraph_text
+        text_content += paragraph_text
+        if len(text_content) >= 160:
+            return text_content[:155] + '...'
 
-    return ""  # No significant <p> block found
+    return text_content
 
 
 def get_meta_tags(meta_img_override, meta_title, meta_description, meta_pubdate='', urlroot='', current_dir='', input_path='', output_file_relpath='', meta_canonical_uri_override=None):
