@@ -4,6 +4,7 @@ import xml.etree.ElementTree as ET
 from markdown.extensions import Extension
 from markdown.inlinepatterns import Pattern
 from markdown.blockprocessors import BlockProcessor
+from datetime import datetime
 
 def get_first_title(markdown_or_html_text):
     pattern = r'(<h[1-6].*?>.+?</h[1-6]>)|#+(\s+(.*?))$'
@@ -61,6 +62,7 @@ class PreviewBlockProcessor(BlockProcessor):
         content_context = self.get_preview_content()
         detailed = content_context.get('detailed', False)
         content_items = content_context.get('content_items', [])
+        content_items = sorted(content_items, key=lambda x: getattr(x, date, datetime.now()))
 
         wrapper = ET.Element('div', attrib={'class': 'postsListWrapper'})
 
