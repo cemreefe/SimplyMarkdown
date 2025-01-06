@@ -19,7 +19,12 @@ def find_modules(directory):
     for root, _, files in os.walk(modules_dir):
         for file in files:
             file_path = os.path.join(root, file)
-            module_dict[get_filename_without_extension(file)], _ = convert_to_html(read_file_content(file_path), os.path.dirname(file_path))   
+            filename, extension = get_filename_without_extension(file), get_extension_from_full_path(file)
+            if extension == 'html':
+                with open(file_path, 'r') as f:
+                module_dict[filename] = f.read()
+            else:
+                module_dict[filename], _ = convert_to_html(read_file_content(file_path), os.path.dirname(file_path))
     return module_dict
 
 def replace_relative_src_links(html_content, reldir, root_url):
