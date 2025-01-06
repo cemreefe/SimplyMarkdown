@@ -46,6 +46,12 @@ def get_filename_without_extension(full_path):
     filename, _ = os.path.splitext(file_name_with_extension)
     return filename
 
+def get_extension_from_full_path(full_path):
+    """Get the extension from a full file path."""
+    file_name_with_extension = os.path.basename(full_path)
+    _, extension = os.path.splitext(file_name_with_extension)
+    return extension
+    
 def fill_template(context, template_path):
     """Fills the HTML template with the given context."""
     env = Environment(loader=FileSystemLoader(os.path.dirname(template_path)))
