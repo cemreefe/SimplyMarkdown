@@ -55,7 +55,7 @@
 &lt;p&gt;Here you can see all of my blog posts! I talk about indie and tech.&lt;/p&gt;
 &lt;div class="postsListWrapper"&gt;
 &lt;div class="postPreview"&gt;
-&lt;div class="previewDate"&gt;2023-07-03&lt;/div&gt;
+&lt;div class="previewDate"&gt;2025-01-06&lt;/div&gt;
 &lt;a class="previewHref" href="posts/2023/07/03/Creative-Coding"&gt;&lt;div&gt;&lt;div class="preview-title"&gt;&lt;h2&gt;Creative Coding&lt;/h2&gt;&lt;/div&gt;
 &lt;p&gt;This is a blog post with a code block&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span&gt;public&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;class&lt;/span&gt; &lt;span&gt;NotificationService&lt;/span&gt;&lt;span&gt; &lt;/span&gt;{
@@ -80,7 +80,7 @@
 &lt;/div&gt;
 &lt;/main&gt;</description></item><item><title> - </title><link>posts/2055/test</link><guid>posts/2055/test</guid><pubDate>Fri, 01 Jan 1999 00:00:00 +0000</pubDate><description>&lt;main&gt;
 &lt;p&gt;Test&lt;/p&gt;
-&lt;/main&gt;</description></item><item><title>Creative Coding - </title><link>posts/2023/07/03/Creative-Coding</link><guid>posts/2023/07/03/Creative-Coding</guid><pubDate>Mon, 03 Jul 2023 00:00:00 +0000</pubDate><description>&lt;main&gt;
+&lt;/main&gt;</description></item><item><title>Creative Coding - </title><link>posts/2023/07/03/Creative-Coding</link><guid>posts/2023/07/03/Creative-Coding</guid><description>&lt;main&gt;
 &lt;div class="categoryTag"&gt;
             coding
           &lt;/div&gt;

@@ -137,6 +137,7 @@ class PreviewBlockProcessor(BlockProcessor):
                     if file.lower().endswith('.md'):
                         file_path = os.path.join(root, file)
                         with open(file_path, 'r') as md_file:
+                            _file_last_modified = datetime.fromtimestamp(os.path.getmtime(file_path)).strftime("%Y-%m-%d")
                             content = md_file.read().strip()
                             title = get_first_title(content)
                             content = content.replace('[TOC]', '')
@@ -154,8 +155,8 @@ class PreviewBlockProcessor(BlockProcessor):
                             content = re.sub(r'<h[2-4]\b[^>]*>(.*?)</h[2-4]>', r'<b>\1</b>', content)
                             content = re.sub(r'<h1\b[^>]*>(.*?)</h1>', r'<div class="preview-title"><h2>\1</h2></div>', content)
 
-                            emoji = meta.get('emoji', [''])[0]
-                            date = meta.get('date', [''])[0]
+                            emoji = meta.get('emoji', ['•'])[0]
+                            date = meta.get('date', [_file_last_modified])[0]
                             tags = meta.get('tags', [''])
                             content_items.append(ContentItem(content, date, href, emoji, tags, title, truncated))
 
