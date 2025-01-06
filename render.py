@@ -5,7 +5,6 @@ import argparse
 from generateSitemap import generate_sitemap
 from generateRSS import generate_rss_feed
 from helpers import *
-from markdownTags import get_first_title
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 

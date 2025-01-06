@@ -2,7 +2,7 @@ import os
 import re
 import shutil 
 from datetime import datetime
-from markdownTags import PreviewExtension
+from markdownTags import PreviewExtension, extract_first_paragraph, get_first_title
 from markdown.extensions.codehilite import CodeHiliteExtension
 import markdown
 from markdown.extensions import Extension
@@ -62,24 +62,6 @@ def copy_css_file(css_path, output_path):
 
 def get_dutluk_emoji_href(emoji):
     return f"https://emoji.dutl.uk/png/64x64/{emoji}.png"
-
-def extract_first_paragraph(html, character_limit=160):
-    # Find all <p> tags and their inner text
-    p_tags = re.findall(r'<p>(.*?)</p>', html, re.DOTALL)
-
-    text_content = ""
-    # Iterate through the extracted <p> tags and construct content
-    for p_content in p_tags:
-        # Remove inner tags from the paragraph
-        paragraph_text = re.sub(r'<parsers-ignore>.*?</parsers-ignore>', '', p_content)
-        paragraph_text = re.sub(r'<.*?>', '', paragraph_text)
-        paragraph_text = paragraph_text.strip()
-
-        text_content += paragraph_text
-        if len(text_content) >= character_limit:
-            return text_content[:character_limit-5] + '...'
-
-    return text_content
 
 
 def get_meta_tags(meta_img_override, meta_title, meta_description, meta_pubdate='', urlroot='', current_dir='', input_path='', output_file_relpath='', meta_canonical_uri_override=None):

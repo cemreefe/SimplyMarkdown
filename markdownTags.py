@@ -15,6 +15,24 @@ def get_first_title(markdown_or_html_text):
         return title
     return ""
 
+def extract_first_paragraph(html, character_limit=160):
+    # Find all <p> tags and their inner text
+    p_tags = re.findall(r'<p>(.*?)</p>', html, re.DOTALL)
+
+    text_content = ""
+    # Iterate through the extracted <p> tags and construct content
+    for p_content in p_tags:
+        # Remove inner tags from the paragraph
+        paragraph_text = re.sub(r'<parsers-ignore>.*?</parsers-ignore>', '', p_content)
+        paragraph_text = re.sub(r'<.*?>', '', paragraph_text)
+        paragraph_text = paragraph_text.strip()
+
+        text_content += paragraph_text
+        if len(text_content) >= character_limit:
+            return text_content[:character_limit-5] + '...'
+
+    return text_content
+
 class ContentItem:
     def __init__(self, content, date, href, emoji, tags, title, truncated):
         self.content = content
@@ -139,7 +157,6 @@ class PreviewBlockProcessor(BlockProcessor):
                         with open(file_path, 'r') as md_file:
                             _file_last_modified = datetime.fromtimestamp(os.path.getmtime(file_path)).strftime("%Y-%m-%d")
                             content = md_file.read().strip()
-                            title = get_first_title(content)
                             content = content.replace('[TOC]', '')
                             components = content.split('\n\n')
                             components = [component for component in components if '<parsers-ignore>' not in component]
@@ -155,9 +172,11 @@ class PreviewBlockProcessor(BlockProcessor):
                             content = re.sub(r'<h[2-4]\b[^>]*>(.*?)</h[2-4]>', r'<b>\1</b>', content)
                             content = re.sub(r'<h1\b[^>]*>(.*?)</h1>', r'<div class="preview-title"><h2>\1</h2></div>', content)
 
-                            emoji = meta.get('emoji', ['•'])[0]
+                            emoji = meta.get('emoji', ['⏩'])[0]
                             date = meta.get('date', [_file_last_modified])[0]
                             tags = meta.get('tags', [''])
+                            title = get_first_title(content) or extract_first_paragraph(content)
+
                             content_items.append(ContentItem(content, date, href, emoji, tags, title, truncated))
 
         return {
