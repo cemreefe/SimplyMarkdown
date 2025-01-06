@@ -62,7 +62,7 @@ class PreviewBlockProcessor(BlockProcessor):
         content_context = self.get_preview_content()
         detailed = content_context.get('detailed', False)
         content_items = content_context.get('content_items', [])
-        content_items = sorted(content_items, key=lambda x: getattr(x, x.date, datetime.now()), reverse=True)
+        content_items = sorted(content_items, key=lambda x: x.date, reverse=True)
 
         wrapper = ET.Element('div', attrib={'class': 'postsListWrapper'})
 
