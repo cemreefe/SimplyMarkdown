@@ -22,7 +22,7 @@ def find_modules(directory):
             filename, extension = get_filename_without_extension(file), get_extension_from_full_path(file)
             if extension == 'html':
                 with open(file_path, 'r') as f:
-                module_dict[filename] = f.read()
+                    module_dict[filename] = f.read()
             else:
                 module_dict[filename], _ = convert_to_html(read_file_content(file_path), os.path.dirname(file_path))
     return module_dict
