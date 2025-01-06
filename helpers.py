@@ -63,7 +63,7 @@ def copy_css_file(css_path, output_path):
 def get_dutluk_emoji_href(emoji):
     return f"https://emoji.dutl.uk/png/64x64/{emoji}.png"
 
-def extract_first_paragraph(html):
+def extract_first_paragraph(html, character_limit=160):
     # Find all <p> tags and their inner text
     p_tags = re.findall(r'<p>(.*?)</p>', html, re.DOTALL)
 
@@ -76,8 +76,8 @@ def extract_first_paragraph(html):
         paragraph_text = paragraph_text.strip()
 
         text_content += paragraph_text
-        if len(text_content) >= 160:
-            return text_content[:155] + '...'
+        if len(text_content) >= character_limit:
+            return text_content[:character_limit-5] + '...'
 
     return text_content
 

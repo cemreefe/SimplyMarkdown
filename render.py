@@ -52,7 +52,8 @@ def replace_relative_src_links(html_content, reldir, root_url):
 def process_markdown_file(input_path, file_path, output_file_, module_dict, root, urlroot, favicon, website_title, template_path, output_path):
     """Processes a Markdown file, converts it to HTML, and fills in the template."""
     content = read_file_content(file_path)
-    title = get_first_title(content)
+    # If no title, use content.
+    title = get_first_title(content) or extract_first_paragraph(content, character_limit=50)
     
     # Change the file extension to '.html'
     output_file = os.path.splitext(output_file_)[0].replace(', ', '-').replace(' ', '-') + '.html'
