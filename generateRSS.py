@@ -3,12 +3,15 @@ import fnmatch
 import argparse
 from xml.etree.ElementTree import Element, SubElement, ElementTree
 from bs4 import BeautifulSoup
+from email.utils import parsedate_to_datetime
+from datetime import datetime
 
-def extract_metadata(html_content):
+def extract_metadata(html_content, last_edit):
     soup = BeautifulSoup(html_content, 'html.parser')
     title = soup.find('title').text if soup.find('title') else 'No title'
     pub_date_meta = soup.find('meta', {'name': 'pubDate'}) or soup.find('meta', {'name': 'pubdate'})
     pub_date = pub_date_meta['content'] if pub_date_meta else None
+    pub_date = pub_date or last_edit
     main_content = str(soup.find('main')) if soup.find('main') else 'No content'
 
     return title, pub_date, main_content
@@ -65,7 +68,8 @@ def generate_rss_feed(root_directory, urlroot='', uri_whitelist='*', feed_title=
         with open(file_path, 'r', encoding='utf-8') as file:
             html_content = file.read()
 
-        item_title, pub_date, main_content = extract_metadata(html_content)
+        last_edit = datetime.fromtimestamp(os.path.getmtime(file_path)).strftime("%a, %d %b %Y %H:%M:%S +0000") # Naive, assume UTC
+        item_title, pub_date, main_content = extract_metadata(html_content, last_edit)
         url = file_path.replace(root_directory, urlroot + '/').replace('\\', '/').lstrip('/')
         url = url.replace('//', '/')
         url = url.replace('https:/', 'https://')
@@ -86,7 +90,15 @@ def generate_rss_feed(root_directory, urlroot='', uri_whitelist='*', feed_title=
         })
 
     # Sort items by pubDate in descending order
-    feed_items.sort(key=lambda x: x['pubDate'] or '', reverse=True)
+    def sort_key(item):
+        if item['pubDate']:
+            try:
+                return parsedate_to_datetime(item['pubDate'])
+            except (TypeError, ValueError):
+                pass
+        return datetime.min  # Default to the oldest possible date for items without valid pubDate
+
+    feed_items.sort(key=sort_key, reverse=True)
 
     for item_data in feed_items:
         item = SubElement(channel, 'item')

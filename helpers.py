@@ -87,6 +87,7 @@ def get_meta_tags(meta_img_override, meta_title, meta_description, meta_pubdate=
     file_path = os.path.join(current_dir, output_file_relpath)
     pub_date = datetime.strptime(meta_pubdate, "%Y-%m-%d").strftime('%a, %d %b %Y %H:%M:%S +0000') if meta_pubdate else None
 
+    assert pub_date
     meta_tags = f'''
     <meta property="og:title" name="title" content="{meta_title}" />
     <meta property="og:image" name="image" content="{meta_img}" />
@@ -98,9 +99,7 @@ def get_meta_tags(meta_img_override, meta_title, meta_description, meta_pubdate=
     <meta name="twitter:description" content="{meta_description}">
     <meta name="twitter:image" content="{meta_img}">
     <link rel="canonical" href="{canonical_url}" />
+    <meta property="og:pubdate" name="pubdate" content="{pub_date}" />
     '''
-
-    if pub_date:
-        meta_tags += f'<meta property="og:pubdate" name="pubdate" content="{pub_date}" />\n'
 
     return meta_tags

@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<rss version="2.0"><channel><title /><link /><description>This is an RSS feed of my website.</description><item><title>About - </title><link>about</link><guid>about</guid><pubDate>Thu, 09 Jan 2025 17:02:29 +0000</pubDate><description>&lt;main&gt;
+<rss version="2.0"><channel><title /><link /><description>This is an RSS feed of my website.</description><item><title>About - </title><link>about</link><guid>about</guid><pubDate>Mon, 06 Jan 2025 00:00:00 +0000</pubDate><description>&lt;main&gt;
 &lt;h2 id="about"&gt;About&lt;/h2&gt;
 &lt;p&gt;Hi, I'm Cemre Efe Karakas!&lt;/p&gt;
 &lt;h2 id="reach-out"&gt;Reach out&lt;/h2&gt;
@@ -36,7 +36,7 @@
 &lt;li&gt;Software Engineering Intern @ Udemy (Summer 2021)&lt;/li&gt;
 &lt;li&gt;Computer Engineering BSc @ Bogazici University (2017-2022)&lt;/li&gt;
 &lt;/ul&gt;
-&lt;/main&gt;</description></item><item><title> - </title><link>archive</link><guid>archive</guid><pubDate>Thu, 09 Jan 2025 17:02:29 +0000</pubDate><description>&lt;main&gt;
+&lt;/main&gt;</description></item><item><title> - </title><link>archive</link><guid>archive</guid><pubDate>Mon, 06 Jan 2025 00:00:00 +0000</pubDate><description>&lt;main&gt;
 &lt;div class="postsListWrapper"&gt;
 &lt;div class="dateTab"&gt;2025&lt;/div&gt;
 &lt;div class="postTitle"&gt;&lt;a href="posts/2023/07/03/Creative-Coding"&gt;&lt;div&gt;💻 Creative Coding&lt;/div&gt;&lt;/a&gt;&lt;/div&gt;
@@ -45,7 +45,7 @@
 &lt;div class="dateTab"&gt;1999&lt;/div&gt;
 &lt;div class="postTitle"&gt;&lt;a href="posts/2055/test"&gt;&lt;div&gt;⏩ Test&lt;/div&gt;&lt;/a&gt;&lt;/div&gt;
 &lt;/div&gt;
-&lt;/main&gt;</description></item><item><title>Home - </title><link>index</link><guid>index</guid><pubDate>Thu, 09 Jan 2025 17:02:29 +0000</pubDate><description>&lt;main&gt;
+&lt;/main&gt;</description></item><item><title>Home - </title><link>index</link><guid>index</guid><pubDate>Mon, 06 Jan 2025 00:00:00 +0000</pubDate><description>&lt;main&gt;
 &lt;h2 id="home"&gt;Home&lt;/h2&gt;
 &lt;p&gt;Welcome to my humble home!&lt;/p&gt;
 &lt;p&gt;&lt;img alt="" src="https://emoji.dutl.uk/png/128x128/%F0%9F%8F%A1.png" style="max-width:100%;"/&gt;&lt;/p&gt;
@@ -59,7 +59,7 @@
 &lt;/blockquote&gt;
 &lt;p&gt;Go to &lt;a href="https://google.com/search?q=google"&gt;google&lt;/a&gt; to find out more.&lt;/p&gt;
 &lt;p&gt;// This is a reusable module&lt;/p&gt;
-&lt;/main&gt;</description></item><item><title>Blog - </title><link>blog</link><guid>blog</guid><pubDate>Thu, 09 Jan 2025 17:02:29 +0000</pubDate><description>&lt;main&gt;
+&lt;/main&gt;</description></item><item><title>Blog - </title><link>blog</link><guid>blog</guid><pubDate>Mon, 06 Jan 2025 00:00:00 +0000</pubDate><description>&lt;main&gt;
 &lt;h2 id="blog"&gt;Blog&lt;/h2&gt;
 &lt;p&gt;Here you can see all of my blog posts! I talk about indie and tech.&lt;/p&gt;
 &lt;div class="postsListWrapper"&gt;
@@ -87,7 +87,7 @@
 &lt;div class="previewDate"&gt;1999-01-01&lt;/div&gt;
 &lt;a class="previewHref" href="posts/2055/test"&gt;&lt;div&gt;&lt;p&gt;Test&lt;/p&gt;&lt;/div&gt;&lt;/a&gt;&lt;/div&gt;
 &lt;/div&gt;
-&lt;/main&gt;</description></item><item><title>Creative Coding - </title><link>posts/2023/07/03/Creative-Coding</link><guid>posts/2023/07/03/Creative-Coding</guid><pubDate>Thu, 09 Jan 2025 17:02:29 +0000</pubDate><description>&lt;main&gt;
+&lt;/main&gt;</description></item><item><title>Creative Coding - </title><link>posts/2023/07/03/Creative-Coding</link><guid>posts/2023/07/03/Creative-Coding</guid><pubDate>Mon, 06 Jan 2025 00:00:00 +0000</pubDate><description>&lt;main&gt;
 &lt;div class="categoryTag"&gt;
             coding
           &lt;/div&gt;
