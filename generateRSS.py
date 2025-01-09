@@ -59,6 +59,8 @@ def generate_rss_feed(root_directory, urlroot='', uri_whitelist='*', feed_title=
     description = SubElement(channel, 'description')
     description.text = feed_description
 
+    feed_items = []
+
     for file_path in html_files:
         with open(file_path, 'r', encoding='utf-8') as file:
             html_content = file.read()
@@ -75,18 +77,30 @@ def generate_rss_feed(root_directory, urlroot='', uri_whitelist='*', feed_title=
 
         parsed_content = parse_main_content(main_content)
 
+        feed_items.append({
+            'title': item_title,
+            'link': url,
+            'guid': url,
+            'pubDate': pub_date,
+            'description': parsed_content
+        })
+
+    # Sort items by pubDate in descending order
+    feed_items.sort(key=lambda x: x['pubDate'] or '', reverse=True)
+
+    for item_data in feed_items:
         item = SubElement(channel, 'item')
         item_title_elem = SubElement(item, 'title')
-        item_title_elem.text = item_title
+        item_title_elem.text = item_data['title']
         link_elem = SubElement(item, 'link')
-        link_elem.text = url
+        link_elem.text = item_data['link']
         guid_elem = SubElement(item, 'guid')
-        guid_elem.text = url
-        if pub_date:
+        guid_elem.text = item_data['guid']
+        if item_data['pubDate']:
             pub_date_elem = SubElement(item, 'pubDate')
-            pub_date_elem.text = pub_date
+            pub_date_elem.text = item_data['pubDate']
         description_elem = SubElement(item, 'description')
-        description_elem.text = parsed_content
+        description_elem.text = item_data['description']
 
     output_file = os.path.join(root_directory, 'rss.xml')
     ElementTree(rss).write(output_file, encoding='utf-8', xml_declaration=True)
