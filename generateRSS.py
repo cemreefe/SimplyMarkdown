@@ -13,14 +13,15 @@ def extract_metadata(html_content, last_edit):
     pub_date = pub_date_meta['content'] if pub_date_meta else None
     pub_date = pub_date or last_edit
     main_content = str(soup.find('main')) if soup.find('main') else 'No content'
+    category_tags = [tag.text.strip() for tag in soup.find_all('categorytag')]
 
-    return title, pub_date, main_content
+    return title, pub_date, main_content, category_tags
 
 def parse_main_content(main_content):
     soup = BeautifulSoup(main_content, 'html.parser')
 
     # Remove all <script> and <style> elements
-    for script_or_style in soup(['script', 'style', 'parsers-ignore']):
+    for script_or_style in soup(['script', 'style', 'parsers-ignore', 'categorytag']):
         script_or_style.decompose()
 
     # Remove all style attributes
@@ -69,7 +70,7 @@ def generate_rss_feed(root_directory, urlroot='', uri_whitelist='*', feed_title=
             html_content = file.read()
 
         last_edit = datetime.fromtimestamp(os.path.getmtime(file_path)).strftime("%a, %d %b %Y %H:%M:%S +0000") # Naive, assume UTC
-        item_title, pub_date, main_content = extract_metadata(html_content, last_edit)
+        item_title, pub_date, main_content, category_tags = extract_metadata(html_content, last_edit)
         url = file_path.replace(root_directory, urlroot + '/').replace('\\', '/').lstrip('/')
         url = url.replace('//', '/')
         url = url.replace('https:/', 'https://')
@@ -86,7 +87,8 @@ def generate_rss_feed(root_directory, urlroot='', uri_whitelist='*', feed_title=
             'link': url,
             'guid': url,
             'pubDate': pub_date,
-            'description': parsed_content
+            'description': parsed_content,
+            'categories': category_tags,
         })
 
     # Sort items by pubDate in descending order
@@ -113,6 +115,10 @@ def generate_rss_feed(root_directory, urlroot='', uri_whitelist='*', feed_title=
             pub_date_elem.text = item_data['pubDate']
         description_elem = SubElement(item, 'description')
         description_elem.text = item_data['description']
+        # Add categories
+        for category in item_data['categories']:
+            category_elem = SubElement(item, 'category')
+            category_elem.text = category
 
     output_file = os.path.join(root_directory, 'rss.xml')
     ElementTree(rss).write(output_file, encoding='utf-8', xml_declaration=True)

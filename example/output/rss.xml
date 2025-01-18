@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<rss version="2.0"><channel><title /><link /><description>This is an RSS feed of my website.</description><item><title>About - </title><link>about</link><guid>about</guid><pubDate>Thu, 09 Jan 2025 17:02:29 +0000</pubDate><description>&lt;main&gt;
+<rss version="2.0"><channel><title /><link /><description>This is an RSS feed of my website.</description><item><title>About - </title><link>about</link><guid>about</guid><pubDate>Mon, 06 Jan 2025 00:00:00 +0000</pubDate><description>&lt;main&gt;
 &lt;h2 id="about"&gt;About&lt;/h2&gt;
 &lt;p&gt;Hi, I'm Cemre Efe Karakas!&lt;/p&gt;
 &lt;h2 id="reach-out"&gt;Reach out&lt;/h2&gt;
@@ -36,7 +36,7 @@
 &lt;li&gt;Software Engineering Intern @ Udemy (Summer 2021)&lt;/li&gt;
 &lt;li&gt;Computer Engineering BSc @ Bogazici University (2017-2022)&lt;/li&gt;
 &lt;/ul&gt;
-&lt;/main&gt;</description></item><item><title> - </title><link>archive</link><guid>archive</guid><pubDate>Thu, 09 Jan 2025 17:02:29 +0000</pubDate><description>&lt;main&gt;
+&lt;/main&gt;</description></item><item><title> - </title><link>archive</link><guid>archive</guid><pubDate>Mon, 06 Jan 2025 00:00:00 +0000</pubDate><description>&lt;main&gt;
 &lt;div class="postsListWrapper"&gt;
 &lt;div class="dateTab"&gt;2025&lt;/div&gt;
 &lt;div class="postTitle"&gt;&lt;a href="posts/2023/07/03/Creative-Coding"&gt;&lt;div&gt;💻 Creative Coding&lt;/div&gt;&lt;/a&gt;&lt;/div&gt;
@@ -45,7 +45,7 @@
 &lt;div class="dateTab"&gt;1999&lt;/div&gt;
 &lt;div class="postTitle"&gt;&lt;a href="posts/2055/test"&gt;&lt;div&gt;⏩ Test&lt;/div&gt;&lt;/a&gt;&lt;/div&gt;
 &lt;/div&gt;
-&lt;/main&gt;</description></item><item><title>Home - </title><link>index</link><guid>index</guid><pubDate>Thu, 09 Jan 2025 17:02:29 +0000</pubDate><description>&lt;main&gt;
+&lt;/main&gt;</description></item><item><title>Home - </title><link>index</link><guid>index</guid><pubDate>Mon, 06 Jan 2025 00:00:00 +0000</pubDate><description>&lt;main&gt;
 &lt;h2 id="home"&gt;Home&lt;/h2&gt;
 &lt;p&gt;Welcome to my humble home!&lt;/p&gt;
 &lt;p&gt;&lt;img alt="" src="https://emoji.dutl.uk/png/128x128/%F0%9F%8F%A1.png" style="max-width:100%;"/&gt;&lt;/p&gt;
@@ -59,7 +59,7 @@
 &lt;/blockquote&gt;
 &lt;p&gt;Go to &lt;a href="https://google.com/search?q=google"&gt;google&lt;/a&gt; to find out more.&lt;/p&gt;
 &lt;p&gt;// This is a reusable module&lt;/p&gt;
-&lt;/main&gt;</description></item><item><title>Blog - </title><link>blog</link><guid>blog</guid><pubDate>Thu, 09 Jan 2025 17:02:29 +0000</pubDate><description>&lt;main&gt;
+&lt;/main&gt;</description></item><item><title>Blog - </title><link>blog</link><guid>blog</guid><pubDate>Mon, 06 Jan 2025 00:00:00 +0000</pubDate><description>&lt;main&gt;
 &lt;h2 id="blog"&gt;Blog&lt;/h2&gt;
 &lt;p&gt;Here you can see all of my blog posts! I talk about indie and tech.&lt;/p&gt;
 &lt;div class="postsListWrapper"&gt;
@@ -87,13 +87,9 @@
 &lt;div class="previewDate"&gt;1999-01-01&lt;/div&gt;
 &lt;a class="previewHref" href="posts/2055/test"&gt;&lt;div&gt;&lt;p&gt;Test&lt;/p&gt;&lt;/div&gt;&lt;/a&gt;&lt;/div&gt;
 &lt;/div&gt;
-&lt;/main&gt;</description></item><item><title>Creative Coding - </title><link>posts/2023/07/03/Creative-Coding</link><guid>posts/2023/07/03/Creative-Coding</guid><pubDate>Thu, 09 Jan 2025 17:02:29 +0000</pubDate><description>&lt;main&gt;
-&lt;div class="categoryTag"&gt;
-            coding
-          &lt;/div&gt;
-&lt;div class="categoryTag"&gt;
-            dev
-          &lt;/div&gt;
+&lt;/main&gt;</description></item><item><title>Creative Coding - </title><link>posts/2023/07/03/Creative-Coding</link><guid>posts/2023/07/03/Creative-Coding</guid><pubDate>Mon, 06 Jan 2025 00:00:00 +0000</pubDate><description>&lt;main&gt;
+
+
 &lt;h1 id="creative-coding"&gt;Creative Coding&lt;/h1&gt;
 &lt;p&gt;This is a blog post with a code block&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span&gt;public&lt;/span&gt;&lt;span&gt; &lt;/span&gt;&lt;span&gt;class&lt;/span&gt; &lt;span&gt;NotificationService&lt;/span&gt;&lt;span&gt; &lt;/span&gt;{
@@ -103,13 +99,9 @@
 &lt;span&gt;  &lt;/span&gt;}
 }
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;/main&gt;</description></item><item><title>Hogwarts Legacy - </title><link>posts/2023/02/18/Hogwarts-Legacy</link><guid>posts/2023/02/18/Hogwarts-Legacy</guid><pubDate>Wed, 18 Feb 2004 00:00:00 +0000</pubDate><description>&lt;main&gt;
-&lt;div class="categoryTag"&gt;
-            gaming
-          &lt;/div&gt;
-&lt;div class="categoryTag"&gt;
-            falan
-          &lt;/div&gt;
+&lt;/main&gt;</description><category>coding</category><category>dev</category></item><item><title>Hogwarts Legacy - </title><link>posts/2023/02/18/Hogwarts-Legacy</link><guid>posts/2023/02/18/Hogwarts-Legacy</guid><pubDate>Wed, 18 Feb 2004 00:00:00 +0000</pubDate><description>&lt;main&gt;
+
+
 &lt;h1 id="hogwarts-legacy"&gt;Hogwarts Legacy&lt;/h1&gt;
 &lt;p&gt;This is a blog post&lt;/p&gt;
 &lt;p&gt;&lt;img alt="" src="/posts/2023/02/18/example_photo.jpeg" style="max-width:100%;"/&gt;&lt;/p&gt;
@@ -122,6 +114,6 @@
 &lt;p&gt;&lt;img alt="" src="https://s3-eu-west-1.amazonaws.com/kooness-stage-bucket/uploads/archive/film-2205325_1280.jpg" style="max-width:100%;"/&gt;&lt;/p&gt;
 &lt;p&gt;Cras eget iaculis enim, a mattis arcu. Nullam vulputate, enim sit amet tincidunt facilisis, turpis turpis gravida metus, quis tincidunt purus enim ac massa. Donec ullamcorper tellus ligula, id ullamcorper nibh malesuada eu. Quisque semper laoreet pretium. Praesent eget magna bibendum, ultrices turpis vitae, molestie ligula. Fusce elit orci, interdum eget purus mattis, ultricies efficitur lacus. Aliquam eu malesuada velit. Mauris bibendum eleifend augue vitae pellentesque. Nullam condimentum erat justo, ac feugiat elit interdum vel. Cras posuere viverra mattis. Sed at dui mauris. Nullam non sem nec orci finibus tincidunt.&lt;/p&gt;
 &lt;p&gt;Suspendisse et bibendum arcu. Sed vehicula pharetra nunc in vestibulum. Etiam accumsan lorem lectus, eget iaculis ligula vulputate ac. Ut et aliquam purus, eu fringilla nulla. Etiam tempor massa vitae enim tempus, id congue arcu tempus. Phasellus et purus eget purus lobortis malesuada a vel nisl. Suspendisse vitae imperdiet orci. Pellentesque ipsum odio, mollis eu nulla eget, tempor viverra diam. Praesent a rutrum nibh. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Proin semper purus dictum ante pretium, a efficitur turpis semper. Nullam ac finibus ex, non rutrum ligula. Sed nec pulvinar mi.&lt;/p&gt;
-&lt;/main&gt;</description></item><item><title> - </title><link>posts/2055/test</link><guid>posts/2055/test</guid><pubDate>Fri, 01 Jan 1999 00:00:00 +0000</pubDate><description>&lt;main&gt;
+&lt;/main&gt;</description><category>gaming</category><category>falan</category></item><item><title> - </title><link>posts/2055/test</link><guid>posts/2055/test</guid><pubDate>Fri, 01 Jan 1999 00:00:00 +0000</pubDate><description>&lt;main&gt;
 &lt;p&gt;Test&lt;/p&gt;
 &lt;/main&gt;</description></item></channel></rss>
