@@ -19,9 +19,9 @@
       <div class="content">
         <main>
           {% for tag in context.category_tags %}
-          <div class="categoryTag">
+          <categoryTag>
             {{ tag }}
-          </div>
+          </categoryTag>
           {% endfor %}
           {{ context.content }}
         </main>
