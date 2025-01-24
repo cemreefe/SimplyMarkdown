@@ -89,6 +89,7 @@ def get_meta_tags(meta_img_override, meta_title, meta_description, meta_pubdate=
 
     assert pub_date
     meta_tags = f'''
+    <meta name="description" content="{meta_description}">
     <meta property="og:title" name="title" content="{meta_title}" />
     <meta property="og:image" name="image" content="{meta_img}" />
     <meta property="og:description" name="description" content="{meta_description}" />
