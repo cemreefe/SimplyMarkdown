@@ -1,121 +1,368 @@
-# SimplyMarkdown - Convert your Markdown into a Website
+# SimplyMarkdown
 
-Welcome to SimplyMarkdown, the simplest framework for creating websites from your Markdown files! With SimplyMarkdown, you can easily and quickly turn your directory of Markdown files into a stunning website without having to deal with any complicated configurations or bloated features.
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-As a solo developer who enjoys creating fun and easy-to-use tools in my free time, I wanted to make something that was both lightweight and effective. And that's exactly what SimplyMarkdown is all about! It's a simple and straightforward framework that lets you focus on your content, not the technical details.
+**SimplyMarkdown** is a lightweight static site generator that transforms your Markdown files into a beautiful, fully-functional website. No complex configurations, no bloated features—just simple, effective content management.
 
-So whether you're a blogger, writer, or just someone who wants to share their thoughts and ideas with the world, SimplyMarkdown has got you covered. With its easy-to-setup environment, you'll be up and running in no time!
+## ✨ Features
 
-# Setup
+- 🚀 **Simple & Fast** — Convert Markdown to HTML with minimal configuration
+- 📝 **Module System** — Reusable components for navbar, footer, and custom modules
+- 🏷️ **Frontmatter Support** — Rich metadata with title, date, tags, and more
+- 📰 **Auto-generated Feeds** — RSS and sitemap out of the box
+- 🔍 **Search Index** — JSON search index for client-side search
+- 🎨 **Syntax Highlighting** — Beautiful code blocks with Pygments
+- 👀 **Watch Mode** — Auto-rebuild on file changes
+- 🌐 **Dev Server** — Built-in development server
+- 📦 **Incremental Builds** — Only rebuild changed files
 
-To setup SimplyMarkdown locally, the only thing you need to do is to clone the repository. Read further for automated github pages integration.
+## 📦 Installation
 
-# How to use
+Clone the repository and install locally:
 
-## How to run
+```bash
+git clone https://github.com/cemreefe/SimplyMarkdown.git
+cd SimplyMarkdown
+pip install -e .
+```
 
-You can create a new directory with your desired structure to form your website. See example input directory in `/example`.
+Or install with development dependencies:
+
+```bash
+pip install -e ".[all]"
+```
+
+## 🚀 Quick Start
+
+### Initialize a New Project
+
+```bash
+simplymarkdown init my-blog
+cd my-blog
+simplymarkdown build -i source -o output --serve
+```
+
+### Or Start from Scratch
+
+1. Create your content structure:
 
 ```
-example/input/
-├── about.md
-├── index.md
-├── blog/
-│   ├── blog.md
-│   └── posts/
-│       ├── coding.md
-│       └── hogwarts.md
-├── modules/
-│   ├── navbar.md
-│   ├── footer.md
-│   ├── custom-module.md
-│   ├── head_extras.html
-└── static/
-│   ├── images/
+my-site/
+├── source/
+│   ├── index.md
+│   ├── about.md
+│   ├── posts/
+│   │   └── 2024/01/15/my-first-post.md
+│   ├── modules/
+│   │   ├── navbar.md
+│   │   └── footer.md
+│   └── static/
+│       └── img/
+└── output/
+```
+
+2. Build your site:
+
+```bash
+simplymarkdown build -i source -o output
+```
+
+3. Start the development server with auto-rebuild:
+
+```bash
+simplymarkdown build -i source -o output --serve --watch
+```
+
+## 📖 Usage
+
+### CLI Commands
+
+```bash
+# Build the site
+simplymarkdown build -i source -o output
+
+# Build with all options
+simplymarkdown build \
+  -i source \
+  -o output \
+  --title "My Blog" \
+  --root https://myblog.com \
+  --favicon 🚀 \
+  --serve \
+  --watch
+
+# Start development server only
+simplymarkdown serve output
+
+# Initialize a new project
+simplymarkdown init my-project
+
+# Create a new blog post
+simplymarkdown new "My New Post"
+```
+
+### Configuration File
+
+Create `simplymarkdown.yaml` in your project root:
+
+```yaml
+input: source
+output: output
+title: My Blog
+root: https://myblog.com
+favicon: 🚀
+
+template: templates/base.html
+theme: themes/custom.css
+
+rss:
+  whitelist: "/posts/*"
+  description: "My blog's RSS feed"
+
+build:
+  include_drafts: false
+  incremental: true
+
+server:
+  port: 8000
+  open_browser: true
+```
+
+## ✍️ Writing Content
+
+### Frontmatter
+
+Every Markdown file can have YAML frontmatter:
+
+```markdown
+---
+title: My Awesome Post
+date: 2024-01-15
+emoji: 🎉
+tags: python
+      web
+      tutorial
+image: /static/img/cover.png
+description: A brief description for SEO
+language: en
+draft: false
+---
+
+# My Awesome Post
+
+Your content here...
+```
+
+### Available Frontmatter Fields
+
+| Field | Description | Default |
+|-------|-------------|---------|
+| `title` | Page/post title | First heading |
+| `date` | Publication date (YYYY-MM-DD) | File modification date |
+| `emoji` | Emoji shown in listings | ⏩ |
+| `tags` | Category tags (one per line) | None |
+| `image` | Open Graph image | `/static/img/default_img.png` |
+| `description` | Meta description | First paragraph |
+| `language` | Page language | `en` |
+| `draft` | If `true`, excluded from build | `false` |
+| `canonical_uri` | Override canonical URL | Auto-generated |
+| `show_related` | Show related posts | `false` |
+| `related_count` | Number of related posts | 5 |
+
+## 🧩 Modules
+
+### Built-in Modules
+
+Place these files in `source/modules/`:
+
+- **`navbar.md`** — Navigation bar (included on all pages)
+- **`footer.md`** — Footer content (included on all pages)
+- **`head_extras.html`** — Extra content for `<head>` (analytics, fonts, etc.)
+
+### Custom Modules
+
+Create any `.md` file in `modules/` and include it:
+
+```markdown
+! include my-custom-module
+```
+
+This includes `modules/my-custom-module.md` at that location.
+
+## 📋 Special Tags
+
+### Post Listings
+
+List all posts in a directory:
+
+```markdown
+% posts
+```
+
+Detailed listings with previews:
+
+```markdown
+% posts:detailed
+```
+
+With pagination:
+
+```markdown
+% posts:paginate:10
+```
+
+### Table of Contents
+
+Generate a table of contents from headings:
+
+```markdown
+! toc
+```
+
+With max heading level:
+
+```markdown
+! toc:maxlevel:3
+```
+
+## 🎨 Themes
+
+### Using a Theme
+
+```bash
+simplymarkdown build -i source -o output --css themes/custom.css
+```
+
+### Creating a Theme
+
+Create a CSS file with styles for:
+
+```css
+/* Base styles */
+body { ... }
+
+/* Navigation */
+nav { ... }
+
+/* Content */
+main { ... }
+.content { ... }
+
+/* Post listings */
+.postsListWrapper { ... }
+.postTitle { ... }
+.postPreview { ... }
+.dateTab { ... }
+
+/* Category tags */
+categoryTag { ... }
+
+/* Code highlighting */
+.highlight { ... }
+
+/* Footer */
+footer { ... }
+```
+
+## 🌐 GitHub Pages Deployment
+
+### Automatic Deployment
+
+Add this workflow to `.github/workflows/deploy.yaml`:
+
+```yaml
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install SimplyMarkdown
+        run: |
+          git clone https://github.com/cemreefe/SimplyMarkdown.git
+          pip install ./SimplyMarkdown
+      
+      - name: Build site
+        run: |
+          simplymarkdown build \
+            -i source \
+            -o output \
+            --title "My Blog" \
+            --root "https://username.github.io"
+      
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./output
+```
+
+## 📁 Project Structure
+
+After building, your output will look like:
+
+```
+output/
+├── index.html
+├── about.html
+├── posts/
+│   └── 2024/01/15/my-first-post.html
+├── static/
 │   ├── css/
+│   │   └── theme.css
+│   └── img/
+├── sitemap.xml
+├── rss.xml
+└── search-index.json
 ```
 
-This will form the basis of your website. SimplyMarkdown will clone your directory and process each file to form your website. Markdown files will be rendered as html files.
+## 🔧 Development
 
+### Setup
 
-In SimplyMarkdown, `modules/` is a reserved directory. 
-- `modules/navbar.md` will be used to render the navigation bar for all html files. 
-- `modules/footer.md` will be used to render the footer for all html files.
-- `modules/head_extras.html` can be used to add extra tags to the `<head>` section of your website.
-- You can create your own custom modules under the `modules/` directory. To render a custom module in a web page, just inclue the module in your markdown sourcefile such as `! include custom-module` to include `modules/custom-module.md`. 
-
-To render your website, simply run 
-
-```
-python3 render.py -i /path/to/directory -o /path/to/output/directory
+```bash
+git clone https://github.com/cemreefe/SimplyMarkdown.git
+cd SimplyMarkdown
+pip install -e ".[all]"
 ```
 
-The following command line arguments are available for this script:
+### Running Tests
 
-- **-i, --input**: Input directory path (required)
-- **-o, --output**: Output directory path (required)
-- **--css**: CSS to include (default: 'themes/basic.css')
-- **--template**: Path to the HTML template (default: 'templates/base.html')
-- **--favicon**: Favicon emoji (default: '👤')
-- **--root**: Project URL root, this is almost always the CNAME of your domain i.e. `https://myblog.com`. (default: '')
-- **--title**: Website title (default: '')
-
-## Special Tags
-
-I have introduced the `%` tag for easier rendering in SimplyMarkdown. If you use 
-
-```
-% <relative-directory>`
+```bash
+pytest
+pytest --cov=simplymarkdown
 ```
 
-SimplyMarkdown will render a list of links to all files under that directory. You can see an example usage in the `blog.md` file in `example/input/blog`.
+### Linting
 
-If you are in `misc/archive.md`, use `% posts` to list md files in `misc/posts` and its subdirectories. 
-
-If you want detailed post overviews rahter than only titles, use 
-
-```
-% <relative-directory>:detailed
+```bash
+ruff check simplymarkdown tests
+mypy simplymarkdown
 ```
 
-## Frontmatter
+## 📄 License
 
-SimplyMarkdown supports frontmatter for markdown files. You can use the following syntax:
+MIT License - see [LICENSE](LICENSE) for details.
 
-```
----
-title: <meta title>
-emoji: <overview emoji>
-date:  <post date>
-tags:  <category-tag-1>
-       <category-tag-2>
-image: <img path>
+## 🤝 Contributing
+
+Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+## 📝 Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for version history.
+
 ---
 
-# Your title
-
-Your post
-```
-
-If you use the emoji tag an emoji will be shown alongside your posts in non-detailed overview mode.
-Date metadata helps sort and date your posts on overview.
-Tags add category tags to the top of your page.
-Title helps you override the metadata title property for your page if page title is too long.
-Image helps you override the metadata image tag of your page. If you don't use this property `static/img/default_img.png` will be used.
-
-## Github Pages Integration
-
-Using SimplyMarkdown with github pages is very simple. 
-
-1. If you have a website on your github pages repository `<username>/<username>.github.io`, checkout into a new branch called `backup` and push your blog there as backup.
-1. Create a new branch on your github pages repository `<username>/<username>.github.io`, named `gh-pages`
-1. On `main` branch, add the SimplyMarkdown rendering [worklfow](/workflow/render.yaml) into a new directory called `.github/workflows`
-1. Create a folder in your `main` branch, call it `source`, this is going to act as the root of your website.
-1. Populate your markdown directory as you wish. **To see an example check out [my personal website](https://github.com/cemreefe/cemreefe.github.io)**.
-1. When you push to your `main` branch, SimplyMarkdown workflow will trigger, and update your `gh-pages` branch.
-
-
-
-## Templates
-
-Templates are html files that you supply to set the style of your website's pages. SimplyMarkdown the following junja template. You can create your own template if desired. However this is rarely necessary.
+Made with ❤️ by [cemreefe](https://github.com/cemreefe)

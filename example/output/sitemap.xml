@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>about</loc>
+    <loc>https://example.com/blog</loc>
   </url>
   <url>
-    <loc>archive</loc>
+    <loc>https://example.com/index</loc>
   </url>
   <url>
-    <loc>index</loc>
+    <loc>https://example.com/about</loc>
   </url>
   <url>
-    <loc>blog</loc>
+    <loc>https://example.com/archive</loc>
   </url>
   <url>
-    <loc>posts/2055/test</loc>
+    <loc>https://example.com/posts/2023/02/18/Hogwarts-Legacy</loc>
   </url>
   <url>
-    <loc>posts/2023/07/03/Creative-Coding</loc>
+    <loc>https://example.com/posts/2023/07/03/Creative-Coding</loc>
   </url>
   <url>
-    <loc>posts/2023/02/18/Hogwarts-Legacy</loc>
+    <loc>https://example.com/posts/2055/test</loc>
   </url>
 </urlset>

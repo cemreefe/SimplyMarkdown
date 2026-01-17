@@ -6,47 +6,32 @@ on:
     - main
 
 jobs:
-  run_script:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python3
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.9
-    - name: Install dependencies
-      run: |
-        python3 -m pip install --upgrade pip
-        pip3 install markdown==3.3.4 jinja2 Pygments BeautifulSoup4
-    - name: Clone SimplyMarkdown
-      run: git clone https://github.com/cemreefe/SimplyMarkdown
-    - name: Run SimplyMarkdown
-      run: |
-        cd SimplyMarkdown
-        python3 render.py -i ../source -o ../output --title "Example Blog" --css ../source/static/css/theme.css --favicon 🟢 --root 'https://mypage.com'
-    - name: Cleanup repo
-      run: |
-        rm -r SimplyMarkdown
-    - name: Clone github pages branch and clean its contents, keep sitemap
-      run: |
-        cd ..
-        mkdir ghp
-        cd ghp
-        git clone -b gh-pages https://github.com/${{ github.actor }}/${{ github.event.repository.name }}
-        cd ${{ github.event.repository.name }}
-        git rm -r '*' 
-        git reset sitemap.xml || echo 
-        git checkout -- sitemap.xml || echo
-    - name: Move new output into github pages branch
-      run: |
-        shopt -s dotglob
-        mv output/* ../ghp/${{ github.event.repository.name }}/
-        
-    - name: Commit changes
-      run: |
-        cd ../ghp/${{ github.event.repository.name }}/
-        git config --global user.name '${{ github.actor }}'
-        git config --global user.email '${{ github.actor }}@users.noreply.github.com'
-        git remote set-url origin https://x-access-token:${{ secrets.AUTO_RENDER_PAT }}@github.com/$GITHUB_REPOSITORY
-        git add -A 
-        git diff-index --quiet HEAD || git commit -m "Rendered by SimplyMarkdown - ${{ github.event.head_commit.message }}" && git push    
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install SimplyMarkdown
+        run: |
+          git clone https://github.com/cemreefe/SimplyMarkdown.git /tmp/SimplyMarkdown
+          pip install /tmp/SimplyMarkdown
+
+      - name: Build site
+        run: |
+          simplymarkdown build \
+            -i source \
+            -o output \
+            --title "Example Blog" \
+            --favicon 🟢 \
+            --root 'https://mypage.com'
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./output
