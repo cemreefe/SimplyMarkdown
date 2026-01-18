@@ -1,6 +1,5 @@
 """Table of Contents module extension for SimplyMarkdown."""
 
-from __future__ import annotations
 
 import re
 import xml.etree.ElementTree as ET

@@ -1,14 +1,15 @@
 """Tests for sitemap, RSS, and search index generators."""
 
+import json
 import tempfile
 from pathlib import Path
 
 import pytest
 
 from simplymarkdown.generators import (
-    generate_sitemap,
     generate_rss_feed,
     generate_search_index,
+    generate_sitemap,
 )
 
 
@@ -17,7 +18,7 @@ def sample_html_dir():
     """Create a temporary directory with sample HTML files."""
     with tempfile.TemporaryDirectory() as tmpdir:
         tmpdir = Path(tmpdir)
-        
+
         # Create sample HTML files
         index_html = """<!DOCTYPE html>
 <html>
@@ -33,7 +34,7 @@ def sample_html_dir():
     </main>
 </body>
 </html>"""
-        
+
         post_html = """<!DOCTYPE html>
 <html>
 <head>
@@ -49,113 +50,89 @@ def sample_html_dir():
     </main>
 </body>
 </html>"""
-        
+
         (tmpdir / "index.html").write_text(index_html)
-        
+
         posts_dir = tmpdir / "posts"
         posts_dir.mkdir()
         (posts_dir / "my-post.html").write_text(post_html)
-        
+
         yield tmpdir
 
 
-class TestGenerateSitemap:
-    """Tests for sitemap generation."""
+def test_sitemap_generation(sample_html_dir: Path) -> None:
+    """Test that sitemap is generated with correct content."""
+    generate_sitemap(sample_html_dir, "https://example.com")
 
-    def test_generates_sitemap_file(self, sample_html_dir: Path) -> None:
-        generate_sitemap(sample_html_dir, "https://example.com")
-        
-        sitemap_path = sample_html_dir / "sitemap.xml"
-        assert sitemap_path.exists()
+    sitemap_path = sample_html_dir / "sitemap.xml"
+    assert sitemap_path.exists()
 
-    def test_sitemap_contains_urls(self, sample_html_dir: Path) -> None:
-        generate_sitemap(sample_html_dir, "https://example.com")
-        
-        sitemap_content = (sample_html_dir / "sitemap.xml").read_text()
-        assert "<urlset" in sitemap_content
-        assert "<url>" in sitemap_content
-        assert "<loc>" in sitemap_content
-
-    def test_sitemap_uses_canonical_urls(self, sample_html_dir: Path) -> None:
-        generate_sitemap(sample_html_dir, "https://example.com")
-        
-        sitemap_content = (sample_html_dir / "sitemap.xml").read_text()
-        assert "https://example.com" in sitemap_content
+    sitemap_content = sitemap_path.read_text()
+    assert "<urlset" in sitemap_content
+    assert "<url>" in sitemap_content
+    assert "<loc>" in sitemap_content
+    assert "https://example.com" in sitemap_content
 
 
-class TestGenerateRssFeed:
-    """Tests for RSS feed generation."""
+@pytest.mark.parametrize(
+    "feed_title,feed_description",
+    [
+        ("My Blog", "A test blog"),
+        (None, None),
+    ],
+)
+def test_rss_generation(sample_html_dir: Path, feed_title: str | None, feed_description: str | None) -> None:
+    """Test that RSS feed is generated correctly."""
+    kwargs = {}
+    if feed_title:
+        kwargs["feed_title"] = feed_title
+    if feed_description:
+        kwargs["feed_description"] = feed_description
 
-    def test_generates_rss_file(self, sample_html_dir: Path) -> None:
-        generate_rss_feed(sample_html_dir, "https://example.com")
-        
-        rss_path = sample_html_dir / "rss.xml"
-        assert rss_path.exists()
+    generate_rss_feed(sample_html_dir, "https://example.com", **kwargs)
 
-    def test_rss_contains_channel(self, sample_html_dir: Path) -> None:
-        generate_rss_feed(
-            sample_html_dir,
-            "https://example.com",
-            feed_title="My Blog",
-            feed_description="A test blog",
-        )
-        
-        rss_content = (sample_html_dir / "rss.xml").read_text()
-        assert "<channel>" in rss_content
-        assert "<title>My Blog</title>" in rss_content
+    rss_path = sample_html_dir / "rss.xml"
+    assert rss_path.exists()
 
-    def test_rss_contains_items(self, sample_html_dir: Path) -> None:
-        generate_rss_feed(sample_html_dir, "https://example.com")
-        
-        rss_content = (sample_html_dir / "rss.xml").read_text()
-        assert "<item>" in rss_content
+    rss_content = rss_path.read_text()
+    assert "<channel>" in rss_content
+    assert "<item>" in rss_content
 
-    def test_rss_whitelist(self, sample_html_dir: Path) -> None:
-        generate_rss_feed(
-            sample_html_dir,
-            "https://example.com",
-            uri_whitelist="posts/*",
-        )
-        
-        rss_content = (sample_html_dir / "rss.xml").read_text()
-        # Should only include posts
-        assert "my-post" in rss_content.lower()
+    if feed_title:
+        assert f"<title>{feed_title}</title>" in rss_content
 
 
-class TestGenerateSearchIndex:
-    """Tests for search index generation."""
+def test_rss_whitelist(sample_html_dir: Path) -> None:
+    """Test that RSS feed respects whitelist patterns."""
+    generate_rss_feed(
+        sample_html_dir,
+        "https://example.com",
+        uri_whitelist="posts/*",
+    )
 
-    def test_generates_search_index_file(self, sample_html_dir: Path) -> None:
-        generate_search_index(sample_html_dir, "https://example.com")
-        
-        index_path = sample_html_dir / "search-index.json"
-        assert index_path.exists()
+    rss_content = (sample_html_dir / "rss.xml").read_text()
+    # Should only include posts
+    assert "my-post" in rss_content.lower()
 
-    def test_search_index_is_valid_json(self, sample_html_dir: Path) -> None:
-        import json
-        
-        generate_search_index(sample_html_dir, "https://example.com")
-        
-        index_content = (sample_html_dir / "search-index.json").read_text()
-        data = json.loads(index_content)
-        
-        assert "version" in data
-        assert "documents" in data
-        assert isinstance(data["documents"], list)
 
-    def test_search_index_contains_documents(self, sample_html_dir: Path) -> None:
-        import json
-        
-        generate_search_index(sample_html_dir, "https://example.com")
-        
-        index_content = (sample_html_dir / "search-index.json").read_text()
-        data = json.loads(index_content)
-        
-        assert len(data["documents"]) == 2
-        
-        # Check document structure
-        for doc in data["documents"]:
-            assert "id" in doc
-            assert "url" in doc
-            assert "title" in doc
-            assert "content" in doc
+def test_search_index_generation(sample_html_dir: Path) -> None:
+    """Test that search index is generated with correct structure."""
+    generate_search_index(sample_html_dir, "https://example.com")
+
+    index_path = sample_html_dir / "search-index.json"
+    assert index_path.exists()
+
+    index_content = index_path.read_text()
+    data = json.loads(index_content)
+
+    assert "version" in data
+    assert "documents" in data
+    assert isinstance(data["documents"], list)
+    assert len(data["documents"]) == 2
+
+    # Check document structure
+    for doc in data["documents"]:
+        assert "id" in doc
+        assert "url" in doc
+        assert "title" in doc
+        assert "content" in doc

@@ -1,6 +1,5 @@
 """Search index generator for SimplyMarkdown."""
 
-from __future__ import annotations
 
 import json
 import os

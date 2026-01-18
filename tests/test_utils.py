@@ -13,52 +13,72 @@ from simplymarkdown.utils import (
 )
 
 
-class TestGetFilenameWithoutExtension:
-    """Tests for get_filename_without_extension function."""
-
-    def test_simple_filename(self) -> None:
-        assert get_filename_without_extension("test.md") == "test"
-
-    def test_path_with_directories(self) -> None:
-        assert get_filename_without_extension("/path/to/file.md") == "file"
-
-    def test_multiple_dots(self) -> None:
-        assert get_filename_without_extension("my.file.name.md") == "my.file.name"
-
-    def test_no_extension(self) -> None:
-        assert get_filename_without_extension("README") == "README"
+@pytest.mark.parametrize(
+    "filename,expected",
+    [
+        ("test.md", "test"),
+        ("/path/to/file.md", "file"),
+        ("my.file.name.md", "my.file.name"),
+        ("README", "README"),
+    ],
+)
+def test_get_filename_without_extension(filename: str, expected: str) -> None:
+    assert get_filename_without_extension(filename) == expected
 
 
-class TestGetExtension:
-    """Tests for get_extension function."""
-
-    def test_simple_extension(self) -> None:
-        assert get_extension("test.md") == "md"
-
-    def test_html_extension(self) -> None:
-        assert get_extension("page.html") == "html"
-
-    def test_no_extension(self) -> None:
-        assert get_extension("README") == ""
-
-    def test_path_with_directories(self) -> None:
-        assert get_extension("/path/to/file.css") == "css"
+@pytest.mark.parametrize(
+    "filename,expected",
+    [
+        ("test.md", "md"),
+        ("page.html", "html"),
+        ("README", ""),
+        ("/path/to/file.css", "css"),
+    ],
+)
+def test_get_extension(filename: str, expected: str) -> None:
+    assert get_extension(filename) == expected
 
 
-class TestSanitizeFilename:
-    """Tests for sanitize_filename function."""
+@pytest.mark.parametrize(
+    "input_str,expected",
+    [
+        ("my file name", "my-file-name"),
+        ("hello, world", "hello-world"),
+        ("my file, example", "my-file-example"),
+        ("already-clean", "already-clean"),
+    ],
+)
+def test_sanitize_filename(input_str: str, expected: str) -> None:
+    assert sanitize_filename(input_str) == expected
 
-    def test_spaces_to_dashes(self) -> None:
-        assert sanitize_filename("my file name") == "my-file-name"
 
-    def test_commas_to_dashes(self) -> None:
-        assert sanitize_filename("hello, world") == "hello-world"
+@pytest.mark.parametrize(
+    "text,expected",
+    [
+        ("# My Title\n\nSome content", "My Title"),
+        ("## Second Level\n\nContent", "Second Level"),
+        ("<h1>HTML Title</h1>", "HTML Title"),
+        ('<h1 class="title">Styled Title</h1>', "Styled Title"),
+        ("Just some plain text without titles.", ""),
+    ],
+)
+def test_get_first_title(text: str, expected: str) -> None:
+    assert get_first_title(text) == expected
 
-    def test_combined(self) -> None:
-        assert sanitize_filename("my file, example") == "my-file-example"
 
-    def test_no_changes_needed(self) -> None:
-        assert sanitize_filename("already-clean") == "already-clean"
+@pytest.mark.parametrize(
+    "filename,meta,expected",
+    [
+        ("_draft-post.md", None, True),
+        ("/path/to/_draft.md", None, True),
+        ("regular-post.md", None, False),
+        ("post.md", {"draft": ["true"]}, True),
+        ("post.md", {"draft": ["false"]}, False),
+        ("post.md", {"title": ["My Post"]}, False),
+    ],
+)
+def test_is_draft(filename: str, meta: dict | None, expected: bool) -> None:
+    assert is_draft(filename, meta) == expected
 
 
 class TestExtractFirstParagraph:
@@ -84,50 +104,3 @@ class TestExtractFirstParagraph:
 
     def test_empty_html(self) -> None:
         assert extract_first_paragraph("") == ""
-
-
-class TestGetFirstTitle:
-    """Tests for get_first_title function."""
-
-    def test_markdown_h1(self) -> None:
-        text = "# My Title\n\nSome content"
-        assert get_first_title(text) == "My Title"
-
-    def test_markdown_h2(self) -> None:
-        text = "## Second Level\n\nContent"
-        assert get_first_title(text) == "Second Level"
-
-    def test_html_h1(self) -> None:
-        text = "<h1>HTML Title</h1>"
-        assert get_first_title(text) == "HTML Title"
-
-    def test_html_with_class(self) -> None:
-        text = '<h1 class="title">Styled Title</h1>'
-        assert get_first_title(text) == "Styled Title"
-
-    def test_no_title(self) -> None:
-        text = "Just some plain text without titles."
-        assert get_first_title(text) == ""
-
-
-class TestIsDraft:
-    """Tests for is_draft function."""
-
-    def test_underscore_prefix(self) -> None:
-        assert is_draft("_draft-post.md") is True
-        assert is_draft("/path/to/_draft.md") is True
-
-    def test_normal_file(self) -> None:
-        assert is_draft("regular-post.md") is False
-
-    def test_draft_frontmatter(self) -> None:
-        meta = {"draft": ["true"]}
-        assert is_draft("post.md", meta) is True
-
-    def test_not_draft_frontmatter(self) -> None:
-        meta = {"draft": ["false"]}
-        assert is_draft("post.md", meta) is False
-
-    def test_no_draft_in_meta(self) -> None:
-        meta = {"title": ["My Post"]}
-        assert is_draft("post.md", meta) is False

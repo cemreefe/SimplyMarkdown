@@ -1,6 +1,5 @@
 """RSS feed generator for SimplyMarkdown."""
 
-from __future__ import annotations
 
 import fnmatch
 import os

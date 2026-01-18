@@ -5,45 +5,32 @@ import pytest
 from simplymarkdown.markdown_converter import convert_to_html
 
 
-class TestConvertToHtml:
-    """Tests for convert_to_html function."""
+@pytest.mark.parametrize(
+    "content,expected_in_html",
+    [
+        ("# Hello World\n\nThis is a paragraph.", ["Hello World</h1>", "<p>This is a paragraph.</p>"]),
+        ("**bold** and *italic*", ["<strong>bold</strong>", "<em>italic</em>"]),
+        ("[Link text](https://example.com)", ['href="https://example.com"', "Link text"]),
+        ("```python\nprint('hello')\n```", ["print", "hello"]),
+        ("Use `code` inline", ["<code>code</code>"]),
+        ("| Header 1 | Header 2 |\n|----------|----------|\n| Cell 1   | Cell 2   |", ["<table>", "<th>", "Header 1"]),
+        ("- Item 1\n- Item 2\n- Item 3", ["<ul>", "<li>"]),
+        ("1. First\n2. Second\n3. Third", ["<ol>", "<li>"]),
+        ("> This is a quote", ["<blockquote>"]),
+        ("Before\n\n---\n\nAfter", ["<hr"]),
+        ("![Alt text](image.png)", ["<img", 'alt="Alt text"']),
+    ],
+)
+def test_markdown_features(content: str, expected_in_html: list[str]) -> None:
+    """Test various markdown features convert correctly."""
+    html, meta = convert_to_html(content)
+    for expected in expected_in_html:
+        assert expected in html
 
-    def test_basic_markdown(self) -> None:
-        content = "# Hello World\n\nThis is a paragraph."
-        html, meta = convert_to_html(content)
-        
-        assert "Hello World</h1>" in html
-        assert "<p>This is a paragraph.</p>" in html
 
-    def test_bold_and_italic(self) -> None:
-        content = "**bold** and *italic*"
-        html, meta = convert_to_html(content)
-        
-        assert "<strong>bold</strong>" in html
-        assert "<em>italic</em>" in html
-
-    def test_links(self) -> None:
-        content = "[Link text](https://example.com)"
-        html, meta = convert_to_html(content)
-        
-        assert 'href="https://example.com"' in html
-        assert "Link text" in html
-
-    def test_code_block(self) -> None:
-        content = "```python\nprint('hello')\n```"
-        html, meta = convert_to_html(content)
-        
-        assert "print" in html
-        assert "hello" in html
-
-    def test_inline_code(self) -> None:
-        content = "Use `code` inline"
-        html, meta = convert_to_html(content)
-        
-        assert "<code>code</code>" in html
-
-    def test_frontmatter_extraction(self) -> None:
-        content = """---
+def test_frontmatter_extraction() -> None:
+    """Test that frontmatter is extracted correctly."""
+    content = """---
 title: My Title
 date: 2024-01-15
 tags: test
@@ -52,65 +39,15 @@ tags: test
 
 # Content
 """
-        html, meta = convert_to_html(content)
-        
-        assert meta.get("title") == ["My Title"]
-        assert meta.get("date") == ["2024-01-15"]
-        assert "test" in meta.get("tags", [])
+    html, meta = convert_to_html(content)
 
-    def test_table(self) -> None:
-        content = """
-| Header 1 | Header 2 |
-|----------|----------|
-| Cell 1   | Cell 2   |
-"""
-        html, meta = convert_to_html(content)
-        
-        assert "<table>" in html
-        assert "<th>" in html or "Header 1" in html
+    assert meta.get("title") == ["My Title"]
+    assert meta.get("date") == ["2024-01-15"]
+    assert "test" in meta.get("tags", [])
 
-    def test_list_unordered(self) -> None:
-        content = """
-- Item 1
-- Item 2
-- Item 3
-"""
-        html, meta = convert_to_html(content)
-        
-        assert "<ul>" in html
-        assert "<li>" in html
 
-    def test_list_ordered(self) -> None:
-        content = """
-1. First
-2. Second
-3. Third
-"""
-        html, meta = convert_to_html(content)
-        
-        assert "<ol>" in html
-        assert "<li>" in html
-
-    def test_blockquote(self) -> None:
-        content = "> This is a quote"
-        html, meta = convert_to_html(content)
-        
-        assert "<blockquote>" in html
-
-    def test_horizontal_rule(self) -> None:
-        content = "Before\n\n---\n\nAfter"
-        html, meta = convert_to_html(content)
-        
-        assert "<hr" in html
-
-    def test_image(self) -> None:
-        content = "![Alt text](image.png)"
-        html, meta = convert_to_html(content)
-        
-        assert "<img" in html
-        assert 'alt="Alt text"' in html
-
-    def test_empty_content(self) -> None:
-        html, meta = convert_to_html("")
-        assert html == ""
-        assert meta == {}
+def test_empty_content() -> None:
+    """Test that empty content returns empty results."""
+    html, meta = convert_to_html("")
+    assert html == ""
+    assert meta == {}

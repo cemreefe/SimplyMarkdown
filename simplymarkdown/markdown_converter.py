@@ -1,6 +1,5 @@
 """Markdown to HTML conversion with extensions."""
 
-from __future__ import annotations
 
 from typing import Any
 

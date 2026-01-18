@@ -7,25 +7,16 @@ from pathlib import Path
 
 import yaml
 
-# Directory names
 MODULES_DIR = "modules"
-
-# File patterns
 MARKDOWN_EXTENSIONS = (".md", ".markdown")
 HTML_EXTENSION = ".html"
 CONVERT_TAG = "<convertsm>"
-
-# Default values
 DEFAULT_FAVICON = "👤"
 DEFAULT_LANGUAGE = "en"
 DEFAULT_META_IMAGE = "/static/img/default_img.png"
 DEFAULT_TEMPLATE = "templates/base.html"
 DEFAULT_THEME = "themes/basic.css"
-
-# External services
 EMOJI_SERVICE_URL = "https://emoji.dutl.uk/png/64x64/"
-
-# Code highlighting options
 CODEHILITE_OPTIONS = {
     "noclasses": True,
     "pygments_options": {"style": "colorful"},
@@ -73,7 +64,6 @@ class Config:
     title: str = ""
     root_url: str = ""
     language: str = DEFAULT_LANGUAGE
-
     rss: RSSConfig = field(default_factory=RSSConfig)
     build: BuildConfig = field(default_factory=BuildConfig)
     server: ServerConfig = field(default_factory=ServerConfig)
@@ -130,42 +120,28 @@ class Config:
             favicon=favicon or DEFAULT_FAVICON,
             title=title or "",
             root_url=root or "",
-            rss=RSSConfig(
-                whitelist=rss_whitelist or "*",
-                description=rss_description or "This is an RSS feed of my website.",
-            ),
-            build=BuildConfig(
-                include_drafts=include_drafts,
-                incremental=incremental,
-            ),
+            rss=RSSConfig(whitelist=rss_whitelist or "*", description=rss_description or "This is an RSS feed of my website."),
+            build=BuildConfig(include_drafts=include_drafts, incremental=incremental),
         )
 
     def to_yaml(self, config_path: str | Path) -> None:
         """Save configuration to a YAML file."""
-        data = {
-            "input": self.input_dir,
-            "output": self.output_dir,
-            "template": self.template,
-            "theme": self.theme,
-            "favicon": self.favicon,
-            "title": self.title,
-            "root": self.root_url,
-            "language": self.language,
-            "rss": {
-                "whitelist": self.rss.whitelist,
-                "description": self.rss.description,
-                "enabled": self.rss.enabled,
-            },
-            "build": {
-                "include_drafts": self.build.include_drafts,
-                "incremental": self.build.incremental,
-            },
-            "server": {
-                "host": self.server.host,
-                "port": self.server.port,
-                "open_browser": self.server.open_browser,
-            },
-        }
-
         with open(config_path, "w", encoding="utf-8") as f:
-            yaml.dump(data, f, default_flow_style=False, sort_keys=False)
+            yaml.dump(
+                {
+                    "input": self.input_dir,
+                    "output": self.output_dir,
+                    "template": self.template,
+                    "theme": self.theme,
+                    "favicon": self.favicon,
+                    "title": self.title,
+                    "root": self.root_url,
+                    "language": self.language,
+                    "rss": {"whitelist": self.rss.whitelist, "description": self.rss.description, "enabled": self.rss.enabled},
+                    "build": {"include_drafts": self.build.include_drafts, "incremental": self.build.incremental},
+                    "server": {"host": self.server.host, "port": self.server.port, "open_browser": self.server.open_browser},
+                },
+                f,
+                default_flow_style=False,
+                sort_keys=False,
+            )

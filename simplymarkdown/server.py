@@ -1,6 +1,5 @@
 """Development server for SimplyMarkdown."""
 
-from __future__ import annotations
 
 import http.server
 import os

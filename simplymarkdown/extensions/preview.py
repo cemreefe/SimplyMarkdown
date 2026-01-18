@@ -1,6 +1,5 @@
 """Preview extension for listing posts in a directory."""
 
-from __future__ import annotations
 
 import os
 import re
