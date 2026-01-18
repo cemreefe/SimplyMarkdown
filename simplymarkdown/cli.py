@@ -46,6 +46,7 @@ def cli() -> None:
 @click.option("--watch", "watch_mode", is_flag=True, help="Watch for changes and rebuild")
 @click.option("--serve", "serve_mode", is_flag=True, help="Start development server")
 @click.option("--port", default=8000, help="Development server port")
+@click.option("--host", default="localhost", help="Development server host")
 @click.option("--no-open", is_flag=True, help="Don't open browser automatically")
 def build(
     input_dir: str,
@@ -62,6 +63,7 @@ def build(
     watch_mode: bool,
     serve_mode: bool,
     port: int,
+    host: str,
     no_open: bool,
 ) -> None:
     """Build the static site from Markdown files.
@@ -125,11 +127,12 @@ def build(
                 input_path,
                 output_path,
                 do_build,
+                host=host,
                 port=port,
                 open_browser=not no_open,
             )
         elif serve_mode:
-            serve(output_path, port=port, open_browser=not no_open)
+            serve(output_path, host=host, port=port, open_browser=not no_open)
         elif watch_mode:
             from simplymarkdown.server import watch as watch_dir
 
@@ -145,12 +148,13 @@ def build(
                     observer.join()
 
 
-@cli.command()
+@cli.command(name="serve")
 @click.argument("output_dir")
 @click.option("--port", default=8000, help="Server port")
 @click.option("--host", default="127.0.0.1", help="Server host")
 @click.option("--no-open", is_flag=True, help="Don't open browser automatically")
-def server(output_dir: str, port: int, host: str, no_open: bool) -> None:
+@click.option("--live-reload", is_flag=True, help="Enable live reload (for use with watch)")
+def serve_cmd(output_dir: str, port: int, host: str, no_open: bool, live_reload: bool) -> None:
     """Start a development server.
 
     Example:
@@ -163,7 +167,7 @@ def server(output_dir: str, port: int, host: str, no_open: bool) -> None:
         click.echo(f"❌ Error: Output directory does not exist: {output_path}", err=True)
         sys.exit(1)
 
-    serve(output_path, host=host, port=port, open_browser=not no_open)
+    serve(output_path, host=host, port=port, open_browser=not no_open, live_reload=live_reload)
 
 
 @cli.command()

@@ -6,6 +6,7 @@ import http.server
 import os
 import socketserver
 import threading
+import time
 import webbrowser
 from collections.abc import Callable
 from functools import partial
@@ -23,6 +24,17 @@ except ImportError:
     FileSystemEvent = None
 
 
+LIVE_RELOAD_SCRIPT = """
+<script>
+(function() {
+  const es = new EventSource('/__livereload');
+  es.onmessage = function() { location.reload(); };
+  es.onerror = function() { es.close(); };
+})();
+</script>
+"""
+
+
 class QuietHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
     """HTTP request handler that suppresses logging."""
 
@@ -34,15 +46,21 @@ class QuietHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
 class LiveReloadHandler(http.server.SimpleHTTPRequestHandler):
     """HTTP request handler with live reload support."""
 
+    last_rebuild: float = 0.0
+    live_reload_enabled: bool = False
+
     def log_message(self, format: str, *args) -> None:
         """Suppress log messages except errors."""
-        if args and "404" in str(args[0]):
-            pass  # Suppress 404s
-        elif args and "500" in str(args[0]):
+        if args and "500" in str(args[0]):
             super().log_message(format, *args)
 
     def do_GET(self) -> None:
-        """Handle GET requests with .html extension handling."""
+        """Handle GET requests with live reload and .html extension handling."""
+        # SSE endpoint for live reload
+        if self.path == "/__livereload" and self.live_reload_enabled:
+            self._handle_livereload_sse()
+            return
+
         # Try adding .html extension for clean URLs
         if not self.path.endswith(
             (
@@ -65,15 +83,95 @@ class LiveReloadHandler(http.server.SimpleHTTPRequestHandler):
             if os.path.exists(full_path):
                 self.path = html_path
 
-        super().do_GET()
+        # If live reload is enabled and this is an HTML file, inject the script
+        if self.live_reload_enabled and self._is_html_request():
+            self._serve_html_with_livereload()
+        else:
+            super().do_GET()
+
+    def _is_html_request(self) -> bool:
+        """Check if the request is for an HTML file."""
+        path = self.path.split("?")[0]
+        if path.endswith(".html"):
+            return True
+        if path.endswith("/"):
+            index_path = os.path.join(self.directory, path.lstrip("/"), "index.html")
+            return os.path.exists(index_path)
+        return False
+
+    def _handle_livereload_sse(self) -> None:
+        """Handle Server-Sent Events for live reload."""
+        self.send_response(200)
+        self.send_header("Content-Type", "text/event-stream")
+        self.send_header("Cache-Control", "no-cache")
+        self.send_header("Connection", "keep-alive")
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.end_headers()
+
+        last_seen = self.last_rebuild
+
+        try:
+            while True:
+                if self.last_rebuild > last_seen:
+                    self.wfile.write(b"data: reload\n\n")
+                    self.wfile.flush()
+                    last_seen = self.last_rebuild
+                time.sleep(0.3)
+        except (BrokenPipeError, ConnectionResetError):
+            pass
+
+    def _serve_html_with_livereload(self) -> None:
+        """Serve HTML file with live reload script injected."""
+        path = self.translate_path(self.path)
+
+        try:
+            with open(path, "rb") as f:
+                content = f.read()
+        except (FileNotFoundError, IsADirectoryError):
+            # Try index.html for directory requests
+            if self.path.endswith("/"):
+                path = os.path.join(path, "index.html")
+                try:
+                    with open(path, "rb") as f:
+                        content = f.read()
+                except FileNotFoundError:
+                    self.send_error(404, "File not found")
+                    return
+            else:
+                self.send_error(404, "File not found")
+                return
+
+        # Inject live reload script before </body>
+        content_str = content.decode("utf-8", errors="replace")
+        if "</body>" in content_str:
+            content_str = content_str.replace("</body>", LIVE_RELOAD_SCRIPT + "</body>")
+        else:
+            content_str += LIVE_RELOAD_SCRIPT
+
+        content = content_str.encode("utf-8")
+
+        try:
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Content-Length", str(len(content)))
+            self.end_headers()
+            self.wfile.write(content)
+        except (BrokenPipeError, ConnectionResetError):
+            pass
 
 
 class RebuildHandler(FileSystemEventHandler):
     """Handler for file system events to trigger rebuilds."""
 
-    def __init__(self, callback: Callable[[], None], debounce_seconds: float = 0.5):
+    def __init__(
+        self,
+        callback: Callable[[], None],
+        debounce_seconds: float = 0.5,
+        handler_class: type | None = None,
+    ):
         self.callback = callback
         self.debounce_seconds = debounce_seconds
+        self.handler_class = handler_class
         self._timer: threading.Timer | None = None
         self._lock = threading.Lock()
 
@@ -101,6 +199,9 @@ class RebuildHandler(FileSystemEventHandler):
         print("\n🔄 Changes detected, rebuilding...")
         try:
             self.callback()
+            # Signal browsers to reload
+            if self.handler_class:
+                self.handler_class.last_rebuild = time.time()
             print("✅ Build complete!")
         except Exception as e:
             print(f"❌ Build failed: {e}")
@@ -111,6 +212,7 @@ def serve(
     host: str = "127.0.0.1",
     port: int = 8000,
     open_browser: bool = True,
+    live_reload: bool = False,
 ) -> None:
     """Start a development server.
 
@@ -119,14 +221,25 @@ def serve(
         host: Host to bind to.
         port: Port to bind to.
         open_browser: Whether to open the browser automatically.
+        live_reload: Whether to enable live reload.
     """
     output_dir = Path(output_dir).resolve()
 
+    LiveReloadHandler.live_reload_enabled = live_reload
+
     handler = partial(LiveReloadHandler, directory=str(output_dir))
 
-    with socketserver.TCPServer((host, port), handler) as httpd:
+    # Use threading server to handle multiple concurrent requests
+    # (needed for SSE live reload endpoint)
+    class ThreadingHTTPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
+        allow_reuse_address = True
+        daemon_threads = True
+
+    with ThreadingHTTPServer((host, port), handler) as httpd:
         url = f"http://{host}:{port}"
         print(f"🌐 Serving at {url}")
+        if live_reload:
+            print("   🔄 Live reload enabled")
         print("   Press Ctrl+C to stop")
 
         if open_browser:
@@ -141,12 +254,14 @@ def serve(
 def watch(
     input_dir: str | Path,
     rebuild_callback: Callable[[], None],
+    handler_class: type | None = None,
 ) -> Observer | None:
     """Watch a directory for changes and trigger rebuilds.
 
     Args:
         input_dir: Directory to watch for changes.
         rebuild_callback: Function to call when changes are detected.
+        handler_class: Optional handler class to signal for live reload.
 
     Returns:
         Observer instance if watchdog is available, None otherwise.
@@ -157,7 +272,7 @@ def watch(
         return None
 
     input_dir = Path(input_dir).resolve()
-    event_handler = RebuildHandler(rebuild_callback)
+    event_handler = RebuildHandler(rebuild_callback, handler_class=handler_class)
     observer = Observer()
     observer.schedule(event_handler, str(input_dir), recursive=True)
     observer.start()
@@ -174,7 +289,7 @@ def serve_with_watch(
     port: int = 8000,
     open_browser: bool = True,
 ) -> None:
-    """Start development server with file watching.
+    """Start development server with file watching and live reload.
 
     Args:
         input_dir: Directory to watch for changes.
@@ -184,12 +299,12 @@ def serve_with_watch(
         port: Port to bind to.
         open_browser: Whether to open the browser automatically.
     """
-    # Start watcher
-    observer = watch(input_dir, rebuild_callback)
+    # Start watcher with live reload support
+    observer = watch(input_dir, rebuild_callback, handler_class=LiveReloadHandler)
 
     try:
-        # Start server (blocks until interrupted)
-        serve(output_dir, host, port, open_browser)
+        # Start server with live reload enabled (blocks until interrupted)
+        serve(output_dir, host, port, open_browser, live_reload=True)
     finally:
         if observer:
             observer.stop()

@@ -259,7 +259,7 @@ class PreviewBlockProcessor(BlockProcessor):
 
                 # Fix relative links
                 content = re.sub(
-                    r"(\[.*?\]\()\.)",
+                    r"(\[.*?\]\()\.\)",
                     rf"\1 {self.directory_name}/{relpath}/.",
                     content,
                 )
@@ -292,5 +292,8 @@ class PreviewBlockProcessor(BlockProcessor):
                     title=title,
                     truncated=truncated,
                 )
-        except Exception:
+        except Exception as e:
+            # Log error for debugging but don't crash
+            import sys
+            print(f"Warning: Failed to process {file_path}: {e}", file=sys.stderr)
             return None
