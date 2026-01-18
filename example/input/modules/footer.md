@@ -1,1 +1,1 @@
-2023 - Made with [SimpyMarkdown](https://github.com/cemreefe/SimplyMarkdown)
+2023 - Made with [SimplyMarkdown](https://github.com/cemreefe/SimplyMarkdown)
