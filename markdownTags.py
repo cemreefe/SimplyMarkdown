@@ -87,7 +87,7 @@ class PreviewBlockProcessor(BlockProcessor):
 
         if detailed:
             for item in content_items:
-                tags_str = ' '.join(t for tag in item.tags for t in tag.split())
+                tags_str = ','.join(tag.strip() for tag in item.tags if tag.strip())
                 date_div = ET.Element('div', attrib={'class': 'previewDate'})
                 date_div.text = item.date
 
@@ -117,7 +117,7 @@ class PreviewBlockProcessor(BlockProcessor):
             prev_yr = None
             for item in content_items:
                 yr = str(item.date.split('-')[0]) if item.date else None
-                tags_str = ' '.join(t for tag in item.tags for t in tag.split())
+                tags_str = ','.join(tag.strip() for tag in item.tags if tag.strip())
 
                 post_wrapper = ET.Element('div', attrib={'class': 'postTitle', 'data-tags': tags_str})
 
@@ -197,9 +197,7 @@ class PreviewBlockProcessor(BlockProcessor):
                                 continue
 
                             if tag_filters:
-                                post_tags = set()
-                                for t in tags:
-                                    post_tags.update(t.split())
+                                post_tags = {t.strip() for t in tags if t.strip()}
                                 if not all(f in post_tags for f in tag_filters):
                                     continue
 
