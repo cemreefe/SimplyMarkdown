@@ -86,6 +86,7 @@ class PreviewBlockProcessor(BlockProcessor):
 
         if detailed:
             for item in content_items:
+                tags_str = ' '.join(t for tag in item.tags for t in tag.split())
                 date_div = ET.Element('div', attrib={'class': 'previewDate'})
                 date_div.text = item.date
 
@@ -100,7 +101,7 @@ class PreviewBlockProcessor(BlockProcessor):
                     read_more.text = '(Read more)'
                     a.append(read_more)
 
-                post_wrapper = ET.Element('div', attrib={'class': 'postPreview'})
+                post_wrapper = ET.Element('div', attrib={'class': 'postPreview', 'data-tags': tags_str})
                 post_wrapper.append(date_div)
                 post_wrapper.append(a)
 
@@ -110,8 +111,9 @@ class PreviewBlockProcessor(BlockProcessor):
             prev_yr = None
             for item in content_items:
                 yr = str(item.date.split('-')[0]) if item.date else None
+                tags_str = ' '.join(t for tag in item.tags for t in tag.split())
 
-                post_wrapper = ET.Element('div', attrib={'class': 'postTitle'})
+                post_wrapper = ET.Element('div', attrib={'class': 'postTitle', 'data-tags': tags_str})
 
                 if yr != prev_yr:
                     date_div = ET.Element('div', attrib={'class': 'dateTab'})
