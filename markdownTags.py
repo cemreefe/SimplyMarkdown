@@ -34,7 +34,7 @@ def extract_first_paragraph(html, character_limit=160):
     return text_content
 
 class ContentItem:
-    def __init__(self, content, date, href, emoji, tags, title, truncated):
+    def __init__(self, content, date, href, emoji, tags, title, truncated, image=None):
         self.content = content
         self.date = date
         self.href = href
@@ -42,6 +42,7 @@ class ContentItem:
         self.tags = tags
         self.title = title
         self.truncated = truncated
+        self.image = image
 
 class PreviewExtension(Extension):
     """Markdown extension to handle the special tag for previews."""
@@ -90,11 +91,16 @@ class PreviewBlockProcessor(BlockProcessor):
                 date_div = ET.Element('div', attrib={'class': 'previewDate'})
                 date_div.text = item.date
 
+                content = re.sub(r'<img\b[^>]*/?>', '', item.content) if item.image else item.content
                 text_div = ET.Element('div')
-                text_div.text = item.content
+                text_div.text = content
 
                 a = ET.Element('a', attrib={'href': item.href, 'class': 'previewHref'})
                 a.append(text_div)
+
+                if item.image:
+                    img = ET.Element('img', attrib={'src': item.image, 'class': 'previewImg', 'alt': ''})
+                    a.append(img)
 
                 if item.truncated:
                     read_more = ET.Element('span', attrib={'class': 'a'})
@@ -181,6 +187,11 @@ class PreviewBlockProcessor(BlockProcessor):
                             tags = meta.get('tags', [''])
                             title = get_first_title(content) or extract_first_paragraph(content)
                             is_featured = meta.get('featured', ['false'])[0].lower() == 'true'
+                            raw_image = meta.get('image', [None])[0]
+                            if raw_image and raw_image.startswith('./'):
+                                image = '/' + self.directory_name + '/' + relpath + '/' + raw_image[2:]
+                            else:
+                                image = raw_image
 
                             if featured_only and not is_featured:
                                 continue
@@ -192,7 +203,7 @@ class PreviewBlockProcessor(BlockProcessor):
                                 if not all(f in post_tags for f in tag_filters):
                                     continue
 
-                            content_items.append(ContentItem(content, date, href, emoji, tags, title, truncated))
+                            content_items.append(ContentItem(content, date, href, emoji, tags, title, truncated, image))
 
         return {
             'content_items': list(reversed(content_items)),
