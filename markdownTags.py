@@ -137,7 +137,9 @@ class PreviewBlockProcessor(BlockProcessor):
             return {}
 
         detailed = ':detailed' in self.directory_name
-        self.directory_name = self.directory_name.replace(':detailed', '')
+        featured_only = ':featured' in self.directory_name
+        tag_filters = re.findall(r':#([\w-]+)', self.directory_name)
+        self.directory_name = re.sub(r':(detailed|featured|#[\w-]+)', '', self.directory_name)
 
         directory_path = os.path.join(self.base_path, self.directory_name) if self.base_path else self.directory_name
 
@@ -176,6 +178,17 @@ class PreviewBlockProcessor(BlockProcessor):
                             date = meta.get('date', [_file_last_modified])[0]
                             tags = meta.get('tags', [''])
                             title = get_first_title(content) or extract_first_paragraph(content)
+                            is_featured = meta.get('featured', ['false'])[0].lower() == 'true'
+
+                            if featured_only and not is_featured:
+                                continue
+
+                            if tag_filters:
+                                post_tags = set()
+                                for t in tags:
+                                    post_tags.update(t.split())
+                                if not all(f in post_tags for f in tag_filters):
+                                    continue
 
                             content_items.append(ContentItem(content, date, href, emoji, tags, title, truncated))
 
