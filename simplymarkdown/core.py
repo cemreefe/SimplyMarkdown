@@ -531,6 +531,8 @@ class SiteBuilder:
         nodes = [node for node in soup.contents if str(node).strip()]
         truncated = len(nodes) > limit
         fragment = BeautifulSoup("".join(str(node) for node in nodes[:limit]), "html.parser")
+        for extra_image in fragment.find_all("img")[1:]:
+            (extra_image.find_parent(("picture", "p")) or extra_image).decompose()
         if heading := fragment.find("h1"):
             heading.name = "h2"
             heading["class"] = "preview-title"

@@ -107,6 +107,23 @@ class SiteBuilderTests(unittest.TestCase):
         self.assertNotIn("unsafePreview", preview)
         self.assertNotIn("color: red", preview)
 
+    def test_detailed_collections_cap_previews_at_one_image(self) -> None:
+        self.write("index.md", "# Index\n\n% posts:detailed")
+        self.write(
+            "posts/post.md",
+            "---\nfeatured: true\n---\n# Post\n\n"
+            "![one](one.png)\n\n![two](two.png)\n\ntext\n\n![three](three.png)",
+        )
+
+        self.build()
+
+        index = (self.output / "index.html").read_text(encoding="utf-8")
+        preview = index.split('class="previewHref"', 1)[1].split("</article>", 1)[0]
+        self.assertEqual(1, preview.count("<img"))
+        self.assertIn("one.png", preview)
+        self.assertNotIn("two.png", preview)
+        self.assertNotIn("three.png", preview)
+
     def test_detailed_collections_reject_unknown_preview_shapes(self) -> None:
         self.write("index.md", "# Index\n\n% posts:detailed")
         self.write("posts/post.md", "---\npreview_shape: starburst\n---\n# Post")
