@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="{{ context.lang }}">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ context.root }}/static/css/theme.css">
+    <link rel="icon" type="image/png" href="{{ context.favicon_path }}">
+    <title>{{ context.title }}</title>
+    {{ context.meta_tags }}
+    {{ context.modules.get('head_extras', '') }}
+  </head>
+  <body>
+    <header class="siteHeader">
+      <nav>{{ context.modules.get('navbar', '') }}</nav>
+    </header>
+    <main>
+      {% if context.category_tags %}<div class="categoryTags" aria-label="Categories">
+        {% for tag in context.category_tags %}<span class="categoryTag">{{ tag }}</span>{% endfor %}
+      </div>{% endif %}
+      {{ context.content }}
+    </main>
+    <footer>{{ context.modules.get('footer', '') }}</footer>
+  </body>
+</html>

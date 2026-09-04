@@ -2,51 +2,47 @@ name: Render with SimplyMarkdown
 
 on:
   push:
-    branches: 
-    - main
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
 
 jobs:
-  run_script:
+  build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python3
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.9
-    - name: Install dependencies
-      run: |
-        python3 -m pip install --upgrade pip
-        pip3 install markdown==3.3.4 jinja2 Pygments BeautifulSoup4
-    - name: Clone SimplyMarkdown
-      run: git clone https://github.com/cemreefe/SimplyMarkdown
-    - name: Run SimplyMarkdown
-      run: |
-        cd SimplyMarkdown
-        python3 render.py -i ../source -o ../output --title "Example Blog" --css ../source/static/css/theme.css --favicon 🟢 --root 'https://mypage.com'
-    - name: Cleanup repo
-      run: |
-        rm -r SimplyMarkdown
-    - name: Clone github pages branch and clean its contents, keep sitemap
-      run: |
-        cd ..
-        mkdir ghp
-        cd ghp
-        git clone -b gh-pages https://github.com/${{ github.actor }}/${{ github.event.repository.name }}
-        cd ${{ github.event.repository.name }}
-        git rm -r '*' 
-        git reset sitemap.xml || echo 
-        git checkout -- sitemap.xml || echo
-    - name: Move new output into github pages branch
-      run: |
-        shopt -s dotglob
-        mv output/* ../ghp/${{ github.event.repository.name }}/
-        
-    - name: Commit changes
-      run: |
-        cd ../ghp/${{ github.event.repository.name }}/
-        git config --global user.name '${{ github.actor }}'
-        git config --global user.email '${{ github.actor }}@users.noreply.github.com'
-        git remote set-url origin https://x-access-token:${{ secrets.AUTO_RENDER_PAT }}@github.com/$GITHUB_REPOSITORY
-        git add -A 
-        git diff-index --quiet HEAD || git commit -m "Rendered by SimplyMarkdown - ${{ github.event.head_commit.message }}" && git push    
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - name: Install a pinned SimplyMarkdown release
+        run: python -m pip install "simplymarkdown @ git+https://github.com/cemreefe/SimplyMarkdown@v2.0.0"
+      - name: Build
+        run: >-
+          simplymarkdown
+          --input source
+          --output public
+          --root https://example.com
+          --title "Example Blog"
+      - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: public
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

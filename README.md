@@ -1,121 +1,131 @@
-# SimplyMarkdown - Convert your Markdown into a Website
+# SimplyMarkdown
 
-Welcome to SimplyMarkdown, the simplest framework for creating websites from your Markdown files! With SimplyMarkdown, you can easily and quickly turn your directory of Markdown files into a stunning website without having to deal with any complicated configurations or bloated features.
+SimplyMarkdown turns one directory of Markdown into a complete static site. It is intentionally small: one build pipeline, one page model, and three explicit extension points.
 
-As a solo developer who enjoys creating fun and easy-to-use tools in my free time, I wanted to make something that was both lightweight and effective. And that's exactly what SimplyMarkdown is all about! It's a simple and straightforward framework that lets you focus on your content, not the technical details.
+## Install and build
 
-So whether you're a blogger, writer, or just someone who wants to share their thoughts and ideas with the world, SimplyMarkdown has got you covered. With its easy-to-setup environment, you'll be up and running in no time!
+Requires Python 3.11 or newer.
 
-# Setup
-
-To setup SimplyMarkdown locally, the only thing you need to do is to clone the repository. Read further for automated github pages integration.
-
-# How to use
-
-## How to run
-
-You can create a new directory with your desired structure to form your website. See example input directory in `/example`.
-
+```bash
+python -m pip install .
+simplymarkdown \
+  --input example/input \
+  --output public \
+  --root https://example.com \
+  --title "Example Blog"
 ```
-example/input/
-├── about.md
+
+`--root` and `--title` are required because canonical URLs, RSS, and page titles cannot be generated correctly without them. The output directory is replaced transactionally: failed builds preserve the previous site, and removed source files cannot survive as stale output.
+
+Run `simplymarkdown --help` for theme, template, favicon, preview, and RSS options. `python render.py` remains an equivalent compatibility entry point.
+
+## Source layout
+
+```text
+source/
 ├── index.md
-├── blog/
-│   ├── blog.md
-│   └── posts/
-│       ├── coding.md
-│       └── hogwarts.md
+├── about.md
+├── posts/
+│   └── 2026/09/04/hello.md
 ├── modules/
 │   ├── navbar.md
 │   ├── footer.md
-│   ├── custom-module.md
-│   ├── head_extras.html
+│   └── head_extras.html
 └── static/
-│   ├── images/
-│   ├── css/
+    └── images/
 ```
 
-This will form the basis of your website. SimplyMarkdown will clone your directory and process each file to form your website. Markdown files will be rendered as html files.
+Markdown becomes HTML; other files are copied unchanged. `modules/` is private and files whose root-level name starts with `_` are ignored. A `.html` file containing `<convertsm>` is processed like Markdown-compatible HTML.
 
+Modules are included on their own line:
 
-In SimplyMarkdown, `modules/` is a reserved directory. 
-- `modules/navbar.md` will be used to render the navigation bar for all html files. 
-- `modules/footer.md` will be used to render the footer for all html files.
-- `modules/head_extras.html` can be used to add extra tags to the `<head>` section of your website.
-- You can create your own custom modules under the `modules/` directory. To render a custom module in a web page, just inclue the module in your markdown sourcefile such as `! include custom-module` to include `modules/custom-module.md`. 
-
-To render your website, simply run 
-
-```
-python3 render.py -i /path/to/directory -o /path/to/output/directory
+```markdown
+! include callout
 ```
 
-The following command line arguments are available for this script:
-
-- **-i, --input**: Input directory path (required)
-- **-o, --output**: Output directory path (required)
-- **--css**: CSS to include (default: 'themes/basic.css')
-- **--template**: Path to the HTML template (default: 'templates/base.html')
-- **--favicon**: Favicon emoji (default: '👤')
-- **--root**: Project URL root, this is almost always the CNAME of your domain i.e. `https://myblog.com`. (default: '')
-- **--title**: Website title (default: '')
-
-## Special Tags
-
-I have introduced the `%` tag for easier rendering in SimplyMarkdown. If you use 
-
-```
-% <relative-directory>`
-```
-
-SimplyMarkdown will render a list of links to all files under that directory. You can see an example usage in the `blog.md` file in `example/input/blog`.
-
-If you are in `misc/archive.md`, use `% posts` to list md files in `misc/posts` and its subdirectories. 
-
-If you want detailed post overviews rahter than only titles, use 
-
-```
-% <relative-directory>:detailed
-```
+`navbar`, `footer`, and `head_extras` are consumed by the bundled template. Unknown modules, duplicate names, include cycles, output collisions, invalid dates, and escaping paths fail the build with a useful error.
 
 ## Frontmatter
 
-SimplyMarkdown supports frontmatter for markdown files. You can use the following syntax:
-
-```
+```markdown
 ---
-title: <meta title>
-emoji: <overview emoji>
-date:  <post date>
-tags:  <category-tag-1>
-       <category-tag-2>
-image: <img path>
+title: A shorter metadata title
+description: Used for search and social cards
+emoji: 🛠️
+date: 2026-09-04
+tags: engineering
+      static sites
+image: ./cover.jpg
+language: en
+featured: true
+canonical_uri: articles/original
 ---
 
-# Your title
-
-Your post
+# The visible title
 ```
 
-If you use the emoji tag an emoji will be shown alongside your posts in non-detailed overview mode.
-Date metadata helps sort and date your posts on overview.
-Tags add category tags to the top of your page.
-Title helps you override the metadata title property for your page if page title is too long.
-Image helps you override the metadata image tag of your page. If you don't use this property `static/img/default_img.png` will be used.
+Dates are ISO `YYYY-MM-DD`. When omitted, a date is inferred from a `YYYY/MM/DD` source path; otherwise the page is left honestly undated. Git checkout times are never treated as publication dates.
 
-## Github Pages Integration
+## Collections
 
-Using SimplyMarkdown with github pages is very simple. 
+A collection line lists Markdown pages below a directory relative to the current page:
 
-1. If you have a website on your github pages repository `<username>/<username>.github.io`, checkout into a new branch called `backup` and push your blog there as backup.
-1. Create a new branch on your github pages repository `<username>/<username>.github.io`, named `gh-pages`
-1. On `main` branch, add the SimplyMarkdown rendering [worklfow](/workflow/render.yaml) into a new directory called `.github/workflows`
-1. Create a folder in your `main` branch, call it `source`, this is going to act as the root of your website.
-1. Populate your markdown directory as you wish. **To see an example check out [my personal website](https://github.com/cemreefe/cemreefe.github.io)**.
-1. When you push to your `main` branch, SimplyMarkdown workflow will trigger, and update your `gh-pages` branch.
+```markdown
+% posts
+% posts:detailed
+% posts:featured
+% posts:detailed:#engineering:#python
+```
+
+Modifiers compose: `detailed` renders excerpts, `featured` checks frontmatter, and every `#tag` must match. Collections are deterministically sorted newest-first.
+
+## Templates and themes
+
+Pass `--css path/to/theme.css` or `--template path/to/page.html`. Templates receive `context` with:
+
+- `page`: the typed page model
+- `content`: rendered page HTML
+- `modules`: rendered modules by name
+- `title`, `lang`, `root`, and `favicon_path`
+- `meta_tags` and `category_tags`
+
+Jinja autoescaping is enabled. Rendered Markdown and modules are the only values marked as trusted HTML.
+
+## Extension API
+
+The CLI stays opinionated; Python callers can add narrowly scoped behavior without replacing the build:
+
+```python
+from pathlib import Path, PurePosixPath
+from simplymarkdown import BuildConfig, SiteBuilder
 
 
+def replace_mark(context, page, source):
+    return source.replace("{{ build-mark }}", "Built with care.")
 
-## Templates
 
-Templates are html files that you supply to set the style of your website's pages. SimplyMarkdown the following junja template. You can create your own template if desired. However this is rarely necessary.
+def robots(context):
+    return {PurePosixPath("robots.txt"): f"Sitemap: {context.root_url}/sitemap.xml\n"}
+
+
+SiteBuilder(
+    BuildConfig(Path("source"), Path("public"), "https://example.com", "My site"),
+    markdown_transforms=(replace_mark,),
+    artifact_generators=(robots,),
+).build()
+```
+
+Transforms operate on discovered `Page` objects. Artifact generators consume the same completed page graph used by HTML, RSS, and sitemap generation—generated HTML is never parsed back into a second model.
+
+## GitHub Pages
+
+Copy [`workflow/render.yaml`](workflow/render.yaml) to `.github/workflows/render.yaml`, update the site URL and package ref, and enable GitHub Pages with **GitHub Actions** as its source. Pin SimplyMarkdown to a release or full commit SHA in production.
+
+## Development
+
+```bash
+python -m pip install -e .
+python -m unittest discover -s tests -v
+```
+
+The implementation follows Python-Markdown's supported extension boundary and creates a fresh parser for each document, avoiding leaked parser state. See the [official extension API](https://python-markdown.github.io/extensions/api/).

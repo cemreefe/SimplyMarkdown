@@ -18,4 +18,3 @@ You're welcome!
 Go to [google](https://google.com/search?q=google) to find out more.
 
 ! include example_module
-! include nonexistent_module
