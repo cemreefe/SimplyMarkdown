@@ -83,7 +83,10 @@ class SiteBuilderTests(unittest.TestCase):
         self.write("index.md", "# Index\n\n% posts:detailed:featured:#coding")
         self.write(
             "posts/2025/01/02/keep.md",
-            "---\nfeatured: true\ntags: coding\n      design\n---\n# Keep\n\n[Inside](other.html)",
+            "---\nfeatured: true\ntags: coding\n      design\npreview_shape: arch\n---\n"
+            "<parsers-ignore>Language selector</parsers-ignore>\n\n"
+            "# Keep\n\n[TOC]\n\n## Details\n\n[Inside](other.html)\n\n"
+            "<script>unsafePreview()</script>\n\n<style>.preview { color: red; }</style>",
         )
         self.write(
             "posts/2025/01/01/drop.md",
@@ -95,9 +98,21 @@ class SiteBuilderTests(unittest.TestCase):
         index = (self.output / "index.html").read_text(encoding="utf-8")
         self.assertIn("Keep", index)
         self.assertNotIn("Drop", index)
+        self.assertIn('class="postPreview postPreview--arch"', index)
         self.assertEqual(1, index.count('class="previewHref"'))
         preview = index.split('class="previewHref"', 1)[1].split("</article>", 1)[0]
         self.assertNotIn("<a href=", preview)
+        self.assertNotIn("Language selector", preview)
+        self.assertNotIn('class="toc"', preview)
+        self.assertNotIn("unsafePreview", preview)
+        self.assertNotIn("color: red", preview)
+
+    def test_detailed_collections_reject_unknown_preview_shapes(self) -> None:
+        self.write("index.md", "# Index\n\n% posts:detailed")
+        self.write("posts/post.md", "---\npreview_shape: starburst\n---\n# Post")
+
+        with self.assertRaisesRegex(BuildError, "invalid preview_shape 'starburst'"):
+            self.build()
 
     def test_links_modules_and_html_pages_are_resolved_at_the_site_boundary(self) -> None:
         self.write("modules/navbar.md", "[Home](/index.html)")

@@ -484,6 +484,15 @@ class SiteBuilder:
             href = html.escape(self._public_path(context, page.url_path), quote=True)
             tags = html.escape(",".join(page.tags), quote=True)
             if detailed:
+                preview_shape = (page.meta.one("preview_shape", "natural") or "natural").lower()
+                if preview_shape not in {"natural", "arch", "blob"}:
+                    raise BuildError(
+                        f"invalid preview_shape {preview_shape!r} in {page.source}; "
+                        "expected natural, arch, or blob"
+                    )
+                shape_class = (
+                    f" postPreview--{preview_shape}" if preview_shape != "natural" else ""
+                )
                 date_markup = (
                     f'<div class="previewDate">{page.published.isoformat()}</div>'
                     if page.published
@@ -492,7 +501,7 @@ class SiteBuilder:
                 preview, truncated = self._preview(page.base_html, context.config.preview_limit)
                 more = '<span class="readMore">(Read more)</span>' if truncated else ""
                 parts.append(
-                    f'<article class="postPreview" data-tags="{tags}">{date_markup}'
+                    f'<article class="postPreview{shape_class}" data-tags="{tags}">{date_markup}'
                     f'<a class="previewHref" href="{href}"><div>{preview}</div>{more}</a></article>'
                 )
                 continue
@@ -510,6 +519,13 @@ class SiteBuilder:
     @staticmethod
     def _preview(rendered: str, limit: int) -> tuple[str, bool]:
         soup = BeautifulSoup(rendered, "html.parser")
+        for excluded in soup.select(".toc, parsers-ignore, script, style"):
+            excluded.decompose()
+        for paragraph in soup.find_all("p"):
+            if not paragraph.get_text(strip=True) and not paragraph.find(
+                ("audio", "iframe", "img", "picture", "svg", "video")
+            ):
+                paragraph.decompose()
         for link in soup.find_all("a"):
             link.unwrap()
         nodes = [node for node in soup.contents if str(node).strip()]

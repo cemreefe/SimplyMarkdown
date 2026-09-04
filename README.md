@@ -56,6 +56,7 @@ date: 2026-09-04
 tags: engineering
       static sites
 image: ./cover.jpg
+preview_shape: arch
 language: en
 featured: true
 canonical_uri: articles/original
@@ -65,6 +66,11 @@ canonical_uri: articles/original
 ```
 
 Dates are ISO `YYYY-MM-DD`. When omitted, a date is inferred from a `YYYY/MM/DD` source path; otherwise the page is left honestly undated. Git checkout times are never treated as publication dates.
+
+`preview_shape` is optional theme metadata for detailed collections. Omit it (or use
+`natural`) to preserve the image's native composition; use `arch` or `blob` to let a theme
+apply an expressive crop. Detailed previews omit generated tables of contents,
+`<parsers-ignore>` blocks, scripts, and styles.
 
 ## Collections
 
