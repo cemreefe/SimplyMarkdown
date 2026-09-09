@@ -469,17 +469,23 @@ class SiteBuilder:
             detailed = "detailed" in modifiers
             featured = "featured" in modifiers
             rest = "rest" in modifiers
+            grouped = "grouped" in modifiers
             tags = {part[1:] for part in modifiers if part.startswith("#") and len(part) > 1}
             unknown = [
                 part
                 for part in modifiers
-                if part not in {"detailed", "featured", "rest"} and not part.startswith("#")
+                if part not in {"detailed", "featured", "rest", "grouped"}
+                and not part.startswith("#")
             ]
             if unknown:
                 raise BuildError(f"unknown collection modifier {unknown[0]!r} in {page.source}")
             if featured and rest:
                 raise BuildError(
                     f"'featured' and 'rest' are mutually exclusive in {page.source}"
+                )
+            if detailed and grouped:
+                raise BuildError(
+                    f"'detailed' and 'grouped' are mutually exclusive in {page.source}"
                 )
             if not target:
                 raise BuildError(f"collection target is empty in {page.source}")
@@ -490,16 +496,16 @@ class SiteBuilder:
                 )
 
             if target_path.is_file():
-                if featured or rest or tags:
+                if featured or rest or grouped or tags:
                     raise BuildError(
-                        "'featured', 'rest' and tag filters don't apply to a single "
+                        "'featured', 'rest', 'grouped' and tag filters don't apply to a single "
                         f"page reference in {page.source}: {target}"
                     )
                 rel = target_path.relative_to(context.config.input_dir).as_posix()
                 single = context.by_source.get(rel)
                 if single is None:
                     raise BuildError(f"referenced page not found in {page.source}: {target}")
-                return self._collection_html(context, [single], detailed)
+                return self._collection_html(context, [single], detailed, grouped)
 
             if not target_path.is_dir():
                 raise BuildError(f"collection directory does not exist: {target_path}")
@@ -518,11 +524,13 @@ class SiteBuilder:
                         item.featured_order if item.featured_order is not None else float("inf")
                     )
                 )
-            return self._collection_html(context, items, detailed)
+            return self._collection_html(context, items, detailed, grouped)
 
         return self._COLLECTION.sub(replace, source)
 
-    def _collection_html(self, context: BuildContext, pages: list[Page], detailed: bool) -> str:
+    def _collection_html(
+        self, context: BuildContext, pages: list[Page], detailed: bool, grouped: bool = False
+    ) -> str:
         parts = ['<div class="postsListWrapper">']
         previous_year: str | None = None
         for page in pages:
@@ -554,12 +562,27 @@ class SiteBuilder:
                 continue
             year = str(page.published.year) if page.published else "Undated"
             if year != previous_year:
+                if grouped and previous_year is not None:
+                    parts.append("</div></section>")
+                if grouped:
+                    parts.append('<section class="postYearGroup">')
                 parts.append(f'<div class="dateTab">{year}</div>')
+                if grouped:
+                    parts.append('<div class="postYearEntries">')
                 previous_year = year
             label = html.escape(f"{page.emoji} {page.title}")
+            metadata = ""
+            if grouped and page.published:
+                day = html.escape(f"{page.published.strftime('%b')} {page.published.day}")
+                metadata = f'<time class="postDate" datetime="{page.published.isoformat()}">{day}</time>'
+                if page.tags:
+                    tag_names = html.escape(" · ".join(page.tags))
+                    metadata += f'<span class="postTags">{tag_names}</span>'
             parts.append(
-                f'<div class="postTitle" data-tags="{tags}"><a href="{href}">{label}</a></div>'
+                f'<div class="postTitle" data-tags="{tags}"><a href="{href}">{label}</a>{metadata}</div>'
             )
+        if grouped and previous_year is not None:
+            parts.append("</div></section>")
         parts.append("</div>")
         return "\n".join(parts)
 
@@ -580,6 +603,20 @@ class SiteBuilder:
         fragment = BeautifulSoup("".join(str(node) for node in nodes[:limit]), "html.parser")
         for extra_image in fragment.find_all("img")[1:]:
             (extra_image.find_parent(("picture", "p")) or extra_image).decompose()
+        # A collection card is already identified by its linked title. Its
+        # thumbnail is decorative there, so don't repeat long alt text or
+        # artwork credits inside the compact preview. The source post retains
+        # both of those details.
+        for image in fragment.find_all("img"):
+            image["alt"] = ""
+            image.attrs.pop("title", None)
+        for description in fragment.find_all(("figcaption", "small")):
+            description.decompose()
+        for paragraph in fragment.find_all("p"):
+            if not paragraph.get_text(strip=True) and not paragraph.find(
+                ("audio", "iframe", "img", "picture", "svg", "video")
+            ):
+                paragraph.decompose()
         if heading := fragment.find("h1"):
             heading.name = "h2"
             heading["class"] = "preview-title"

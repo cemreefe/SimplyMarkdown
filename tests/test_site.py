@@ -156,12 +156,28 @@ class SiteBuilderTests(unittest.TestCase):
         with self.assertRaisesRegex(BuildError, "single page reference"):
             self.build()
 
+    def test_grouped_collection_keeps_years_with_their_posts(self) -> None:
+        self.write("index.md", "# Index\n\n% posts:grouped")
+        self.write("posts/new.md", "---\ndate: 2025-01-09\ntags: coding\n---\n# New")
+        self.write("posts/old.md", "---\ndate: 2024-12-31\n---\n# Old")
+
+        self.build()
+
+        index = (self.output / "index.html").read_text(encoding="utf-8")
+        self.assertIn('class="postYearGroup"', index)
+        self.assertIn('class="postYearEntries"', index)
+        self.assertIn('datetime="2025-01-09"', index)
+        self.assertIn(">coding<", index)
+        self.assertLess(index.index(">2025<"), index.index("New"))
+        self.assertLess(index.index(">2024<"), index.index("Old"))
+
     def test_detailed_collections_cap_previews_at_one_image(self) -> None:
         self.write("index.md", "# Index\n\n% posts:detailed")
         self.write(
             "posts/post.md",
             "---\nfeatured: true\n---\n# Post\n\n"
-            "![one](one.png)\n\n![two](two.png)\n\ntext\n\n![three](three.png)",
+            "![one](one.png)\n<small>Image description</small>\n\n"
+            "![two](two.png)\n\ntext\n\n![three](three.png)",
         )
 
         self.build()
@@ -172,6 +188,8 @@ class SiteBuilderTests(unittest.TestCase):
         self.assertIn("one.png", preview)
         self.assertNotIn("two.png", preview)
         self.assertNotIn("three.png", preview)
+        self.assertIn('alt=""', preview)
+        self.assertNotIn("Image description", preview)
 
     def test_detailed_collections_reject_unknown_preview_shapes(self) -> None:
         self.write("index.md", "# Index\n\n% posts:detailed")
