@@ -67,6 +67,7 @@ class Page:
     tags: tuple[str, ...]
     emoji: str
     featured: bool
+    featured_order: int | None = None
     base_html: str = ""
     content_html: str = ""
     description: str = ""
@@ -285,12 +286,7 @@ class SiteBuilder:
                 if tag
             )
             title = meta.one("title") or self._inferred_title(body) or path.stem
-            featured = (meta.one("featured", "false") or "false").lower() in {
-                "1",
-                "true",
-                "yes",
-                "on",
-            }
+            featured, featured_order = self._featured(meta, path)
             pages.append(
                 Page(
                     source=path,
@@ -304,6 +300,7 @@ class SiteBuilder:
                     tags=tags,
                     emoji=meta.one("emoji", "⏩") or "⏩",
                     featured=featured,
+                    featured_order=featured_order,
                 )
             )
         if not pages:
@@ -382,6 +379,28 @@ class SiteBuilder:
                 pass
         return None
 
+    @staticmethod
+    def _featured(meta: FrontMatter, source: Path) -> tuple[bool, int | None]:
+        """Parse the `featured` frontmatter field.
+
+        `featured: true` (also `yes`/`on`) marks a post as featured with no
+        explicit position. `featured: <integer>` marks it featured *and*
+        gives it a position — ascending, lowest first — among other
+        explicitly-ordered featured posts; unordered featured posts sort
+        after ordered ones, most recent first.
+        """
+        raw = (meta.one("featured", "") or "").strip().lower()
+        if raw in {"", "false", "no", "off"}:
+            return False, None
+        if raw in {"true", "yes", "on"}:
+            return True, None
+        try:
+            return True, int(raw)
+        except ValueError:
+            raise BuildError(
+                f"invalid featured value {raw!r} in {source}; expected true/false or an integer order"
+            ) from None
+
     def _inferred_title(self, body: str) -> str:
         source = self._COLLECTION.sub("", self._INCLUDE.sub("", body))
         soup = BeautifulSoup(self._markdown(source), "html.parser")
@@ -446,33 +465,59 @@ class SiteBuilder:
     def _expand_collections(self, context: BuildContext, page: Page, source: str) -> str:
         def replace(match: re.Match[str]) -> str:
             spec = match.group("spec").strip()
-            directory, *modifiers = (part.strip() for part in spec.split(":"))
+            target, *modifiers = (part.strip() for part in spec.split(":"))
             detailed = "detailed" in modifiers
             featured = "featured" in modifiers
+            rest = "rest" in modifiers
             tags = {part[1:] for part in modifiers if part.startswith("#") and len(part) > 1}
             unknown = [
                 part
                 for part in modifiers
-                if part not in {"detailed", "featured"} and not part.startswith("#")
+                if part not in {"detailed", "featured", "rest"} and not part.startswith("#")
             ]
             if unknown:
                 raise BuildError(f"unknown collection modifier {unknown[0]!r} in {page.source}")
-            if not directory:
-                raise BuildError(f"collection directory is empty in {page.source}")
-            collection_dir = (page.source.parent / directory).resolve()
-            if not collection_dir.is_relative_to(context.config.input_dir):
+            if featured and rest:
                 raise BuildError(
-                    f"collection escapes the input directory in {page.source}: {directory}"
+                    f"'featured' and 'rest' are mutually exclusive in {page.source}"
                 )
-            if not collection_dir.is_dir():
-                raise BuildError(f"collection directory does not exist: {collection_dir}")
-            items = [item for item in context.pages if item.source.is_relative_to(collection_dir)]
+            if not target:
+                raise BuildError(f"collection target is empty in {page.source}")
+            target_path = (page.source.parent / target).resolve()
+            if not target_path.is_relative_to(context.config.input_dir):
+                raise BuildError(
+                    f"collection escapes the input directory in {page.source}: {target}"
+                )
+
+            if target_path.is_file():
+                if featured or rest or tags:
+                    raise BuildError(
+                        "'featured', 'rest' and tag filters don't apply to a single "
+                        f"page reference in {page.source}: {target}"
+                    )
+                rel = target_path.relative_to(context.config.input_dir).as_posix()
+                single = context.by_source.get(rel)
+                if single is None:
+                    raise BuildError(f"referenced page not found in {page.source}: {target}")
+                return self._collection_html(context, [single], detailed)
+
+            if not target_path.is_dir():
+                raise BuildError(f"collection directory does not exist: {target_path}")
+            items = [item for item in context.pages if item.source.is_relative_to(target_path)]
             if featured:
                 items = [item for item in items if item.featured]
+            elif rest:
+                items = [item for item in items if not item.featured]
             if tags:
                 items = [item for item in items if tags.issubset(set(item.tags))]
             items.sort(key=lambda item: item.url_path)
             items.sort(key=lambda item: item.published or date.min, reverse=True)
+            if featured:
+                items.sort(
+                    key=lambda item: (
+                        item.featured_order if item.featured_order is not None else float("inf")
+                    )
+                )
             return self._collection_html(context, items, detailed)
 
         return self._COLLECTION.sub(replace, source)
@@ -493,6 +538,7 @@ class SiteBuilder:
                 shape_class = (
                     f" postPreview--{preview_shape}" if preview_shape != "natural" else ""
                 )
+                featured_class = " postPreview--featured" if page.featured else ""
                 date_markup = (
                     f'<div class="previewDate">{page.published.isoformat()}</div>'
                     if page.published
@@ -501,7 +547,8 @@ class SiteBuilder:
                 preview, truncated = self._preview(page.base_html, context.config.preview_limit)
                 more = '<span class="readMore">(Read more)</span>' if truncated else ""
                 parts.append(
-                    f'<article class="postPreview{shape_class}" data-tags="{tags}">{date_markup}'
+                    f'<article class="postPreview{shape_class}{featured_class}" data-tags="{tags}">'
+                    f'{date_markup}'
                     f'<a class="previewHref" href="{href}"><div>{preview}</div>{more}</a></article>'
                 )
                 continue

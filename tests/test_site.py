@@ -98,7 +98,7 @@ class SiteBuilderTests(unittest.TestCase):
         index = (self.output / "index.html").read_text(encoding="utf-8")
         self.assertIn("Keep", index)
         self.assertNotIn("Drop", index)
-        self.assertIn('class="postPreview postPreview--arch"', index)
+        self.assertIn('class="postPreview postPreview--arch postPreview--featured"', index)
         self.assertEqual(1, index.count('class="previewHref"'))
         preview = index.split('class="previewHref"', 1)[1].split("</article>", 1)[0]
         self.assertNotIn("<a href=", preview)
@@ -106,6 +106,55 @@ class SiteBuilderTests(unittest.TestCase):
         self.assertNotIn('class="toc"', preview)
         self.assertNotIn("unsafePreview", preview)
         self.assertNotIn("color: red", preview)
+
+    def test_featured_posts_can_be_ordered_and_the_rest_rendered_separately(self) -> None:
+        self.write(
+            "index.md",
+            "# Index\n\n% posts:detailed:featured\n\n## Rest\n\n% posts:detailed:rest",
+        )
+        self.write("posts/a.md", "---\nfeatured: 2\ndate: 2025-01-01\n---\n# A")
+        self.write("posts/b.md", "---\nfeatured: 1\ndate: 2024-01-01\n---\n# B")
+        self.write("posts/c.md", "---\nfeatured: true\ndate: 2026-01-01\n---\n# C")
+        self.write("posts/d.md", "---\ndate: 2023-01-01\n---\n# D")
+
+        self.build()
+
+        index = (self.output / "index.html").read_text(encoding="utf-8")
+        featured_html, rest_html = index.split(">Rest<", 1)
+        # Ordered featured posts (B, A) come first by their explicit position,
+        # then unordered featured posts (C) by recency.
+        self.assertLess(featured_html.index(">B<"), featured_html.index(">A<"))
+        self.assertLess(featured_html.index(">A<"), featured_html.index(">C<"))
+        self.assertNotIn(">D<", featured_html)
+        # The rest collection has exactly the non-featured post.
+        self.assertIn(">D<", rest_html)
+        self.assertNotIn(">A<", rest_html)
+        self.assertNotIn(">B<", rest_html)
+        self.assertNotIn(">C<", rest_html)
+
+    def test_featured_and_rest_are_mutually_exclusive(self) -> None:
+        self.write("index.md", "# Index\n\n% posts:featured:rest")
+        self.write("posts/a.md", "# A")
+
+        with self.assertRaisesRegex(BuildError, "mutually exclusive"):
+            self.build()
+
+    def test_a_single_page_can_be_referenced_as_its_own_collection(self) -> None:
+        self.write("index.md", "# Index\n\n% posts/only.md:detailed")
+        self.write("posts/only.md", "---\ndate: 2025-06-01\n---\n# Only\n\nBody text.")
+
+        self.build()
+
+        index = (self.output / "index.html").read_text(encoding="utf-8")
+        self.assertIn("Only", index)
+        self.assertEqual(1, index.count('class="previewHref"'))
+
+    def test_single_page_reference_rejects_filters(self) -> None:
+        self.write("index.md", "# Index\n\n% posts/only.md:detailed:featured")
+        self.write("posts/only.md", "# Only")
+
+        with self.assertRaisesRegex(BuildError, "single page reference"):
+            self.build()
 
     def test_detailed_collections_cap_previews_at_one_image(self) -> None:
         self.write("index.md", "# Index\n\n% posts:detailed")
